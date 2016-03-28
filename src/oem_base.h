@@ -38,11 +38,7 @@ protected:
         Rcpp::Rcout << std::left << std::setw(7)  << std::setfill(sep) << iter;
         Rcpp::Rcout << std::endl;
     }
-    void print_footer()
-    {
-        const int width = 80;
-        Rcpp::Rcout << std::string(width, '=') << std::endl << std::endl;
-    }
+    
     
 public:
     oemBase(int n_, 
@@ -78,8 +74,6 @@ public:
         for(i = 0; i < maxit; ++i)
         {
             beta_prev = beta;
-            // old_y = dual_y;
-            //std::copy(dual_y.data(), dual_y.data() + dim_dual, old_y.data());
             
             update_u();
             update_beta();
@@ -91,7 +85,6 @@ public:
             
         }
         
-        // print_footer();
         
         return i + 1;
     }
