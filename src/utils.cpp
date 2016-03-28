@@ -114,6 +114,42 @@ void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty)
   
 }
 
+void soft_threshold(SparseVector &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact)
+{
+    int v_size = vec.size();
+    res.setZero();
+    res.reserve(v_size);
+    
+    const double *ptr = vec.data();
+    for(int i = 0; i < v_size; i++)
+    {
+        double total_pen = pen_fact(i) * penalty;
+        
+        if(ptr[i] > total_pen)
+            res.insertBack(i) = ptr[i] - total_pen;
+        else if(ptr[i] < -total_pen)
+            res.insertBack(i) = ptr[i] + total_pen;
+    }
+}
+
+void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact)
+{
+    int v_size = vec.size();
+    res.setZero();
+    
+    const double *ptr = vec.data();
+    for(int i = 0; i < v_size; i++)
+    {
+        double total_pen = pen_fact(i) * penalty;
+        
+        if(ptr[i] > total_pen)
+            res(i) = ptr[i] - total_pen;
+        else if(ptr[i] < -total_pen)
+            res(i) = ptr[i] + total_pen;
+    }
+    
+}
+
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,
                        double &lambdak, double &lambdakminus1, const int &penalty)
 {
