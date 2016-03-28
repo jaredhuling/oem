@@ -93,15 +93,16 @@ void block_soft_threshold(VectorXd &res, const VectorXd &vec, const double &pena
                           const int &ngroups, VectorXi &unique_grps, VectorXi &grps);
 
 /*
-void block_soft_threshold(SparseVector &res, const VectorXd &vec, const double &penalty,
+void block_soft_threshold(SpVec &res, const VectorXd &vec, const double &penalty,
                                  const int &ngroups, const MapVeci &unique_grps, const MapVeci &grps);
  */ 
   
 bool stopRule(const VectorXd& cur, const VectorXd& prev, const double& tolerance);
 
-bool stopRule(const SparseVector& cur, const SparseVector& prev, const double& tolerance);
+bool stopRule(const SpVec& cur, const SpVec& prev, const double& tolerance);
 
 bool stopRuleMat(const MatrixXd& cur, const MatrixXd& prev, const double& tolerance);
+
 
 /*
 template <typename T, typename T2>

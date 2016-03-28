@@ -391,12 +391,12 @@ bool stopRule(const VectorXd& cur, const VectorXd& prev, const double& tolerance
   return 1;
 }
 
-bool stopRule(const SparseVector& cur, const SparseVector& prev, const double& tolerance) {
+bool stopRule(const SpVec& cur, const SpVec& prev, const double& tolerance) {
   
   
-  SparseVector diff = cur - prev;
+  SpVec diff = cur - prev;
     
-  for(SparseVector::InnerIterator iter(diff); iter; ++iter)
+  for(SpVec::InnerIterator iter(diff); iter; ++iter)
   {
     double prevval = prev.coeff(iter.index());
     double curval  = cur.coeff(iter.index());
