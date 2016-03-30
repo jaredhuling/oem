@@ -1,25 +1,24 @@
-#ifndef OEMBASE_H
-#define OEMBASE_H
+#ifndef OEM_BASE_H
+#define OEM_BASE_H
 
 #include <RcppEigen.h>
 #include "utils.h"
 
 
-template<typename VecTypeBeta, typename MatTypeX>
+template<typename VecTypeBeta>
 class oemBase
 {
 protected:
     
-    const int nvars;         // dimension of beta
-    const int nobs;          // number of rows
+    const int nvars;                  // dimension of beta
+    const int nobs;                   // number of rows
     
-    MatTypeX X;              // design matrix
-    MatTypeX A;              // A matrix
-    VectorXd u;              // u
-    VecTypeBeta beta;        // parameters to be optimized
-    VecTypeBeta beta_prev;   // parameters from previous iteration
+    VectorXd u;                       // u vector
     
-    double tol;              // tolerance for convergence
+    VecTypeBeta beta;                 // parameters to be optimized
+    VecTypeBeta beta_prev;            // parameters from previous iteration
+    
+    double tol;                       // tolerance for convergence
     
     virtual void next_beta(VecTypeBeta &res) = 0;
     
@@ -67,18 +66,17 @@ public:
         //beta.swap(newbeta);
     }
     
-    int solve(int maxit)
+    virtual int solve(int maxit)
     {
         int i;
         
         for(i = 0; i < maxit; ++i)
         {
+            
             beta_prev = beta;
             
             update_u();
             update_beta();
-            
-            // print_row(i);
             
             if(converged())
                 break;
@@ -91,8 +89,11 @@ public:
     
     virtual double get_lambda_zero() const { return 0; }
     virtual VecTypeBeta get_beta() { return beta; }
+    
+    virtual void init(double lambda_, std::string penalty_) {}
+    virtual void init_warm(double lambda_) {}
 };
 
 
 
-#endif // OEMBASE_H
+#endif // OEM_BASE_H

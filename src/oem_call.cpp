@@ -1,6 +1,6 @@
 #define EIGEN_DONT_PARALLELIZE
 
-#include "oem.h"
+#include "oem_dense_tall.h"
 #include "DataStd.h"
 
 using Eigen::MatrixXf;
@@ -42,15 +42,18 @@ inline void write_beta_matrix(SpMat &betas, int col, double beta0, SpVec &coef, 
 RcppExport SEXP oem_fit(SEXP x_, 
                         SEXP y_, 
                         SEXP family_,
+                        SEXP penalty_,
                         SEXP lambda_,
                         SEXP nlambda_, 
                         SEXP lmin_ratio_,
+                        SEXP alpha_,
+                        SEXP gamma_,
                         SEXP penalty_factor_,
                         SEXP standardize_, 
                         SEXP intercept_,
                         SEXP opts_)
 {
-BEGIN_RCPP
+    BEGIN_RCPP
 
     //Rcpp::NumericMatrix xx(x_);
     //Rcpp::NumericVector yy(y_);
@@ -83,12 +86,15 @@ BEGIN_RCPP
     const int irls_maxit   = as<int>(opts["irls_maxit"]);
     const double irls_tol  = as<double>(opts["irls_tol"]);
     const double tol       = as<double>(opts["tol"]);
+    const double alpha     = as<double>(alpha_);
+    const double gamma     = as<double>(gamma_);
     bool standardize       = as<bool>(standardize_);
     bool intercept         = as<bool>(intercept_);
     bool intercept_bin     = intercept;
     
     CharacterVector family(as<CharacterVector>(family_));
-    ArrayXd penalty_factor(as<ArrayXd>(penalty_factor_));
+    std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
+    VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
     
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
@@ -104,7 +110,7 @@ BEGIN_RCPP
             fullbetamat = true;
             add = 1;
             // dont penalize the intercept
-            ArrayXd penalty_factor_tmp(p+1);
+            VectorXd penalty_factor_tmp(p+1);
             
             penalty_factor_tmp << 0, penalty_factor;
             penalty_factor.swap(penalty_factor_tmp);
@@ -124,15 +130,15 @@ BEGIN_RCPP
     datstd.standardize(X, Y);
     
     // initialize pointers 
-    oemBase<Eigen::VectorXd, Eigen::MatrixXd> *solver = NULL; // obj doesn't point to anything yet
+    oemBase<Eigen::VectorXd> *solver = NULL; // obj doesn't point to anything yet
     
-
+    
     // initialize classes
     if(n > 2 * p)
     {
         if (family(0) == "gaussian")
         {
-            solver = new oem(X, Y, penalty_factor, tol);
+            solver = new oemDenseTall(X, Y, penalty_factor, alpha, gamma, tol);
         } else if (family(0) == "binomial")
         {
             //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
@@ -162,37 +168,54 @@ BEGIN_RCPP
         nlambda = lambda.size();
     }
 
-
-    SpMat beta(p + 1, nlambda);
-    beta.reserve(Eigen::VectorXi::Constant(nlambda, std::min(n, p)));
+    List beta_list(penalty.size());
+    List iter_list(penalty.size());
+    
+    MatrixXd beta(p + 1, nlambda);
 
     IntegerVector niter(nlambda);
     double ilambda = 0.0;
 
-    for(int i = 0; i < nlambda; i++)
+    for (unsigned int p = 0; p < penalty.size(); p++)
     {
-        ilambda = lambda[i] * n / datstd.get_scaleY();
-        if(i == 0)
-            solver->init(ilambda);
-        else
-            solver->init_warm(ilambda);
-
-        niter[i] = solver->solve(maxit);
-        SpVec res = solver->get_gamma();
-        double beta0 = 0.0;
-        if (!fullbetamat)
+        for(int i = 0; i < nlambda; i++)
         {
-            datstd.recover(beta0, res);
-        }
-        write_beta_matrix(beta, i, beta0, res, fullbetamat);
-    }
+            ilambda = lambda[i] * n / datstd.get_scaleY();
+            if(i == 0)
+                solver->init(ilambda, penalty[p]);
+            else
+                solver->init_warm(ilambda);
     
+            niter[i] = solver->solve(maxit);
+            VectorXd res = solver->get_beta();
+            
+            double beta0 = 0.0;
+            
+            // if the design matrix includes the intercept
+            // then don't back into the intercept with
+            // datastd and include it to beta directly.
+            if (fullbetamat)
+            {
+                beta.block(0, i, p+1, 1) = res;
+                datstd.recover(beta0, res);
+            } else 
+            {
+                datstd.recover(beta0, res);
+                beta(0,i) = beta0;
+                beta.block(1, i, p, 1) = res;
+            }
+            
+        } //end loop over lambda values
+        
+        beta_list(p) = beta;
+        iter_list(p) = niter;
+        
+    } // end loop over penalties
 
     delete solver;
 
-    return List::create(Named("lambda") = lambda,
-                        Named("beta") = beta,
-                        Named("niter") = niter);
-
-END_RCPP
+    return List::create(Named("beta")   = beta_list,
+                        Named("lambda") = lambda,
+                        Named("niter")  = iter_list);
+    END_RCPP
 }

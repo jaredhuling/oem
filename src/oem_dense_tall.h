@@ -1,5 +1,5 @@
-#ifndef _oem_OEM_H
-#define _oem_OEM_H
+#ifndef OEM_DENSE_TALL_H
+#define OEM_DENSE_TALL_H
 
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
@@ -17,7 +17,7 @@
 // b => y
 // f(x) => 1/2 * ||Ax - b||^2
 // g(z) => lambda * ||z||_1
-class oem: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
+class oemDenseTall: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
 {
 protected:
     typedef float Scalar;
@@ -80,7 +80,7 @@ protected:
     
     
 public:
-    oem(ConstGenericMatrix &X_, 
+    oemDenseTall(ConstGenericMatrix &X_, 
         ConstGenericVector &Y_,
         VectorXd &penalty_factor_,
         const double &alpha_,
@@ -123,4 +123,4 @@ public:
 
 
 
-#endif // OEM_H
+#endif // OEM_DENSE_TALL_H

@@ -1,5 +1,5 @@
-#ifndef _oem2_LANCZOS_H
-#define _oem2_LANCZOS_H
+#ifndef _oem_LANCZOS_H
+#define _oem_LANCZOS_H
 
 
 #include <Rcpp.h>

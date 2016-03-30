@@ -7,10 +7,11 @@ Author: Jared Huling
 Maintainer: <jaredhuling@gmail.com>
 Description: Solves least squares problems using orthogonalizing EM
 License: What license is it under?
+LazyData: TRUE
 Depends:
-    Rcpp (>= 0.11.0),
-    RcppEigen (>= 0.3.2.2.0),
     Matrix,
     foreach
+Imports:
+    Rcpp (>= 0.11.0)
 LinkingTo: Rcpp, RcppEigen, BH
 RoxygenNote: 5.0.1

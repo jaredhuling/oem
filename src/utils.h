@@ -11,6 +11,8 @@
 #include <cmath>
 #include <numeric>
 
+using namespace Rcpp;
+using namespace RcppEigen;
 
 using Eigen::MatrixXd;
 using Eigen::ArrayXd;
@@ -78,7 +80,11 @@ void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty);
 
 void soft_threshold(SpVec &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact);
 
+void soft_threshold(SpVec &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact, double &d);
+
 void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact);
+
+void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact, double &d);
 
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,
                        double &lambdak, double &lambdakminus1, const int &penalty);
