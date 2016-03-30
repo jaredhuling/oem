@@ -2,6 +2,7 @@
 
 #include "oem_dense_tall.h"
 #include "DataStd.h"
+#include "oem_calls.h"
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
@@ -39,19 +40,19 @@ inline void write_beta_matrix(SpMat &betas, int col, double beta0, SpVec &coef, 
     }
 }
 
-RcppExport SEXP oem_fit(SEXP x_, 
-                        SEXP y_, 
-                        SEXP family_,
-                        SEXP penalty_,
-                        SEXP lambda_,
-                        SEXP nlambda_, 
-                        SEXP lmin_ratio_,
-                        SEXP alpha_,
-                        SEXP gamma_,
-                        SEXP penalty_factor_,
-                        SEXP standardize_, 
-                        SEXP intercept_,
-                        SEXP opts_)
+RcppExport SEXP oem_fit_dense_tall(SEXP x_, 
+                                   SEXP y_, 
+                                   SEXP family_,
+                                   SEXP penalty_,
+                                   SEXP lambda_,
+                                   SEXP nlambda_, 
+                                   SEXP lmin_ratio_,
+                                   SEXP alpha_,
+                                   SEXP gamma_,
+                                   SEXP penalty_factor_,
+                                   SEXP standardize_, 
+                                   SEXP intercept_,
+                                   SEXP opts_)
 {
     BEGIN_RCPP
 

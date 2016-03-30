@@ -2,7 +2,6 @@
 #' @useDynLib oem
 #' @import Rcpp
 #' @exportPattern "^[[:alpha:]]+"
-#' 
 #' @export
 oem <- function(x, 
                 y, 
@@ -62,7 +61,7 @@ oem <- function(x,
     standardize <- as.logical(standardize)
     intercept <- as.logical(intercept)
     
-    res <- .Call("oem_fit", 
+    res <- .Call("oem_fit_dense_tall", 
                  x, y, 
                  family, 
                  penalty, 

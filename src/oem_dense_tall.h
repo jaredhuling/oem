@@ -81,11 +81,11 @@ protected:
     
 public:
     oemDenseTall(ConstGenericMatrix &X_, 
-        ConstGenericVector &Y_,
-        VectorXd &penalty_factor_,
-        const double &alpha_,
-        const double &gamma_,
-        const double tol_ = 1e-6) :
+                 ConstGenericVector &Y_,
+                 VectorXd &penalty_factor_,
+                 const double &alpha_,
+                 const double &gamma_,
+                 const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), X_.cols(),
               tol_),
               X(X_.data(), X_.rows(), X_.cols()),
