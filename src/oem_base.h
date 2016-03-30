@@ -89,6 +89,7 @@ public:
         return i + 1;
     }
     
+    virtual double get_lambda_zero() const { return 0; }
     virtual VecTypeBeta get_beta() { return beta; }
 };
 
