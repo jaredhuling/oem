@@ -1,9 +1,11 @@
-#ifndef OEM_DENSE_TALL_H
-#define OEM_DENSE_TALL_H
+#ifndef OEM_DENSE_H
+#define OEM_DENSE_H
 
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
+
+
 
 // minimize  1/2 * ||y - X * beta||^2 + lambda * ||beta||_1
 //
@@ -17,22 +19,24 @@
 // b => y
 // f(x) => 1/2 * ||Ax - b||^2
 // g(z) => lambda * ||z||_1
-class oemDenseTall: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
+class oemDense: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
 {
 protected:
     typedef float Scalar;
     typedef double Double;
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> Matrix;
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Map<const Matrix> MapMat;
-    typedef Eigen::Map<const Vector> MapVec;
+    typedef Map<const Matrix> MapMat;
+    typedef Map<const Vector> MapVec;
+    typedef Map<VectorXd> MapVecd;
+    typedef Map<Eigen::MatrixXd> MapMatd;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    MapMat X;                  // data matrix
-    MapVec Y;                  // response vector
+    const MapMatd X;           // data matrix
+    const MapVecd Y;           // response vector
     VectorXd penalty_factor;   // penalty multiplication factors 
     int penalty_factor_size;
     Vector XY;                 // X'Y
@@ -49,12 +53,17 @@ protected:
     double threshval;
     
     
-    void compute_d_update_A()
+    void compute_XtX_d_update_A()
     {
+        
+        // compute X'X
+        XX = XtX(X);
+        
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
+        
         eigs.init();
-        eigs.compute(500, 0.05);
+        eigs.compute(1000, 0.0001);
         Vector eigenvals = eigs.eigenvalues();
         d = eigenvals[0];
         
@@ -80,32 +89,34 @@ protected:
     
     
 public:
-    oemDenseTall(ConstGenericMatrix &X_, 
-                 ConstGenericVector &Y_,
-                 VectorXd &penalty_factor_,
-                 const double &alpha_,
-                 const double &gamma_,
-                 const double tol_ = 1e-6) :
+    oemDense(const MapMatd &X_, 
+             const MapVecd &Y_,
+             VectorXd &penalty_factor_,
+             const double &alpha_,
+             const double &gamma_,
+             const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), X_.cols(),
               tol_),
-              X(X_.data(), X_.rows(), X_.cols()),
-              Y(Y_.data(), Y_.size()),
+              X( Map<MatrixXd>(X_) ),
+              Y( Map<VectorXd>(Y_) ),
               penalty_factor(penalty_factor_),
               penalty_factor_size(penalty_factor_.size()),
               XY(X.transpose() * Y),
-              XX(XtX(X)),
+              XX(X_.cols(), X_.cols()),
               alpha(alpha_),
               gamma(gamma_),
               lambda0(XY.cwiseAbs().maxCoeff())
     {}
     
+    
     double get_lambda_zero() const { return lambda0; }
+    double get_d() { return d; }
     
     // init() is a cold start for the first lambda
     void init(double lambda_, std::string penalty_)
     {
         beta.setZero();
-        compute_d_update_A();
+        compute_XtX_d_update_A();
         
         lambda = lambda_;
         penalty = penalty_;

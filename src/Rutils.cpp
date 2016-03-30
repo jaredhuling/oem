@@ -27,6 +27,41 @@ RcppExport SEXP crossprodcpp(SEXP X)
 }
 
 //port faster cross product 
+RcppExport SEXP largestEig(SEXP X)
+{
+    using namespace Rcpp;
+    using namespace RcppEigen;
+    try {
+        using Eigen::Map;
+        using Eigen::MatrixXd;
+        using Eigen::Lower;
+        
+        Rcpp::NumericMatrix xx(X);
+        const int n = xx.rows();
+        
+        MatrixXd A(n, n);
+        
+        // Copy data 
+        std::copy(xx.begin(), xx.end(), A.data());
+        
+        Spectra::DenseSymMatProd<double> op(A);
+        Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
+        
+        eigs.init();
+        eigs.compute(1000, 0.0001);
+        Eigen::VectorXd eigenvals = eigs.eigenvalues();
+        double d = eigenvals[0];
+        
+        return wrap(d);
+    } catch (std::exception &ex) {
+        forward_exception_to_r(ex);
+    } catch (...) {
+        ::Rf_error("C++ exception (unknown reason)");
+    }
+    return R_NilValue; //-Wall
+}
+
+//port faster cross product 
 RcppExport SEXP xpwx(SEXP X, SEXP W)
 {
   using namespace Rcpp;

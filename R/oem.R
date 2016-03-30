@@ -16,7 +16,7 @@ oem <- function(x,
                 standardize = FALSE,
                 intercept = FALSE,
                 maxit = 500L, 
-                tol = 1e05,
+                tol = 1e-5,
                 irls.maxit = 100L,
                 irls.tol = 1e-5) 
 {

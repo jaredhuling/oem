@@ -1,6 +1,7 @@
 #ifndef _oem2_RUTILS_H
 #define _oem2_RUTILS_H
 
+#include "Spectra/SymEigsSolver.h"
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <Eigen/SVD>
@@ -17,6 +18,8 @@ using namespace RcppEigen;
 RcppExport SEXP crossprodcpp(SEXP);
 
 RcppExport SEXP xpwx(SEXP, SEXP);
+
+RcppExport SEXP largestEig(SEXP);
                                
 RcppExport SEXP subcpp(SEXP, SEXP);
 

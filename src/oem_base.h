@@ -45,6 +45,7 @@ public:
             double tol_ = 1e-6) :
     nvars(p_), 
     nobs(n_),
+    u(p_),               // allocate space but do not set values
     beta(p_),            // allocate space but do not set values
     beta_prev(p_),       // allocate space but do not set values
     tol(tol_)
@@ -76,6 +77,7 @@ public:
             beta_prev = beta;
             
             update_u();
+            
             update_beta();
             
             if(converged())
@@ -89,6 +91,7 @@ public:
     
     virtual double get_lambda_zero() const { return 0; }
     virtual VecTypeBeta get_beta() { return beta; }
+    virtual double get_d() { return 0; }
     
     virtual void init(double lambda_, std::string penalty_) {}
     virtual void init_warm(double lambda_) {}

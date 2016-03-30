@@ -1,5 +1,5 @@
 
-#include "oem_dense_tall.h"
+#include "oem_dense.h"
 #include "DataStd.h"
 
 using Eigen::MatrixXf;
@@ -17,6 +17,7 @@ using Rcpp::List;
 using Rcpp::Named;
 using Rcpp::IntegerVector;
 using Rcpp::CharacterVector;
+
 
 typedef Map<VectorXd> MapVecd;
 typedef Map<Eigen::MatrixXd> MapMatd;
@@ -39,23 +40,12 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
                                    SEXP opts_)
 {
     BEGIN_RCPP
-
-    //Rcpp::NumericMatrix xx(x_);
-    //Rcpp::NumericVector yy(y_);
     
+    const MapMatd X(as<MapMatd>(x_));
+    const MapVecd Y(as<MapVecd>(y_));
     
-    Rcpp::NumericMatrix xx(x_);
-    Rcpp::NumericVector yy(y_);
-    
-    const int n = xx.rows();
-    const int p = xx.cols();
-    
-    MatrixXd X(n, p);
-    VectorXd Y(n);
-    
-    // Copy data 
-    std::copy(xx.begin(), xx.end(), X.data());
-    std::copy(yy.begin(), yy.end(), Y.data());
+    const int n = X.rows();
+    const int p = X.cols();
     
 
     // In glmnet, we minimize
@@ -102,17 +92,17 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             
             VectorXd v(n);
             v.fill(1);
-            MatrixXd X_tmp(n, p+1);
+            //MatrixXd X_tmp(n, p+1);
             
-            X_tmp << v, X;
-            X.swap(X_tmp);
+            //X_tmp << v, X;
+            //X.swap(X_tmp);
             
-            X_tmp.resize(0,0);
+            //X_tmp.resize(0,0);
         }
     }
     
-    DataStd<double> datstd(n, p + add, standardize, intercept);
-    datstd.standardize(X, Y);
+    //DataStd<double> datstd(n, p + add, standardize, intercept);
+    //datstd.standardize(X, Y);
     
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // obj doesn't point to anything yet
@@ -123,7 +113,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     {
         if (family(0) == "gaussian")
         {
-            solver = new oemDenseTall(X, Y, penalty_factor, alpha, gamma, tol);
+            solver = new oemDense(X, Y, penalty_factor, alpha, gamma, tol);
         } else if (family(0) == "binomial")
         {
             //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
@@ -146,28 +136,33 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         
         double lmax = 0.0;
         
-        lmax = solver->get_lambda_zero() / n * datstd.get_scaleY();
+        lmax = solver->get_lambda_zero() / n; // * datstd.get_scaleY();
         double lmin = as<double>(lmin_ratio_) * lmax;
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
         nlambda = lambda.size();
     }
 
+    MatrixXd beta(p + 1, nlambda);
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     
-    MatrixXd beta(p + 1, nlambda);
-
     IntegerVector niter(nlambda);
+    int nlambda_store = nlambda;
     double ilambda = 0.0;
 
-    for (unsigned int p = 0; p < penalty.size(); p++)
+    for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
+        if (penalty[pp] == "ols")
+        {
+            nlambda = 1L;
+        } 
+        
         for(int i = 0; i < nlambda; i++)
         {
-            ilambda = lambda[i] * n / datstd.get_scaleY();
+            ilambda = lambda[i] * n; //     / datstd.get_scaleY();
             if(i == 0)
-                solver->init(ilambda, penalty[p]);
+                solver->init(ilambda, penalty[pp]);
             else
                 solver->init_warm(ilambda);
     
@@ -182,26 +177,39 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             if (fullbetamat)
             {
                 beta.block(0, i, p+1, 1) = res;
-                datstd.recover(beta0, res);
+                //datstd.recover(beta0, res);
             } else 
             {
-                datstd.recover(beta0, res);
+                //datstd.recover(beta0, res);
                 beta(0,i) = beta0;
                 beta.block(1, i, p, 1) = res;
             }
             
         } //end loop over lambda values
         
-        beta_list(p) = beta;
-        iter_list(p) = niter;
+        if (penalty[pp] == "ols")
+        {
+            // reset to old nlambda
+            nlambda = nlambda_store;
+            beta_list(pp) = beta.col(0);
+        } else 
+        {
+            beta_list(pp) = beta;
+        }
+        
+        
+        iter_list(pp) = niter;
         
     } // end loop over penalties
+    
+    double d = solver->get_d();
 
     delete solver;
 
     return List::create(Named("beta")   = beta_list,
                         Named("lambda") = lambda,
-                        Named("niter")  = iter_list);
+                        Named("niter")  = iter_list,
+                        Named("d")      = d);
     END_RCPP
 }
 

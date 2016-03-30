@@ -1,7 +1,6 @@
 #ifndef _oem_UTILS_H
 #define _oem_UTILS_H
 
-
 #include <Rcpp.h>
 #include <RcppEigen.h>
 #include <vector> 
@@ -10,6 +9,7 @@
 #include <iostream>
 #include <cmath>
 #include <numeric>
+#include <boost/noncopyable.hpp>
 
 using namespace Rcpp;
 using namespace RcppEigen;
@@ -22,6 +22,8 @@ using Eigen::SparseMatrix;
 using Eigen::Lower;
 using Eigen::Upper;
 using Eigen::Ref;
+using Eigen::Map;
+using Rcpp::as;
 typedef Eigen::Triplet<double> T;
 typedef Eigen::MappedSparseMatrix<double> MSpMat;
 typedef Eigen::SparseVector<double> SpVec;
@@ -49,28 +51,28 @@ void sliced_crossprod_inplace(VectorXd &res, const MatrixXd& X, const VectorXd& 
 
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XtWX(const MatrixXd& xx, const MatrixXd& ww);
+MatrixXd XtWX(const MapMat& xx, const MatrixXd& ww);
 
 //computes XWX' where W is diagonal (input w as vector)
-MatrixXd XWXt(const MatrixXd& xx, const MatrixXd& ww);
+MatrixXd XWXt(const MapMat& xx, const MatrixXd& ww);
 
 //SpMat X'WX where W is diagonal (input w as vector)
-SpMat XtWX(const SpMat& xx, const MatrixXd& ww);
+SpMat XtWX(const MSpMat& xx, const MatrixXd& ww);
 
 //computes XWX' where W is diagonal (input w as vector)
-SpMat XWXt(const SpMat& xx, const MatrixXd& ww);
+SpMat XWXt(const MSpMat& xx, const MatrixXd& ww);
 
 //computes X'X 
-MatrixXd XtX(const MatrixXd& xx);
+MatrixXd XtX(const MapMat &xx);
 
 //computes XX'
-MatrixXd XXt(const MatrixXd& xx);
+MatrixXd XXt(const MapMat& xx);
 
 //computes X'X 
-SpMat XtX(const SpMat& xx);
+SpMat XtX(const MSpMat& xx);
 
 //computes XX'
-SpMat XXt(const SpMat& xx);
+SpMat XXt(const MSpMat& xx);
 
 // soft thresholding
 

@@ -352,7 +352,7 @@ static void block_soft_threshold(SparseVector &res, const VectorXd &vec, const d
  */
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XtWX(const MatrixXd& xx, const MatrixXd& ww) {
+MatrixXd XtWX(const MapMat& xx, const MatrixXd& ww) {
     const int n(xx.cols());
     MatrixXd AtWA(MatrixXd(n, n).setZero().
                       selfadjointView<Lower>().rankUpdate(xx.adjoint() * ww.array().sqrt().matrix().asDiagonal()));
@@ -360,7 +360,7 @@ MatrixXd XtWX(const MatrixXd& xx, const MatrixXd& ww) {
 }
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XWXt(const MatrixXd& xx, const MatrixXd& ww) {
+MatrixXd XWXt(const MapMat& xx, const MatrixXd& ww) {
     const int n(xx.rows());
     MatrixXd AWAt(MatrixXd(n, n).setZero().
                       selfadjointView<Lower>().rankUpdate(xx * ww.array().sqrt().matrix().asDiagonal()));
@@ -368,7 +368,7 @@ MatrixXd XWXt(const MatrixXd& xx, const MatrixXd& ww) {
 }
 
 //computes X'X
-MatrixXd XtX(const MatrixXd& xx) {
+MatrixXd XtX(const MapMat &xx) {
     const int n(xx.cols());
     MatrixXd AtA(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx.adjoint()));
@@ -376,7 +376,7 @@ MatrixXd XtX(const MatrixXd& xx) {
 }
 
 //computes XX'
-MatrixXd XXt(const MatrixXd& xx) {
+MatrixXd XXt(const MapMat& xx) {
     const int n(xx.rows());
     MatrixXd AAt(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx));
@@ -384,21 +384,21 @@ MatrixXd XXt(const MatrixXd& xx) {
 }
 
 //computes X'X
-SpMat XtX(const SpMat& xx) {
+SpMat XtX(const MSpMat& xx) {
     const int n(xx.cols());
     SpMat AtA(SpMat(n, n).selfadjointView<Upper>().rankUpdate(xx.adjoint()));
     return (AtA);
 }
 
 //computes XX'
-SpMat XXt(const SpMat& xx) {
+SpMat XXt(const MSpMat& xx) {
     const int n(xx.rows());
     SpMat AAt(SpMat(n, n).selfadjointView<Upper>().rankUpdate(xx));
     return (AAt);
 }
 
 //computes X'WX where W is diagonal (input w as vector)
-SpMat XtWX(const SpMat& xx, const MatrixXd& ww) {
+SpMat XtWX(const MSpMat& xx, const MatrixXd& ww) {
     const int n(xx.cols());
     SpMat AtWA(SpMat(n, n).
                    selfadjointView<Lower>().rankUpdate(xx.adjoint() * ww.array().sqrt().matrix().asDiagonal()));
@@ -406,7 +406,7 @@ SpMat XtWX(const SpMat& xx, const MatrixXd& ww) {
 }
 
 //computes X'WX where W is diagonal (input w as vector)
-SpMat XWXt(const SpMat& xx, const MatrixXd& ww) {
+SpMat XWXt(const MSpMat& xx, const MatrixXd& ww) {
     const int n(xx.rows());
     SpMat AWAt(SpMat(n, n).
                    selfadjointView<Lower>().rankUpdate(xx * ww.array().sqrt().matrix().asDiagonal()));
