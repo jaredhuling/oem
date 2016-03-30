@@ -97,9 +97,7 @@ public:
               alpha(alpha_),
               gamma(gamma_),
               lambda0(XY.cwiseAbs().maxCoeff())
-    {
-                  compute_d_update_A();
-    }
+    {}
     
     double get_lambda_zero() const { return lambda0; }
     
@@ -107,6 +105,7 @@ public:
     void init(double lambda_, std::string penalty_)
     {
         beta.setZero();
+        compute_d_update_A();
         
         lambda = lambda_;
         penalty = penalty_;

@@ -1,8 +1,6 @@
-#define EIGEN_DONT_PARALLELIZE
 
 #include "oem_dense_tall.h"
 #include "DataStd.h"
-#include "oem_calls.h"
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
@@ -25,20 +23,6 @@ typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
 
-inline void write_beta_matrix(SpMat &betas, int col, double beta0, SpVec &coef, bool startatzero)
-{
-    
-    int add = 0;
-    if (!startatzero)
-    {
-        add = 1;
-        betas.insert(0, col) = beta0;
-    }
-    for(SpVec::InnerIterator iter(coef); iter; ++iter)
-    {
-        betas.insert(iter.index() + add, col) = iter.value();
-    }
-}
 
 RcppExport SEXP oem_fit_dense_tall(SEXP x_, 
                                    SEXP y_, 
@@ -220,3 +204,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
                         Named("niter")  = iter_list);
     END_RCPP
 }
+
+
+
+
