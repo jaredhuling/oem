@@ -26,6 +26,71 @@ RcppExport SEXP crossprodcpp(SEXP X)
   return R_NilValue; //-Wall
 }
 
+//port faster scaledcross product 
+RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
+{
+    using namespace Rcpp;
+    using namespace RcppEigen;
+    try {
+        using Eigen::Map;
+        using Eigen::MatrixXd;
+        using Eigen::Lower;
+        const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+        const int n(A.rows());
+        
+        
+        // these need to be RowVectorXd if 
+        // we do not transpose A first
+        Eigen::RowVectorXd mean = A.colwise().mean();
+        Eigen::RowVectorXd std = ((A.rowwise() - mean).array().square().colwise().sum() / (n - 1)).sqrt();
+        
+        MatrixXd AtA(MatrixXd(n, n).setZero().
+                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).matrix() ));
+        
+        return wrap(AtA);
+    } catch (std::exception &ex) {
+        forward_exception_to_r(ex);
+    } catch (...) {
+        ::Rf_error("C++ exception (unknown reason)");
+    }
+    return R_NilValue; //-Wall
+}
+
+//port faster scaled cross product 
+RcppExport SEXP crossprodcpp_scaled(SEXP X)
+{
+    using namespace Rcpp;
+    using namespace RcppEigen;
+    try {
+        using Eigen::Map;
+        using Eigen::MatrixXd;
+        using Eigen::Lower;
+        const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+        const int n(A.rows());
+        const int p(A.cols());
+        
+        
+        // these need to be RowVectorXd if 
+        // we do not transpose A first
+        Eigen::RowVectorXd mean = A.colwise().mean();
+        Eigen::RowVectorXd std = ((A.rowwise() - mean).array().square().colwise().sum() / (n - 1)).sqrt();
+        
+        
+        // this currently induces a copy, need to fix if possible
+        MatrixXd AtA(MatrixXd(p, p).setZero().
+                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).array().matrix().adjoint() ));
+        
+        return wrap(AtA);
+    } catch (std::exception &ex) {
+        forward_exception_to_r(ex);
+    } catch (...) {
+        ::Rf_error("C++ exception (unknown reason)");
+    }
+    return R_NilValue; //-Wall
+}
+
+
+
 //port faster cross product 
 RcppExport SEXP largestEig(SEXP X)
 {
@@ -82,6 +147,29 @@ RcppExport SEXP xpwx(SEXP X, SEXP W)
     ::Rf_error("C++ exception (unknown reason)");
   }
   return R_NilValue; //-Wall
+}
+
+//port faster cross product 
+RcppExport SEXP xxt(SEXP X)
+{
+    using namespace Rcpp;
+    using namespace RcppEigen;
+    try {
+        using Eigen::Map;
+        using Eigen::MatrixXd;
+        using Eigen::Lower;
+        const Eigen::Map<MatrixXd> A(as<Map<MatrixXd> >(X));
+        
+        const int n(A.rows());
+        MatrixXd AtA(MatrixXd(n, n).setZero().
+                         selfadjointView<Lower>().rankUpdate(A));
+        return wrap(AtA);
+    } catch (std::exception &ex) {
+        forward_exception_to_r(ex);
+    } catch (...) {
+        ::Rf_error("C++ exception (unknown reason)");
+    }
+    return R_NilValue; //-Wall
 }
 
 //port faster subtract

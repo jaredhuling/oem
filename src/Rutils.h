@@ -17,7 +17,13 @@ using namespace RcppEigen;
 
 RcppExport SEXP crossprodcpp(SEXP);
 
+RcppExport SEXP tcrossprodcpp_scaled(SEXP);
+
+RcppExport SEXP crossprodcpp_scaled(SEXP);
+
 RcppExport SEXP xpwx(SEXP, SEXP);
+
+RcppExport SEXP xxt(SEXP);
 
 RcppExport SEXP largestEig(SEXP);
                                
