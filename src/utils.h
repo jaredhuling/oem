@@ -66,9 +66,16 @@ SpMat XWXt(const MSpMat& xx, const MatrixXd& ww);
 //computes X'X 
 MatrixXd XtX(const MapMat &xx);
 
+MatrixXd XtX(const MatrixXd &xx);
+
+MatrixXd XtX(MatrixXd &xx);
+
 //computes XX'
 MatrixXd XXt(const MapMat& xx);
 
+MatrixXd XXt(const MatrixXd& xx);
+
+MatrixXd XXt(MatrixXd& xx);
 
 //computes X'X 
 MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd);

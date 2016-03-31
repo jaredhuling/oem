@@ -1,6 +1,5 @@
 
 #include "oem_dense.h"
-#include "DataStd.h"
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
@@ -113,33 +112,23 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     //DataStd<double> datstd(n, p + add, standardize, intercept);
     //datstd.standardize(X, Y);
     
+    std::cout << "before solver" << std::endl;
+    
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // obj doesn't point to anything yet
     
     
     // initialize classes
-    if(n > 2 * p)
+
+    if (family(0) == "gaussian")
     {
-        if (family(0) == "gaussian")
-        {
-            solver = new oemDense(X, Y, penalty_factor, alpha, gamma, intercept, standardize, tol);
-        } else if (family(0) == "binomial")
-        {
-            //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
-        }
-    } else
+        solver = new oemDense(X, Y, penalty_factor, alpha, gamma, intercept, standardize, tol);
+    } else if (family(0) == "binomial")
     {
-        if (family(0) == "gaussian")
-        {
-            //solver = new oemWide(datX, datY, penalty_factor, eps_abs, eps_rel);
-        } else if (family(0) == "binomial")
-        {
-            //solver_wide = new ADMMLassoLogisticWide(datX, datY, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
-            //solver = new oemWide(datX, datY, penalty_factor, eps_abs, eps_rel);
-            std::cout << "Warning: binomial not implemented for wide case yet \n"  << std::endl;
-        }
+        //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
     }
     
+    std::cout << "after new solver " << std::endl;
     
     if (nlambda < 1) {
         
@@ -150,7 +139,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
         nlambda = lambda.size();
-        
+        std::cout << "lambda" << lmax << std::endl;
     }
     
     
@@ -176,7 +165,8 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
                 solver->init(ilambda, penalty[pp]);
             else
                 solver->init_warm(ilambda);
-    
+            
+            std::cout << "initialized" << std::endl;
             
             niter[i] = solver->solve(maxit);
             VectorXd res = solver->get_beta();

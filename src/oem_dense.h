@@ -38,7 +38,8 @@ protected:
     const MapMatd X;           // data matrix
     const MapVecd Y;           // response vector
     VectorXd penalty_factor;   // penalty multiplication factors 
-    int penalty_factor_size;
+    int penalty_factor_size;   // size of penalty_factor vector
+    int XXdim;                 // dimension of XX (different if n > p and p >= n)
     Vector XY;                 // X'Y
     MatrixXd XX;               // X'X
     MatrixXd A;                // A = d * I - X'X
@@ -58,24 +59,43 @@ protected:
     {
         
         // compute X'X
-        
+        std::cout << "before X'X" << std::endl;
         if (standardize) 
         {
-            XX = XtX_scaled(X, colmeans, colstd);
+            if (nobs < nvars) {
+                XX = XtX_scaled(X, colmeans, colstd);
+            } else 
+            {
+                XX = XXt_scaled(X, colmeans, colstd);
+            }
             
         } else if (intercept && !standardize) 
         {
             Eigen::RowVectorXd colsums = colmeans * nobs;
-            
-            XX.bottomRightCorner(nvars, nvars) = XtX(X);
-            XX.block(0,1,1,nvars) = colsums;
-            XX.block(1,0,nvars,1) = colsums.transpose();
-            XX(0,0) = nobs;
+            if (nobs < nvars) 
+            {
+                XX.bottomRightCorner(nvars, nvars) = XtX(X);
+                XX.block(0,1,1,nvars) = colsums;
+                XX.block(1,0,nvars,1) = colsums.transpose();
+                XX(0,0) = nobs;
+            } else 
+            {
+                XX = XXt(X);
+                XX.array() += 1; // adding 1 for the intercept
+            }
             
         } else 
         {
-            XX = XtX(X);
+            if (nobs < nvars) 
+            {
+                XX = XtX(X);
+            } else 
+            {
+                XX = XXt(X);
+            }
         }
+        
+        std::cout << "after X'X" << std::endl;
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
@@ -85,13 +105,24 @@ protected:
         Vector eigenvals = eigs.eigenvalues();
         d = eigenvals[0];
         
-        A = -XX;
-        A.diagonal().array() += d;
+        std::cout << "after eigen(X'X)" << std::endl;
+        
+        if (nobs > nvars)
+        {
+            A = -XX;
+            A.diagonal().array() += d;
+        }
     }
     
     void next_u(Vector &res)
     {
-        res = A * beta_prev + XY;
+        if (nvars < nobs)
+        {
+            res = A * beta_prev + XY;
+        } else 
+        {
+            res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
+        }
     }
     
     void next_beta(Vector &res)
@@ -122,9 +153,10 @@ public:
               Y( Map<VectorXd>(Y_) ),
               penalty_factor(penalty_factor_),
               penalty_factor_size(penalty_factor_.size()),
+              XXdim(std::min(X_.cols(), X_.rows()) + intercept_ * (1 - standardize_) * (X_.rows() > X_.cols()) ),
+              // only add extra row/column to XX if  intercept  and no standardize  AND nobs > nvars
               XY(X_.cols() + intercept_ * (1 - standardize_)), // add extra space if intercept but no standardize
-              XX(X_.cols() + intercept_ * (1 - standardize_),  // add extra space if intercept but no standardize
-                 X_.cols() + intercept_ * (1 - standardize_)), // add extra space if intercept but no standardize
+              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
               alpha(alpha_),
               gamma(gamma_)
     {}
@@ -133,9 +165,15 @@ public:
     double compute_lambda_zero() 
     { 
         
+        std::cout << "before anything X'Y" << std::endl;
+        
         meanY = Y.mean();
+        
+        std::cout << "after meanY" << std::endl;
+        
         colmeans = X.colwise().mean();
         
+        std::cout << "before X'Y" << std::endl;
         
         if (standardize)
         {
@@ -166,6 +204,7 @@ public:
             XY = X.transpose() * Y;
         }
         
+        std::cout << "after X'Y" << std::endl;
         
         compute_XtX_d_update_A();
         

@@ -24,8 +24,8 @@ protected:
     VecTypeBeta beta;                 // parameters to be optimized
     VecTypeBeta beta_prev;            // parameters from previous iteration
     
-    Eigen::RowVectorXd colmeans;          // column means of X
-    Eigen::RowVectorXd colstd;           // column std devs of X
+    Eigen::RowVectorXd colmeans;      // column means of X
+    Eigen::RowVectorXd colstd;        // column std devs of X
     
     double tol;                       // tolerance for convergence
     
@@ -61,6 +61,8 @@ public:
     u(p_ + intercept_ * (1 - standardize_)),               // allocate space but do not set values
     beta(p_ + intercept_ * (1 - standardize_)),            // allocate space but do not set values
     beta_prev(p_ + intercept_ * (1 - standardize_)),       // allocate space but do not set values
+    colmeans(p_),
+    colstd(p_),
     tol(tol_)
     {}
     

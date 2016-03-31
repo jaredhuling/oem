@@ -375,8 +375,41 @@ MatrixXd XtX(const MapMat &xx) {
     return (AtA);
 }
 
+//computes X'X
+MatrixXd XtX(const MatrixXd &xx) {
+    const int n(xx.cols());
+    MatrixXd AtA(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx.adjoint()));
+    return (AtA);
+}
+
+//computes X'X
+MatrixXd XtX(MatrixXd &xx) {
+    const int n(xx.cols());
+    MatrixXd AtA(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx.adjoint()));
+    return (AtA);
+}
+
 //computes XX'
 MatrixXd XXt(const MapMat& xx) {
+    const int n(xx.rows());
+    MatrixXd AAt(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx));
+    return (AAt);
+}
+
+//computes XX'
+MatrixXd XXt(const MatrixXd& xx) {
+    const int n(xx.rows());
+    MatrixXd AAt(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx));
+    return (AAt);
+}
+
+
+//computes XX'
+MatrixXd XXt(MatrixXd& xx) {
     const int n(xx.rows());
     MatrixXd AAt(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx));
