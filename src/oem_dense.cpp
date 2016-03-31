@@ -90,14 +90,23 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             penalty_factor_tmp << 0, penalty_factor;
             penalty_factor.swap(penalty_factor_tmp);
             
-            VectorXd v(n);
-            v.fill(1);
+            //VectorXd v(n);
+            //v.fill(1);
             //MatrixXd X_tmp(n, p+1);
             
             //X_tmp << v, X;
             //X.swap(X_tmp);
             
             //X_tmp.resize(0,0);
+        }
+    } else 
+    {
+        if (intercept & !standardize) 
+        {
+            VectorXd penalty_factor_tmp(p+1);
+            
+            penalty_factor_tmp << 0, penalty_factor;
+            penalty_factor.swap(penalty_factor_tmp);
         }
     }
     
@@ -113,7 +122,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     {
         if (family(0) == "gaussian")
         {
-            solver = new oemDense(X, Y, penalty_factor, alpha, gamma, tol);
+            solver = new oemDense(X, Y, penalty_factor, alpha, gamma, intercept, standardize, tol);
         } else if (family(0) == "binomial")
         {
             //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
@@ -130,19 +139,21 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             std::cout << "Warning: binomial not implemented for wide case yet \n"  << std::endl;
         }
     }
-
+    
     
     if (nlambda < 1) {
         
         double lmax = 0.0;
         
-        lmax = solver->get_lambda_zero() / n; // * datstd.get_scaleY();
+        lmax = solver->compute_lambda_zero() / n; // * datstd.get_scaleY();
         double lmin = as<double>(lmin_ratio_) * lmax;
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
         nlambda = lambda.size();
+        
     }
-
+    
+    
     MatrixXd beta(p + 1, nlambda);
     List beta_list(penalty.size());
     List iter_list(penalty.size());
@@ -166,6 +177,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             else
                 solver->init_warm(ilambda);
     
+            
             niter[i] = solver->solve(maxit);
             VectorXd res = solver->get_beta();
             
@@ -174,6 +186,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             // if the design matrix includes the intercept
             // then don't back into the intercept with
             // datastd and include it to beta directly.
+            /*
             if (fullbetamat)
             {
                 beta.block(0, i, p+1, 1) = res;
@@ -181,9 +194,11 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             } else 
             {
                 //datstd.recover(beta0, res);
-                beta(0,i) = beta0;
-                beta.block(1, i, p, 1) = res;
+                //beta(0,i) = beta0;
+                //beta.block(1, i, p, 1) = res;
             }
+            */
+            beta.block(0, i, p+1, 1) = res;
             
         } //end loop over lambda values
         

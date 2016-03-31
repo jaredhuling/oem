@@ -19,6 +19,7 @@ using Eigen::ArrayXd;
 using Eigen::VectorXd;
 using Eigen::VectorXi;
 using Eigen::SparseMatrix;
+using Eigen::RowVectorXd;
 using Eigen::Lower;
 using Eigen::Upper;
 using Eigen::Ref;
@@ -67,6 +68,13 @@ MatrixXd XtX(const MapMat &xx);
 
 //computes XX'
 MatrixXd XXt(const MapMat& xx);
+
+
+//computes X'X 
+MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd);
+
+//computes XX'
+MatrixXd XXt_scaled(const MapMat& xx, RowVectorXd &colmeans, RowVectorXd &colstd);
 
 //computes X'X 
 SpMat XtX(const MSpMat& xx);

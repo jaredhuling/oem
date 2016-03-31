@@ -26,6 +26,7 @@ RcppExport SEXP crossprodcpp(SEXP X)
   return R_NilValue; //-Wall
 }
 
+
 //port faster scaledcross product 
 RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
 {
@@ -44,10 +45,10 @@ RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
         Eigen::RowVectorXd mean = A.colwise().mean();
         Eigen::RowVectorXd std = ((A.rowwise() - mean).array().square().colwise().sum() / (n - 1)).sqrt();
         
-        MatrixXd AtA(MatrixXd(n, n).setZero().
+        MatrixXd AAt(MatrixXd(n, n).setZero().
                          selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).matrix() ));
         
-        return wrap(AtA);
+        return wrap(AAt);
     } catch (std::exception &ex) {
         forward_exception_to_r(ex);
     } catch (...) {

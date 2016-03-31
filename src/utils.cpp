@@ -383,6 +383,30 @@ MatrixXd XXt(const MapMat& xx) {
     return (AAt);
 }
 
+
+MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
+    const int p(xx.cols());
+    // this currently induces a copy, need to fix if possible
+    MatrixXd AtA(MatrixXd(p, p).setZero().
+                     selfadjointView<Lower>().rankUpdate(((xx.rowwise() - colmeans).array().rowwise() / 
+                     colstd.array()).array().matrix().adjoint() ));
+    
+    return (AtA);
+}
+
+
+MatrixXd XXt_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
+    const int n(xx.rows());
+    // this currently induces a copy, need to fix if possible
+    MatrixXd AAt(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(((xx.rowwise() - colmeans).array().rowwise() / 
+                     colstd.array()).matrix() ));
+    
+    return (AAt);
+}
+
+
+
 //computes X'X
 SpMat XtX(const MSpMat& xx) {
     const int n(xx.cols());

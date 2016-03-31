@@ -45,6 +45,7 @@ protected:
     double d;                  // d value (largest eigenvalue of X'X)
     double alpha;              // alpha = mixing parameter for elastic net
     double gamma;              // extra tuning parameter for mcp/scad
+    
     std::string penalty;       // penalty specified
     
     Scalar lambda;             // L1 penalty
@@ -57,7 +58,24 @@ protected:
     {
         
         // compute X'X
-        XX = XtX(X);
+        
+        if (standardize) 
+        {
+            XX = XtX_scaled(X, colmeans, colstd);
+            
+        } else if (intercept && !standardize) 
+        {
+            Eigen::RowVectorXd colsums = colmeans * nobs;
+            
+            XX.bottomRightCorner(nvars, nvars) = XtX(X);
+            XX.block(0,1,1,nvars) = colsums;
+            XX.block(1,0,nvars,1) = colsums.transpose();
+            XX(0,0) = nobs;
+            
+        } else 
+        {
+            XX = XtX(X);
+        }
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
@@ -94,29 +112,72 @@ public:
              VectorXd &penalty_factor_,
              const double &alpha_,
              const double &gamma_,
+             bool &intercept_,
+             bool &standardize_,
              const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), X_.cols(),
-              tol_),
+                             intercept_, standardize_,
+                                 tol_),
               X( Map<MatrixXd>(X_) ),
               Y( Map<VectorXd>(Y_) ),
               penalty_factor(penalty_factor_),
               penalty_factor_size(penalty_factor_.size()),
-              XY(X.transpose() * Y),
-              XX(X_.cols(), X_.cols()),
+              XY(X_.cols() + intercept_ * (1 - standardize_)), // add extra space if intercept but no standardize
+              XX(X_.cols() + intercept_ * (1 - standardize_),  // add extra space if intercept but no standardize
+                 X_.cols() + intercept_ * (1 - standardize_)), // add extra space if intercept but no standardize
               alpha(alpha_),
-              gamma(gamma_),
-              lambda0(XY.cwiseAbs().maxCoeff())
+              gamma(gamma_)
     {}
     
     
-    double get_lambda_zero() const { return lambda0; }
+    double compute_lambda_zero() 
+    { 
+        
+        meanY = Y.mean();
+        colmeans = X.colwise().mean();
+        
+        
+        if (standardize)
+        {
+            colstd = ((X.rowwise() - colmeans).array().square().colwise().sum() / (nobs - 1)).sqrt();
+        }
+        
+        if (intercept && standardize) 
+        {
+            scaleY = (Y.array() - meanY).matrix().norm() * (1.0 / std::sqrt(double(nobs)));
+            
+            XY = ((X.rowwise() - colmeans).array().rowwise() / 
+                      colstd.array()).array().matrix().adjoint() * 
+                      ((Y.array() - meanY) / scaleY).matrix();
+        } else if (intercept && !standardize) 
+        {
+            XY.tail(nvars) = X.transpose() * Y;
+            XY(0) = Y.sum();
+        } else if (!intercept && standardize)
+        {
+            scaleY = std::sqrt((Y.array() - meanY).square().sum() / (double(nobs - 1) ));
+            
+            // maybe don't center X?
+            XY = ((X.rowwise() - colmeans).array().rowwise() / 
+                      colstd.array()).array().matrix().adjoint() * 
+                      ((Y.array() - meanY) / scaleY).matrix();
+        } else 
+        {
+            XY = X.transpose() * Y;
+        }
+        
+        
+        compute_XtX_d_update_A();
+        
+        lambda0 = XY.cwiseAbs().maxCoeff();
+        return lambda0; 
+    }
     double get_d() { return d; }
     
     // init() is a cold start for the first lambda
     void init(double lambda_, std::string penalty_)
     {
         beta.setZero();
-        compute_XtX_d_update_A();
         
         lambda = lambda_;
         penalty = penalty_;
@@ -128,6 +189,27 @@ public:
     {
         lambda = lambda_;
         
+    }
+    
+    VectorXd get_beta() 
+    { 
+        
+        if (standardize) 
+        {
+            beta.array() /= colstd.array();
+            beta *= scaleY;
+            VectorXd betaret(nvars+1);
+            betaret(0) = meanY - (beta.array() * colmeans.array()).array().sum();
+            
+        } else if (intercept && !standardize) 
+        {
+            return beta;
+        } 
+        
+        VectorXd betaret(nvars+1);
+        betaret(0) = 0;
+        betaret.tail(nvars) = beta;
+        return betaret;
     }
 };
 

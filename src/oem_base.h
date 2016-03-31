@@ -13,10 +13,19 @@ protected:
     const int nvars;                  // dimension of beta
     const int nobs;                   // number of rows
     
+    bool intercept;                   //
+    bool standardize;                 //
+    
+    double meanY;
+    double scaleY;
+    
     VectorXd u;                       // u vector
     
     VecTypeBeta beta;                 // parameters to be optimized
     VecTypeBeta beta_prev;            // parameters from previous iteration
+    
+    Eigen::RowVectorXd colmeans;          // column means of X
+    Eigen::RowVectorXd colstd;           // column std devs of X
     
     double tol;                       // tolerance for convergence
     
@@ -42,12 +51,16 @@ protected:
 public:
     oemBase(int n_, 
             int p_,
+            bool intercept_,
+            bool standardize_,
             double tol_ = 1e-6) :
     nvars(p_), 
     nobs(n_),
-    u(p_),               // allocate space but do not set values
-    beta(p_),            // allocate space but do not set values
-    beta_prev(p_),       // allocate space but do not set values
+    intercept(intercept_),
+    standardize(standardize_),
+    u(p_ + intercept_ * (1 - standardize_)),               // allocate space but do not set values
+    beta(p_ + intercept_ * (1 - standardize_)),            // allocate space but do not set values
+    beta_prev(p_ + intercept_ * (1 - standardize_)),       // allocate space but do not set values
     tol(tol_)
     {}
     
@@ -89,9 +102,12 @@ public:
         return i + 1;
     }
     
-    virtual double get_lambda_zero() const { return 0; }
+    virtual double compute_lambda_zero() { return 0; }
     virtual VecTypeBeta get_beta() { return beta; }
     virtual double get_d() { return 0; }
+    
+    Eigen::RowVectorXd get_X_colmeans() {return colmeans;}
+    Eigen::RowVectorXd get_X_colstd() {return colstd;}
     
     virtual void init(double lambda_, std::string penalty_) {}
     virtual void init_warm(double lambda_) {}
