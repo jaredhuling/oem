@@ -73,7 +73,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
     bool fullbetamat = false;
-    int add = 0;
+    
     if (family(0) != "gaussian")
     {
         standardize = false;
@@ -82,7 +82,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         if (intercept_bin)
         {
             fullbetamat = true;
-            add = 1;
+            
             // dont penalize the intercept
             VectorXd penalty_factor_tmp(p+1);
             
@@ -112,14 +112,12 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     //DataStd<double> datstd(n, p + add, standardize, intercept);
     //datstd.standardize(X, Y);
     
-    std::cout << "before solver" << std::endl;
-    
     // initialize pointers 
-    oemBase<Eigen::VectorXd> *solver = NULL; // obj doesn't point to anything yet
+    oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
     
     
     // initialize classes
-
+    
     if (family(0) == "gaussian")
     {
         solver = new oemDense(X, Y, penalty_factor, alpha, gamma, intercept, standardize, tol);
@@ -127,8 +125,6 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
     {
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
     }
-    
-    std::cout << "after new solver " << std::endl;
     
     if (nlambda < 1) {
         
@@ -139,7 +135,7 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
         nlambda = lambda.size();
-        std::cout << "lambda" << lmax << std::endl;
+        
     }
     
     
@@ -165,8 +161,6 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
                 solver->init(ilambda, penalty[pp]);
             else
                 solver->init_warm(ilambda);
-            
-            std::cout << "initialized" << std::endl;
             
             niter[i] = solver->solve(maxit);
             VectorXd res = solver->get_beta();

@@ -59,10 +59,10 @@ protected:
     {
         
         // compute X'X
-        std::cout << "before X'X" << std::endl;
+        
         if (standardize) 
         {
-            if (nobs < nvars) {
+            if (nobs > nvars) {
                 XX = XtX_scaled(X, colmeans, colstd);
             } else 
             {
@@ -72,7 +72,7 @@ protected:
         } else if (intercept && !standardize) 
         {
             Eigen::RowVectorXd colsums = colmeans * nobs;
-            if (nobs < nvars) 
+            if (nobs > nvars) 
             {
                 XX.bottomRightCorner(nvars, nvars) = XtX(X);
                 XX.block(0,1,1,nvars) = colsums;
@@ -81,12 +81,12 @@ protected:
             } else 
             {
                 XX = XXt(X);
-                XX.array() += 1; // adding 1 for the intercept
+                XX.array() += 1; // adding 1 to all of XX' for the intercept
             }
             
         } else 
         {
-            if (nobs < nvars) 
+            if (nobs > nvars) 
             {
                 XX = XtX(X);
             } else 
@@ -95,7 +95,6 @@ protected:
             }
         }
         
-        std::cout << "after X'X" << std::endl;
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
@@ -104,8 +103,6 @@ protected:
         eigs.compute(1000, 0.0001);
         Vector eigenvals = eigs.eigenvalues();
         d = eigenvals[0];
-        
-        std::cout << "after eigen(X'X)" << std::endl;
         
         if (nobs > nvars)
         {
@@ -121,7 +118,22 @@ protected:
             res = A * beta_prev + XY;
         } else 
         {
-            res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
+            if (standardize) 
+            {
+                res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
+                
+            } else if (intercept && !standardize) 
+            {
+                // need to handle differently with intercept
+                VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
+                resid.array() -= beta_prev(0);
+                res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
+                res(0) = resid.sum() + d * beta_prev(0);
+                
+            } else 
+            {
+                res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
+            }
         }
     }
     
@@ -146,9 +158,11 @@ public:
              bool &intercept_,
              bool &standardize_,
              const double tol_ = 1e-6) :
-    oemBase<Eigen::VectorXd>(X_.rows(), X_.cols(),
-                             intercept_, standardize_,
-                                 tol_),
+    oemBase<Eigen::VectorXd>(X_.rows(), 
+                             X_.cols(),
+                             intercept_, 
+                             standardize_,
+                             tol_),
               X( Map<MatrixXd>(X_) ),
               Y( Map<VectorXd>(Y_) ),
               penalty_factor(penalty_factor_),
@@ -165,15 +179,10 @@ public:
     double compute_lambda_zero() 
     { 
         
-        std::cout << "before anything X'Y" << std::endl;
         
         meanY = Y.mean();
-        
-        std::cout << "after meanY" << std::endl;
-        
         colmeans = X.colwise().mean();
         
-        std::cout << "before X'Y" << std::endl;
         
         if (standardize)
         {
@@ -189,8 +198,10 @@ public:
                       ((Y.array() - meanY) / scaleY).matrix();
         } else if (intercept && !standardize) 
         {
+            
             XY.tail(nvars) = X.transpose() * Y;
             XY(0) = Y.sum();
+            
         } else if (!intercept && standardize)
         {
             scaleY = std::sqrt((Y.array() - meanY).square().sum() / (double(nobs - 1) ));
@@ -204,7 +215,6 @@ public:
             XY = X.transpose() * Y;
         }
         
-        std::cout << "after X'Y" << std::endl;
         
         compute_XtX_d_update_A();
         
