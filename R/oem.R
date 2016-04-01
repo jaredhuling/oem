@@ -21,7 +21,7 @@ oem <- function(x,
                 irls.tol = 1e-5) 
 {
     family  <- match.arg(family)
-    penalty <- match.arg(penalty)
+    penalty <- match.arg(penalty, several.ok = TRUE)
     
     dims <- dim(x)
     n <- dims[1]

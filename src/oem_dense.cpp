@@ -191,13 +191,15 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
             // reset to old nlambda
             nlambda = nlambda_store;
             beta_list(pp) = beta.col(0);
+            iter_list(pp) = niter(0);
         } else 
         {
             beta_list(pp) = beta;
+            iter_list(pp) = niter;
         }
         
         
-        iter_list(pp) = niter;
+        
         
     } // end loop over penalties
     
