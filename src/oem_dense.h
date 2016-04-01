@@ -255,9 +255,13 @@ public:
         
         if (standardize) 
         {
-            beta.array() /= colstd.array();
-            beta *= scaleY;
             VectorXd betaret(nvars+1);
+            betaret.setZero();
+            
+            betaret.tail(nvars) = beta.array() / colstd.transpose().array();
+            
+            betaret *= scaleY;
+            
             if (intercept) 
             {
                 betaret(0) = meanY - (beta.array() * colmeans.array()).array().sum();
