@@ -49,8 +49,8 @@ protected:
     
     std::string penalty;       // penalty specified
     
-    Scalar lambda;             // L1 penalty
-    Scalar lambda0;            // minimum lambda to make coefficients all zero
+    double lambda;             // L1 penalty
+    double lambda0;            // minimum lambda to make coefficients all zero
     
     double threshval;
     
@@ -145,6 +145,16 @@ protected:
         } else if (penalty == "ols")
         {
             beta = u / d;
+        } else if (penalty == "elastic.net")
+        {
+            double denom = d + alpha;
+            soft_threshold(beta, u, lambda, penalty_factor, denom);
+        } else if (penalty == "scad") 
+        {
+            
+        } else if (penalty == "mcp") 
+        {
+            soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         }
     }
     

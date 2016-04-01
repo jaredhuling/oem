@@ -6,7 +6,7 @@
 oem <- function(x, 
                 y, 
                 family = c("gaussian", "binomial"),
-                penalty = c("lasso", "ols"),
+                penalty = c("elastic.net", "lasso", "ols", "mcp"),
                 lambda = numeric(0),
                 nlambda = 100L,
                 lambda.min.ratio = NULL,

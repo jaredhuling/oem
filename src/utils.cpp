@@ -165,7 +165,6 @@ void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, V
         else if(ptr[i] < -total_pen)
             res(i) = ptr[i] + total_pen;
     }
-    
 }
 
 
@@ -184,7 +183,28 @@ void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, V
         else if(ptr[i] < -total_pen)
             res(i) = (ptr[i] + total_pen)/d;
     }
+}
+
+void soft_threshold_mcp(VectorXd &res, const VectorXd &vec, const double &penalty, 
+                        VectorXd &pen_fact, double &d, double &gamma)
+{
+    int v_size = vec.size();
+    res.setZero();
+    double gammad = gamma * d;
     
+    const double *ptr = vec.data();
+    for(int i = 0; i < v_size; i++)
+    {
+        double total_pen = pen_fact(i) * penalty;
+        
+        
+        if (std::abs(ptr[i]) > gammad * total_pen)
+            res(i) = ptr[i]/d;
+        else if(ptr[i] > total_pen)
+            res(i) = gamma * (ptr[i] - total_pen)/(gammad - 1);
+        else if(ptr[i] < -total_pen)
+            res(i) = gamma * (ptr[i] + total_pen)/(gammad - 1);
+    }
 }
 
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,

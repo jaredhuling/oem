@@ -103,6 +103,9 @@ void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, V
 
 void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, VectorXd &pen_fact, double &d);
 
+void soft_threshold_mcp(VectorXd &res, const VectorXd &vec, const double &penalty, 
+                        VectorXd &pen_fact, double &d, double &alpha);
+
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,
                        double &lambdak, double &lambdakminus1, const int &penalty);
 
