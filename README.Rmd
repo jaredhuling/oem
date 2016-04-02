@@ -70,8 +70,8 @@ library(plus)
 set.seed(123)
 n <- 1000
 p <- 200
-m <- 50
-b <- matrix(c(runif(m, -0.05, 0.05), rep(0, p - m)))
+m <- 25
+b <- matrix(c(runif(m, -0.5, 0.5), rep(0, p - m)))
 x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 
@@ -79,7 +79,7 @@ y <- drop(x %*% b) + rnorm(n)
 microbenchmark(
     "sparsenet[mcp]" = {res1 <- sparsenet(x, y, thresh = 1e-10, # thresh must be very low for glmnet to be accurate
                                           gamma = c(2,3), #sparsenet throws an error if you only fit 1 value of gamma
-                                          nlambda = 200)}, 
+                                          nlambda = 200)},
     "oem[mcp]"    = {res2 <- oem(x, y,  
                                  penalty = "mcp",
                                  gamma = 2,
@@ -101,8 +101,8 @@ microbenchmark(
 )
 
 
-x.test <- matrix(rnorm(n * p, sd = 3), n, p)
-y.test <- drop(x.test %*% b) + rnorm(n)
+x.test <- matrix(rnorm(10000 * p, sd = 3), 10000, p)
+y.test <- drop(x.test %*% b) + rnorm(10000)
 
 spn.preds <- predict(res1, x.test, which.gamma = 1)
 oem.preds <- sapply(1:length(res2$lambda), function(i) x.test %*% res2$beta[[1]][-1,i] + res2$beta[[1]][1,i])
@@ -114,11 +114,12 @@ oem.mse    <- apply(oem.preds,    2, function(x) mean((y.test - x) ^ 2))
 ncvreg.mse <- apply(ncvreg.preds, 2, function(x) mean((y.test - x) ^ 2))
 plus.mse   <- apply(plus.preds,   2, function(x) mean((y.test - x) ^ 2))
 
-plot(x = res1$lambda[1:150], y = spn.mse[1:150], col = "red", main = "MSE", type = "l",
-     ylim = range(spn.mse, oem.mse, ncvreg.mse), lwd = 2, xlab = "lam index", ylab = "MSE")
-lines(x = res2$lambda[1:150], y = oem.mse[1:150], col = "blue", lwd = 2)
-lines(x = res3$lambda[1:150], y = ncvreg.mse[1:150]-0.0005, col = "darkgoldenrod2", lwd = 2) #make smaller bc of overlap
-lines(x = res4$lam[1:150], y = plus.mse[1:150], col = "darkorchid1", lwd = 2)
+plot(x = res1$lambda[1:200], y = spn.mse[1:200], col = "red", main = "MSE", type = "l",
+     xlim = range(res1$lambda[1:200], res2$lambda[1:200], res3$lambda[1:200]),
+     ylim = range(spn.mse, oem.mse, ncvreg.mse), lwd = 2, xlab = "lambda", ylab = "MSE")
+lines(x = res2$lambda[1:200], y = oem.mse[1:200], col = "blue", lwd = 2)
+lines(x = res3$lambda[1:200], y = ncvreg.mse[1:200]-0.0005, col = "darkgoldenrod2", lwd = 2) #make smaller bc of overlap
+lines(x = res4$lam[1:200], y = plus.mse[1:200], col = "darkorchid1", lwd = 2)
 legend(0.115, 1.185, c("sparsenet", "oem", "ncvreg", "plus"), lty=c(1,1), # gives the legend appropriate symbols (lines)
         lwd=c(2,2,2),col=c("red","blue", "darkgoldenrod2", "darkorchid1"))
 

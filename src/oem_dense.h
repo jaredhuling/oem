@@ -95,6 +95,7 @@ protected:
             }
         }
         
+        XX /= nobs;
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
@@ -113,26 +114,26 @@ protected:
     
     void next_u(Vector &res)
     {
-        if (nvars < nobs)
+        if (nobs > nvars)
         {
             res = A * beta_prev + XY;
         } else 
         {
             if (standardize) 
             {
-                res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
-                
+                res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
             } else if (intercept && !standardize) 
             {
                 // need to handle differently with intercept
                 VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
                 resid.array() -= beta_prev(0);
+                resid /=  double(nobs);
                 res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
                 res(0) = resid.sum() + d * beta_prev(0);
                 
             } else 
             {
-                res = X.adjoint() * (Y - X * beta_prev) + d * beta_prev;
+                res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
             }
         }
     }
@@ -196,7 +197,7 @@ public:
         
         if (standardize)
         {
-            colstd = ((X.rowwise() - colmeans).array().square().colwise().sum() / (nobs - 1)).sqrt();
+            colstd = (((X.rowwise() - colmeans).array().square().colwise().sum() / (nobs - 1)).sqrt());
         }
         
         if (intercept && standardize) 
@@ -224,6 +225,11 @@ public:
         {
             XY = X.transpose() * Y;
         }
+        
+        //colstd   /= double(std::pow(nobs, 2));
+        colmeans /= double(nobs);
+        XY /= nobs;
+        
         
         
         compute_XtX_d_update_A();

@@ -126,11 +126,12 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
     }
     
+    
+    double lmax = 0.0;
+    lmax = solver->compute_lambda_zero(); // * datstd.get_scaleY();
+    
     if (nlambda < 1) {
         
-        double lmax = 0.0;
-        
-        lmax = solver->compute_lambda_zero() / n; // * datstd.get_scaleY();
         double lmin = as<double>(lmin_ratio_) * lmax;
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
@@ -156,7 +157,8 @@ RcppExport SEXP oem_fit_dense_tall(SEXP x_,
         
         for(int i = 0; i < nlambda; i++)
         {
-            ilambda = lambda[i] * n; //     / datstd.get_scaleY();
+            
+            ilambda = lambda[i]; // * n; //     / datstd.get_scaleY();
             if(i == 0)
                 solver->init(ilambda, penalty[pp]);
             else

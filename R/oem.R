@@ -40,6 +40,7 @@ oem <- function(x,
         stop("penalty.factor must have same length as number of columns in x")
     }
     
+    
     if (is.null(lambda.min.ratio)) {
         lambda.min.ratio <- ifelse(nrow(x) < ncol(x), 0.01, 0.0001)
     } else {
@@ -51,6 +52,17 @@ oem <- function(x,
         stop("lambda.min.ratio must be between 0 and 1")
     }
     
+    if(nlambda[1] <= 0) 
+    {
+        stop("nlambda must be a positive integer")
+    }
+    
+    lambda <- sort(as.numeric(lambda), decreasing = TRUE)
+    
+    if (length(lambda) > 0)
+        
+        
+    
     nlambda <- as.integer(nlambda)
     alpha <- as.double(alpha)
     gamma <- as.double(gamma)
@@ -60,6 +72,15 @@ oem <- function(x,
     maxit  <- as.integer(maxit)
     standardize <- as.logical(standardize)
     intercept <- as.logical(intercept)
+    
+    if(maxit <= 0 | irls.maxit <= 0)
+    {
+        stop("maxit and irls.maxit should be positive")
+    }
+    if(tol < 0 | irls.tol < 0)
+    {
+        stop("tol and irls.tol should be nonnegative")
+    }
     
     res <- .Call("oem_fit_dense_tall", 
                  x, y, 
@@ -78,5 +99,6 @@ oem <- function(x,
                       irls_maxit = irls.maxit,
                       irls_tol   = irls.tol),
                  PACKAGE = "oem")
+    class(res) <- "oem.fit"
     res
 }

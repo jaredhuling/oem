@@ -191,20 +191,42 @@ void soft_threshold_mcp(VectorXd &res, const VectorXd &vec, const double &penalt
     int v_size = vec.size();
     res.setZero();
     double gammad = gamma * d;
+    double d_minus_gammainv = d - 1 / gamma;
+    
     
     const double *ptr = vec.data();
     for(int i = 0; i < v_size; i++)
     {
         double total_pen = pen_fact(i) * penalty;
         
-        
         if (std::abs(ptr[i]) > gammad * total_pen)
             res(i) = ptr[i]/d;
         else if(ptr[i] > total_pen)
-            res(i) = gamma * (ptr[i] - total_pen)/(gammad - 1);
+            res(i) = (ptr[i] - total_pen)/(d_minus_gammainv);
         else if(ptr[i] < -total_pen)
-            res(i) = gamma * (ptr[i] + total_pen)/(gammad - 1);
+            res(i) = (ptr[i] + total_pen)/(d_minus_gammainv);
+        
     }
+     
+     /*
+    VectorXd signU = (vec.array()>0).select(VectorXd::Constant( vec.size(), 1 ),-1);
+    
+    for (unsigned j = 0; j < vec.size(); j++) {
+        double total_pen = pen_fact(j) * penalty;
+        if (std::abs(vec(j)) <= gamma * total_pen * d ) {
+            std::cout << "rhs       " << gamma * total_pen * d << std::endl;
+            std::cout << "gamma     " << gamma  << std::endl;
+            std::cout << "total_pen " << total_pen << std::endl;
+            std::cout << "d         " << d << std::endl;
+            std::cout << "lhs       " << std::abs(vec(j)) << std::endl;
+            res(j) = signU(j) * threshold(std::abs(vec(j)) - total_pen) 
+            / (d - 1 / gamma);
+        } else {
+            std::cout << "wtf" << vec(j) / d << std::endl;
+            res(j) = vec(j) / d;
+        }
+    }
+     */
 }
 
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,
