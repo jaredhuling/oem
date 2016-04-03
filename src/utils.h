@@ -25,13 +25,20 @@ using Eigen::Upper;
 using Eigen::Ref;
 using Eigen::Map;
 using Rcpp::as;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixX;
+typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorX;
+
+typedef Map<const MatrixX> MapMat;
+typedef Map<const VectorX> MapVec;
 typedef Eigen::Triplet<double> T;
 typedef Eigen::MappedSparseMatrix<double> MSpMat;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
-typedef Eigen::Map<MatrixXd> MapMat;
-typedef Eigen::Map<VectorXd> MapVec;
-typedef Eigen::Map<ArrayXd>  MapArrayd;
+typedef Map<MatrixXd> MapMatd;
+typedef Map<VectorXd> MapVecd;
+//typedef Eigen::Map<const MatrixXd> MapMatdnc;
+//typedef Eigen::Map<const VectorXd> MapVecdnc;
+typedef Map<ArrayXd>  MapArrayd;
 typedef Eigen::SparseMatrix<double, Eigen::RowMajor> SpMatR;
 typedef Eigen::SparseMatrix<int, Eigen::RowMajor> SpMatIntR;
 
@@ -52,10 +59,10 @@ void sliced_crossprod_inplace(VectorXd &res, const MatrixXd& X, const VectorXd& 
 
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XtWX(const MapMat& xx, const MatrixXd& ww);
+MatrixXd XtWX(const MapMatd& xx, const MatrixXd& ww);
 
 //computes XWX' where W is diagonal (input w as vector)
-MatrixXd XWXt(const MapMat& xx, const MatrixXd& ww);
+MatrixXd XWXt(const MapMatd& xx, const MatrixXd& ww);
 
 //SpMat X'WX where W is diagonal (input w as vector)
 SpMat XtWX(const MSpMat& xx, const MatrixXd& ww);
@@ -64,24 +71,34 @@ SpMat XtWX(const MSpMat& xx, const MatrixXd& ww);
 SpMat XWXt(const MSpMat& xx, const MatrixXd& ww);
 
 //computes X'X 
-MatrixXd XtX(const MapMat &xx);
+//MatrixXd XtX(const MapMatd &xx);
+
+//MatrixXd XtX(MapMat &xx);
+
+//MatrixXd XtX(const MapMat &xx);
+
+void XtX(MatrixXd &xTx, const MatrixXd &xx);
 
 MatrixXd XtX(const MatrixXd &xx);
 
-MatrixXd XtX(MatrixXd &xx);
+//MatrixXd XtX(MatrixXd &xx);
 
 //computes XX'
+//MatrixXd XXt(const MapMatd& xx);
+
+//MatrixXd XXt(MapMat& xx);
+
+//MatrixXd XXt(const MapMat& xx);
+
 MatrixXd XXt(const MapMat& xx);
 
-MatrixXd XXt(const MatrixXd& xx);
-
-MatrixXd XXt(MatrixXd& xx);
+//MatrixXd XXt(MatrixXd& xx);
 
 //computes X'X 
-MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd);
+MatrixXd XtX_scaled(const MapMatd &xx, RowVectorXd &colmeans, RowVectorXd &colstd);
 
 //computes XX'
-MatrixXd XXt_scaled(const MapMat& xx, RowVectorXd &colmeans, RowVectorXd &colstd);
+MatrixXd XXt_scaled(const MapMatd& xx, RowVectorXd &colmeans, RowVectorXd &colstd);
 
 //computes X'X 
 SpMat XtX(const MSpMat& xx);

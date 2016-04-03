@@ -82,7 +82,7 @@ oem <- function(x,
         stop("tol and irls.tol should be nonnegative")
     }
     
-    res <- .Call("oem_fit_dense_tall", 
+    res <- .Call("oem_fit_dense", 
                  x, y, 
                  family, 
                  penalty, 

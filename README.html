@@ -84,16 +84,16 @@ b &lt;- matrix(c(runif(m), rep(0, p - m)))
 x &lt;- matrix(rnorm(n * p, sd = 3), n, p)
 y &lt;- drop(x %*% b) + rnorm(n)
 
-lambdas = oem(x, y, intercept = FALSE, standardize = FALSE)$lambda
+lambdas = oem(x, y, intercept = TRUE, standardize = FALSE)$lambda
 
 microbenchmark(
-    &quot;glmnet[lasso]&quot; = {res1 &lt;- glmnet(x, y, thresh = 1e-10, # thresh must be very low for glmnet to be accurate
+    &quot;glmnet[lasso]&quot; = {res1 &lt;- glmnet(x, y, thresh = 1e-10, 
                                       standardize = FALSE,
-                                      intercept = FALSE,
+                                      intercept = TRUE,
                                       lambda = lambdas)}, 
     &quot;oem[lasso]&quot;    = {res2 &lt;- oem(x, y,
                                    penalty = &quot;elastic.net&quot;,
-                                   intercept = FALSE, 
+                                   intercept = TRUE, 
                                    standardize = FALSE,
                                    lambda = lambdas,
                                    tol = 1e-10)},
@@ -101,14 +101,21 @@ microbenchmark(
 )</code></pre>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 6.381488 6.481014 7.171990 6.993996 7.982421 8.021032     5
-##     oem[lasso] 2.023880 2.083363 2.365171 2.377320 2.624369 2.716922     5
+##  glmnet[lasso] 6.222878 6.302698 6.356654 6.305703 6.418260 6.533731     5
+##     oem[lasso] 1.623102 1.682378 1.710289 1.704843 1.725202 1.815921     5
 ##  cld
 ##    b
 ##   a</code></pre>
 <pre class="r"><code># difference of results
 max(abs(coef(res1) - res2$beta[[1]]))</code></pre>
-<pre><code>## [1] 1.037584e-07</code></pre>
+<pre><code>## [1] 1.048072e-07</code></pre>
+<pre class="r"><code>res1 &lt;- glmnet(x, y, thresh = 1e-12, # thresh must be very low for glmnet to be accurate
+                                      standardize = FALSE,
+                                      intercept = TRUE,
+                                      lambda = lambdas)
+
+max(abs(coef(res1) - res2$beta[[1]]))</code></pre>
+<pre><code>## [1] 3.763398e-09</code></pre>
 </div>
 <div id="mcp" class="section level3">
 <h3>MCP</h3>
@@ -126,8 +133,9 @@ y &lt;- drop(x %*% b) + rnorm(n)
 
 
 microbenchmark(
-    &quot;sparsenet[mcp]&quot; = {res1 &lt;- sparsenet(x, y, thresh = 1e-10, # thresh must be very low for glmnet to be accurate
-                                          gamma = c(2,3), #sparsenet throws an error if you only fit 1 value of gamma
+    &quot;sparsenet[mcp]&quot; = {res1 &lt;- sparsenet(x, y, thresh = 1e-10, 
+                                          gamma = c(2,3), #sparsenet throws an error 
+                                                          #if you only fit 1 value of gamma
                                           nlambda = 200)},
     &quot;oem[mcp]&quot;    = {res2 &lt;- oem(x, y,  
                                  penalty = &quot;mcp&quot;,
@@ -145,7 +153,7 @@ microbenchmark(
                                    method = &quot;mc+&quot;,
                                    gamma = 2,
                                    lam = res2$lambda,
-                                   eps = 1e-10)},
+                                   eps = 1e-8)},
     times = 5
 )</code></pre>
 <pre><code>## Warning message: some lam not reached by the plus path and dropped
@@ -154,11 +162,11 @@ microbenchmark(
 ## Warning message: some lam not reached by the plus path and dropped
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
-##            expr      min        lq      mean    median       uq       max
-##  sparsenet[mcp] 1535.880 1551.5570 1605.5377 1564.9102 1637.944 1737.3974
-##        oem[mcp]  133.719  136.9696  140.4288  137.7298  145.569  148.1564
-##     ncvreg[mcp] 6178.016 6258.3558 6304.6958 6274.2707 6374.116 6438.7197
-##       plus[mcp] 1479.134 1556.9671 1601.5719 1627.2505 1651.201 1693.3071
+##            expr       min        lq      mean   median        uq       max
+##  sparsenet[mcp] 1462.5689 1484.1197 1523.3090 1533.235 1539.6380 1596.9830
+##        oem[mcp]  126.3424  126.5575  127.6516  126.880  126.9965  131.4817
+##     ncvreg[mcp] 5751.6990 5829.8433 6009.9578 5893.059 6036.2814 6538.9065
+##       plus[mcp] 1306.8089 1368.8418 1482.3665 1463.349 1621.1173 1651.7154
 ##  neval cld
 ##      5  b 
 ##      5 a  

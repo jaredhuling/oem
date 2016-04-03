@@ -6,7 +6,7 @@
 
 
 template<typename VecTypeBeta>
-class oemBase
+class oemBaseS
 {
 protected:
     
@@ -49,7 +49,7 @@ protected:
     
     
 public:
-    oemBase(int n_, 
+    oemBaseS(int n_, 
             int p_,
             bool intercept_,
             bool standardize_,
@@ -58,15 +58,15 @@ public:
     nobs(n_),
     intercept(intercept_),
     standardize(standardize_),
-    u(p_),               // allocate space but do not set values
-    beta(p_),            // allocate space but do not set values
-    beta_prev(p_),       // allocate space but do not set values
+    u(p_ + intercept_ * (1 - standardize_)),               // allocate space but do not set values
+    beta(p_ + intercept_ * (1 - standardize_)),            // allocate space but do not set values
+    beta_prev(p_ + intercept_ * (1 - standardize_)),       // allocate space but do not set values
     colmeans(p_),
     colstd(p_),
     tol(tol_)
     {}
     
-    virtual ~oemBase() {}
+    virtual ~oemBaseS() {}
     
     void update_u()
     {

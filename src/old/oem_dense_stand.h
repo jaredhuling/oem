@@ -28,15 +28,15 @@ protected:
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
     typedef Map<const Matrix> MapMat;
     typedef Map<const Vector> MapVec;
-    typedef Map<VectorXd> MapVecd;
-    typedef Map<Eigen::MatrixXd> MapMatd;
+    typedef Map<const MatrixXd> MapMatd;
+    typedef Map<const VectorXd> MapVecd;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MatrixXd X;           // data matrix
-    const VectorXd Y;           // response vector
+    const MapMatd X;                  // data matrix
+    MapVec Y;                  // response vector
     VectorXd penalty_factor;   // penalty multiplication factors 
     int penalty_factor_size;   // size of penalty_factor vector
     int XXdim;                 // dimension of XX (different if n > p and p >= n)
@@ -55,6 +55,16 @@ protected:
     double threshval;
     
     
+    MatrixXd XtX() const {
+        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        rankUpdate(X.adjoint());
+    }
+    
+    MatrixXd XXt() const {
+        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        rankUpdate(X);
+    }
+    
     void compute_XtX_d_update_A()
     {
         
@@ -62,10 +72,10 @@ protected:
         
         if (nobs > nvars) 
         {
-            XX = XtX(X);
+            XX = XtX();
         } else 
         {
-            XX = XXt(X);
+            XX = XXt();
         }
         
         
@@ -121,7 +131,7 @@ protected:
     
     
 public:
-    oemDense(ConstGenericMatrix &X_, 
+    oemDense(const Eigen::Ref<const MatrixXd>  &X_, 
              ConstGenericVector &Y_,
              VectorXd &penalty_factor_,
              const double &alpha_,
@@ -134,16 +144,15 @@ public:
                              intercept_, 
                              standardize_,
                              tol_),
-              X( X_ ),
-              Y( Y_ ),
-              penalty_factor(penalty_factor_),
-              penalty_factor_size(penalty_factor_.size()),
-              XXdim( std::min(X_.cols(), X_.rows()) ),
-              // only add extra row/column to XX if  intercept  and no standardize  AND nobs > nvars
-              XY(X_.cols()), // add extra space if intercept but no standardize
-              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
-              alpha(alpha_),
-              gamma(gamma_)
+                             X(X_.data(), X_.rows(), X_.cols()),
+                             Y(Y_.data(), Y_.size()),
+                             penalty_factor(penalty_factor_),
+                             penalty_factor_size(penalty_factor_.size()),
+                             XXdim( std::min(X_.cols(), X_.rows()) ),
+                             XY(X_.cols()), // add extra space if intercept but no standardize
+                             XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
+                             alpha(alpha_),
+                             gamma(gamma_)
     {}
     
     

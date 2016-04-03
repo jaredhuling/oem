@@ -394,7 +394,7 @@ static void block_soft_threshold(SparseVector &res, const VectorXd &vec, const d
  */
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XtWX(const MapMat& xx, const MatrixXd& ww) {
+MatrixXd XtWX(const MapMatd& xx, const MatrixXd& ww) {
     const int n(xx.cols());
     MatrixXd AtWA(MatrixXd(n, n).setZero().
                       selfadjointView<Lower>().rankUpdate(xx.adjoint() * ww.array().sqrt().matrix().asDiagonal()));
@@ -402,21 +402,31 @@ MatrixXd XtWX(const MapMat& xx, const MatrixXd& ww) {
 }
 
 //computes X'WX where W is diagonal (input w as vector)
-MatrixXd XWXt(const MapMat& xx, const MatrixXd& ww) {
+MatrixXd XWXt(const MapMatd& xx, const MatrixXd& ww) {
     const int n(xx.rows());
     MatrixXd AWAt(MatrixXd(n, n).setZero().
                       selfadjointView<Lower>().rankUpdate(xx * ww.array().sqrt().matrix().asDiagonal()));
     return (AWAt);
 }
 
+/*
 //computes X'X
-MatrixXd XtX(const MapMat &xx) {
+MatrixXd XtX(const MapMatd &xx) {
     const int n(xx.cols());
     MatrixXd AtA(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx.adjoint()));
     return (AtA);
 }
 
+
+//computes X'X
+MatrixXd XtX(MapMat &xx) {
+    const int n(xx.cols());
+    MatrixXd AtA(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx.adjoint()));
+    return (AtA);
+}
+*/
 //computes X'X
 MatrixXd XtX(const MatrixXd &xx) {
     const int n(xx.cols());
@@ -425,12 +435,36 @@ MatrixXd XtX(const MatrixXd &xx) {
     return (AtA);
 }
 
+void XtX(MatrixXd &xTx, const MatrixXd &xx) {
+    xTx.setZero().selfadjointView<Lower>().rankUpdate(xx.adjoint());
+}
+
+
+/*
 //computes X'X
 MatrixXd XtX(MatrixXd &xx) {
     const int n(xx.cols());
     MatrixXd AtA(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx.adjoint()));
     return (AtA);
+}
+
+
+//computes XX'
+MatrixXd XXt(const MapMatd& xx) {
+    const int n(xx.rows());
+    MatrixXd AAt(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx));
+    return (AAt);
+}
+
+
+//computes XX'
+MatrixXd XXt(MapMat& xx) {
+    const int n(xx.rows());
+    MatrixXd AAt(MatrixXd(n, n).setZero().
+                     selfadjointView<Lower>().rankUpdate(xx));
+    return (AAt);
 }
 
 //computes XX'
@@ -440,15 +474,17 @@ MatrixXd XXt(const MapMat& xx) {
                      selfadjointView<Lower>().rankUpdate(xx));
     return (AAt);
 }
+*/
 
 //computes XX'
-MatrixXd XXt(const MatrixXd& xx) {
+MatrixXd XXt(const MapMat& xx) {
     const int n(xx.rows());
     MatrixXd AAt(MatrixXd(n, n).setZero().
                      selfadjointView<Lower>().rankUpdate(xx));
     return (AAt);
 }
 
+/*
 
 //computes XX'
 MatrixXd XXt(MatrixXd& xx) {
@@ -457,9 +493,11 @@ MatrixXd XXt(MatrixXd& xx) {
                      selfadjointView<Lower>().rankUpdate(xx));
     return (AAt);
 }
+ 
+ */
 
 
-MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
+MatrixXd XtX_scaled(const MapMatd &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
     const int p(xx.cols());
     // this currently induces a copy, need to fix if possible
     MatrixXd AtA(MatrixXd(p, p).setZero().
@@ -470,7 +508,7 @@ MatrixXd XtX_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd
 }
 
 
-MatrixXd XXt_scaled(const MapMat &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
+MatrixXd XXt_scaled(const MapMatd &xx, RowVectorXd &colmeans, RowVectorXd &colstd) {
     const int n(xx.rows());
     // this currently induces a copy, need to fix if possible
     MatrixXd AAt(MatrixXd(n, n).setZero().

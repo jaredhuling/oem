@@ -19,7 +19,7 @@
 // b => y
 // f(x) => 1/2 * ||Ax - b||^2
 // g(z) => lambda * ||z||_1
-class oemDenseS: public oemBaseS<Eigen::VectorXd> //Eigen::SparseVector<double>
+class oemDense: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
 {
 protected:
     typedef float Scalar;
@@ -28,15 +28,15 @@ protected:
     typedef Eigen::Matrix<double, Eigen::Dynamic, 1> Vector;
     typedef Map<const Matrix> MapMat;
     typedef Map<const Vector> MapVec;
-    typedef Map<VectorXd> MapVecd;
-    typedef Map<Eigen::MatrixXd> MapMatd;
+    typedef Map<const MatrixXd> MapMatd;
+    typedef Map<const VectorXd> MapVecd;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MapMatd X;           // data matrix
-    const MapVecd Y;           // response vector
+    const MapMatd X;                  // data matrix
+    MapVec Y;                  // response vector
     VectorXd penalty_factor;   // penalty multiplication factors 
     int penalty_factor_size;   // size of penalty_factor vector
     int XXdim;                 // dimension of XX (different if n > p and p >= n)
@@ -55,45 +55,29 @@ protected:
     double threshval;
     
     
+    MatrixXd XtX() const {
+        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        rankUpdate(X.adjoint());
+    }
+    
+    MatrixXd XXt() const {
+        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        rankUpdate(X);
+    }
+    
     void compute_XtX_d_update_A()
     {
         
         // compute X'X
         
-        if (standardize) 
+        if (nobs > nvars) 
         {
-            if (nobs > nvars) {
-                XX = XtX_scaled(X, colmeans, colstd);
-            } else 
-            {
-                XX = XXt_scaled(X, colmeans, colstd);
-            }
-            
-        } else if (intercept && !standardize) 
-        {
-            Eigen::RowVectorXd colsums = colmeans * nobs;
-            if (nobs > nvars) 
-            {
-                XX.bottomRightCorner(nvars, nvars) = XtX(X);
-                XX.block(0,1,1,nvars) = colsums;
-                XX.block(1,0,nvars,1) = colsums.transpose();
-                XX(0,0) = nobs;
-            } else 
-            {
-                XX = XXt(X);
-                XX.array() += 1; // adding 1 to all of XX' for the intercept
-            }
-            
+            XX = XtX();
         } else 
         {
-            if (nobs > nvars) 
-            {
-                XX = XtX(X);
-            } else 
-            {
-                XX = XXt(X);
-            }
+            XX = XXt();
         }
+        
         
         XX /= nobs;
         
@@ -119,36 +103,7 @@ protected:
             res = A * beta_prev + XY;
         } else 
         {
-            if (standardize) 
-            {
-                VectorXd adj_vec = nobs * colmeans.transpose().array() / colstd.transpose().array();
-                //VectorXd resid_cur = (    ((Y.array() - meanY) / scaleY).array() - 
-                //    (  ( (X * beta_prev).array() / colstd.transpose().array() ).matrix() - 
-                //    (beta_prev.array() *  adj_vec.array() ).matrix()  ).array()    );
-                //res = (X.rowwise() - nobs * colmeans).array().matrix().adjoint() * resid_cur;
-                //res.array() /= colstd.transpose().array();
-                //res /= double(nobs);
-                
-                res = ((X.rowwise() - nobs * colmeans).array().rowwise() / 
-                           colstd.array()).array().matrix().adjoint() * 
-                           (((Y.array() - meanY) / scaleY).matrix() - 
-                           ((X.rowwise() - nobs * colmeans).array().rowwise() / 
-                           colstd.array()).array().matrix() * beta_prev) / double(nobs);
-                //res.array() -= (nobs * adj_vec.array() * resid_cur.array()).array();
-                res += d * beta_prev;
-            } else if (intercept && !standardize) 
-            {
-                // need to handle differently with intercept
-                VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
-                resid.array() -= beta_prev(0);
-                resid /=  double(nobs);
-                res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
-                res(0) = resid.sum() + d * beta_prev(0);
-                
-            } else 
-            {
-                res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
-            }
+            res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
         }
     }
     
@@ -162,8 +117,9 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + alpha;
-            soft_threshold(beta, u, lambda, penalty_factor, denom);
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
         {
             
@@ -175,75 +131,36 @@ protected:
     
     
 public:
-    oemDenseS(const MapMatd &X_, 
-             const MapVecd &Y_,
+    oemDense(const Eigen::Ref<const MatrixXd>  &X_, 
+             ConstGenericVector &Y_,
              VectorXd &penalty_factor_,
              const double &alpha_,
              const double &gamma_,
              bool &intercept_,
              bool &standardize_,
              const double tol_ = 1e-6) :
-    oemBaseS<Eigen::VectorXd>(X_.rows(), 
+    oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
                              intercept_, 
                              standardize_,
                              tol_),
-              X( Map<MatrixXd>(X_) ),
-              Y( Map<VectorXd>(Y_) ),
-              penalty_factor(penalty_factor_),
-              penalty_factor_size(penalty_factor_.size()),
-              XXdim(std::min(X_.cols(), X_.rows()) + intercept_ * (1 - standardize_) * (X_.rows() > X_.cols()) ),
-              // only add extra row/column to XX if  intercept  and no standardize  AND nobs > nvars
-              XY(X_.cols() + intercept_ * (1 - standardize_)), // add extra space if intercept but no standardize
-              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
-              alpha(alpha_),
-              gamma(gamma_)
+                             X(X_.data(), X_.rows(), X_.cols()),
+                             Y(Y_.data(), Y_.size()),
+                             penalty_factor(penalty_factor_),
+                             penalty_factor_size(penalty_factor_.size()),
+                             XXdim( std::min(X_.cols(), X_.rows()) ),
+                             XY(X_.cols()), // add extra space if intercept but no standardize
+                             XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
+                             alpha(alpha_),
+                             gamma(gamma_)
     {}
     
     
     double compute_lambda_zero() 
     { 
         
-        
-        meanY = Y.mean();
-        colmeans = X.colwise().mean();
-        
-        
-        if (standardize)
-        {
-            colstd = (((X.rowwise() - colmeans).array().square().colwise().sum() / (nobs - 1)).sqrt());
-        }
-        
-        if (intercept && standardize) 
-        {
-            scaleY = (Y.array() - meanY).matrix().norm() * (1.0 / std::sqrt(double(nobs)));
-            
-            XY = ((X.rowwise() - colmeans).array().rowwise() / 
-                      colstd.array()).array().matrix().adjoint() * 
-                      ((Y.array() - meanY) / scaleY).matrix();
-        } else if (intercept && !standardize) 
-        {
-            
-            XY.tail(nvars) = X.transpose() * Y;
-            XY(0) = Y.sum();
-            
-        } else if (!intercept && standardize)
-        {
-            scaleY = std::sqrt((Y.array() - meanY).square().sum() / (double(nobs - 1) ));
-            
-            // maybe don't center X?
-            XY = ((X.rowwise() - colmeans).array().rowwise() / 
-                      colstd.array()).array().matrix().adjoint() * 
-                      ((Y.array() - meanY) / scaleY).matrix();
-        } else 
-        {
-            XY = X.transpose() * Y;
-        }
-        
-        //colstd   /= double(std::pow(nobs, 2));
-        colmeans /= double(nobs);
+        XY = X.transpose() * Y;
         XY /= nobs;
-        
         
         
         compute_XtX_d_update_A();
@@ -272,31 +189,7 @@ public:
     
     VectorXd get_beta() 
     { 
-        
-        if (standardize) 
-        {
-            VectorXd betaret(nvars+1);
-            betaret.setZero();
-            
-            betaret.tail(nvars) = beta.array() / colstd.transpose().array();
-            
-            betaret *= scaleY;
-            
-            if (intercept) 
-            {
-                betaret(0) = meanY - (beta.array() * colmeans.array()).array().sum();
-            }
-            return betaret;
-            
-        } else if (intercept && !standardize) 
-        {
-            return beta;
-        } 
-        
-        VectorXd betaret(nvars+1);
-        betaret(0) = 0;
-        betaret.tail(nvars) = beta;
-        return betaret;
+        return beta;
     }
 };
 
