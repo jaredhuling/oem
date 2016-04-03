@@ -68,7 +68,7 @@ res1 <- glmnet(x, y, thresh = 1e-12, # thresh must be very low for glmnet to be 
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
-### MCP
+### Nonconvex Penalties
 
 ```{r mcp}
 library(sparsenet)
@@ -83,6 +83,15 @@ b <- matrix(c(runif(m, -0.5, 0.5), rep(0, p - m)))
 x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 
+mcp.lam <- oem(x, y, penalty = "mcp",
+               gamma = 2, intercept = TRUE, 
+               standardize = TRUE,
+               nlambda = 200, tol = 1e-10)$lambda
+
+scad.lam <- oem(x, y, penalty = "scad",
+               gamma = 4, intercept = TRUE, 
+               standardize = TRUE,
+               nlambda = 200, tol = 1e-10)$lambda
 
 microbenchmark(
     "sparsenet[mcp]" = {res1 <- sparsenet(x, y, thresh = 1e-10, 
@@ -99,15 +108,42 @@ microbenchmark(
     "ncvreg[mcp]"    = {res3 <- ncvreg(x, y,  
                                    penalty = "MCP",
                                    gamma = 2,
-                                   nlambda = 200,
-                                   eps = 1e-8)}, 
+                                   lambda = mcp.lam,
+                                   eps = 1e-7)}, 
     "plus[mcp]"    = {res4 <- plus(x, y,  
                                    method = "mc+",
                                    gamma = 2,
-                                   lam = res2$lambda,
-                                   eps = 1e-8)},
+                                   lam = mcp.lam)},
+    "oem[scad]"    = {res5 <- oem(x, y,  
+                                 penalty = "scad",
+                                 gamma = 4,
+                                 intercept = TRUE, 
+                                 standardize = TRUE,
+                                 nlambda = 200,
+                                 tol = 1e-10)},
+    "ncvreg[scad]"    = {res6 <- ncvreg(x, y,  
+                                   penalty = "SCAD",
+                                   gamma = 4,
+                                   lambda = scad.lam,
+                                   eps = 1e-7)}, 
+    "plus[scad]"    = {res7 <- plus(x, y,  
+                                   method = "scad",
+                                   gamma = 4,
+                                   lam = scad.lam)}, 
     times = 5
 )
+
+# MCP: oem and ncvreg
+max(abs(res2$beta[[1]] - res3$beta))
+
+# SCAD: oem and ncvreg
+max(abs(res5$beta[[1]] - res6$beta))
+
+# MCP: oem and plus 
+max(abs(res2$beta[[1]][-1,1:nrow(res4$beta)] - t(res4$beta)))
+
+# SCAD: oem and plus 
+max(abs(res5$beta[[1]][-1,1:nrow(res7$beta)] - t(res7$beta)))
 
 
 ```

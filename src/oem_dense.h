@@ -104,7 +104,7 @@ protected:
         res.setZero();
         double gammad = gamma * d;
         double d_minus_gammainv = d - 1 / gamma;
-        
+        double gamma_minus1_d = (gamma - 1) * d;
         
         const double *ptr = vec.data();
         for(int i = 0; i < v_size; i++)
@@ -113,10 +113,19 @@ protected:
             
             if (std::abs(ptr[i]) > gammad * total_pen)
                 res(i) = ptr[i]/d;
+            else if (std::abs(ptr[i]) > (d + 1) * total_pen)
+            {
+                double gam_ptr = (gamma - 1) * ptr[i];
+                double gam_pen = gamma * total_pen;
+                if(gam_ptr > gam_pen)
+                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1);
+                else if(gam_ptr < -gam_pen)
+                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1);
+            }
             else if(ptr[i] > total_pen)
-                res(i) = (ptr[i] - total_pen)/(d_minus_gammainv);
+                res(i) = (ptr[i] - total_pen)/d;
             else if(ptr[i] < -total_pen)
-                res(i) = (ptr[i] + total_pen)/(d_minus_gammainv);
+                res(i) = (ptr[i] + total_pen)/d;
             
         }
         
@@ -189,7 +198,7 @@ protected:
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
         {
-            
+            soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
