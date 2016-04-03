@@ -1,13 +1,5 @@
----
-output:
-  html_document:
-    keep_md: yes
----
 
-```{r setup, include=FALSE}
-library(knitr)
-opts_chunk$set(message = FALSE)
-```
+
 
 
 
@@ -28,7 +20,8 @@ or by cloning and building using `R CMD INSTALL`
 
 ### Lasso
 
-```{r}
+
+```r
 library(microbenchmark)
 library(glmnet)
 library(oem)
@@ -56,15 +49,31 @@ microbenchmark(
                                    tol = 1e-10)},
     times = 5
 )
+```
 
+```
+## Unit: seconds
+##           expr      min       lq     mean   median       uq      max neval
+##  glmnet[lasso] 6.381488 6.481014 7.171990 6.993996 7.982421 8.021032     5
+##     oem[lasso] 2.023880 2.083363 2.365171 2.377320 2.624369 2.716922     5
+##  cld
+##    b
+##   a
+```
+
+```r
 # difference of results
 max(abs(coef(res1) - res2$beta[[1]]))
+```
 
+```
+## [1] 1.037584e-07
 ```
 
 ### MCP
 
-```{r mcp}
+
+```r
 library(sparsenet)
 library(ncvreg)
 library(plus)
@@ -101,8 +110,21 @@ microbenchmark(
                                    eps = 1e-10)},
     times = 5
 )
+```
 
 
+```
+## Unit: milliseconds
+##            expr      min        lq      mean    median       uq       max
+##  sparsenet[mcp] 1535.880 1551.5570 1605.5377 1564.9102 1637.944 1737.3974
+##        oem[mcp]  133.719  136.9696  140.4288  137.7298  145.569  148.1564
+##     ncvreg[mcp] 6178.016 6258.3558 6304.6958 6274.2707 6374.116 6438.7197
+##       plus[mcp] 1479.134 1556.9671 1601.5719 1627.2505 1651.201 1693.3071
+##  neval cld
+##      5  b 
+##      5 a  
+##      5   c
+##      5  b
 ```
 
 

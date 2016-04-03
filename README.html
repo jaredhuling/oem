@@ -91,22 +91,24 @@ microbenchmark(
                                       standardize = FALSE,
                                       intercept = FALSE,
                                       lambda = lambdas)}, 
-    &quot;oem[lasso]&quot;    = {res2 &lt;- oem(x, y,  
+    &quot;oem[lasso]&quot;    = {res2 &lt;- oem(x, y,
+                                   penalty = &quot;elastic.net&quot;,
                                    intercept = FALSE, 
                                    standardize = FALSE,
+                                   lambda = lambdas,
                                    tol = 1e-10)},
     times = 5
 )</code></pre>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 5.957167 6.032322 6.085467 6.061418 6.169615 6.206814     5
-##     oem[lasso] 1.259577 1.261551 1.280781 1.265785 1.274392 1.342600     5
+##  glmnet[lasso] 6.381488 6.481014 7.171990 6.993996 7.982421 8.021032     5
+##     oem[lasso] 2.023880 2.083363 2.365171 2.377320 2.624369 2.716922     5
 ##  cld
 ##    b
 ##   a</code></pre>
 <pre class="r"><code># difference of results
 max(abs(coef(res1) - res2$beta[[1]]))</code></pre>
-<pre><code>## [1] 1.594798e-07</code></pre>
+<pre><code>## [1] 1.037584e-07</code></pre>
 </div>
 <div id="mcp" class="section level3">
 <h3>MCP</h3>
@@ -115,10 +117,10 @@ library(ncvreg)
 library(plus)
 # compute the full solution path, n &gt; p
 set.seed(123)
-n &lt;- 1000
+n &lt;- 5000
 p &lt;- 200
-m &lt;- 50
-b &lt;- matrix(c(runif(m, -0.05, 0.05), rep(0, p - m)))
+m &lt;- 25
+b &lt;- matrix(c(runif(m, -0.5, 0.5), rep(0, p - m)))
 x &lt;- matrix(rnorm(n * p, sd = 3), n, p)
 y &lt;- drop(x %*% b) + rnorm(n)
 
@@ -126,7 +128,7 @@ y &lt;- drop(x %*% b) + rnorm(n)
 microbenchmark(
     &quot;sparsenet[mcp]&quot; = {res1 &lt;- sparsenet(x, y, thresh = 1e-10, # thresh must be very low for glmnet to be accurate
                                           gamma = c(2,3), #sparsenet throws an error if you only fit 1 value of gamma
-                                          nlambda = 200)}, 
+                                          nlambda = 200)},
     &quot;oem[mcp]&quot;    = {res2 &lt;- oem(x, y,  
                                  penalty = &quot;mcp&quot;,
                                  gamma = 2,
@@ -138,7 +140,7 @@ microbenchmark(
                                    penalty = &quot;MCP&quot;,
                                    gamma = 2,
                                    nlambda = 200,
-                                   eps = 1e-10)},
+                                   eps = 1e-8)}, 
     &quot;plus[mcp]&quot;    = {res4 &lt;- plus(x, y,  
                                    method = &quot;mc+&quot;,
                                    gamma = 2,
@@ -146,37 +148,22 @@ microbenchmark(
                                    eps = 1e-10)},
     times = 5
 )</code></pre>
+<pre><code>## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
-##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp]  549.1413  550.0468  551.9357  551.8736  553.8224
-##        oem[mcp]  220.9289  224.0819  225.7419  224.1889  229.4206
-##     ncvreg[mcp] 2636.3129 2637.0175 2643.1984 2638.3734 2650.9394
-##       plus[mcp]  937.5180  965.9953  990.9321  994.5528 1016.0538
-##        max neval  cld
-##   554.7942     5  b  
-##   230.0892     5 a   
-##  2653.3488     5    d
-##  1040.5405     5   c</code></pre>
-<pre class="r"><code>x.test &lt;- matrix(rnorm(n * p, sd = 3), n, p)
-y.test &lt;- drop(x.test %*% b) + rnorm(n)
-
-spn.preds &lt;- predict(res1, x.test, which.gamma = 1)
-oem.preds &lt;- sapply(1:length(res2$lambda), function(i) x.test %*% res2$beta[[1]][-1,i] + res2$beta[[1]][1,i])
-ncvreg.preds &lt;- predict(res3, x.test, type = &quot;response&quot;)
-plus.preds &lt;- t(predict(res4, newx = x.test, lam = res4$lam)$newy)</code></pre>
-<pre class="r"><code>spn.mse    &lt;- apply(spn.preds,    2, function(x) mean((y.test - x) ^ 2))
-oem.mse    &lt;- apply(oem.preds,    2, function(x) mean((y.test - x) ^ 2))
-ncvreg.mse &lt;- apply(ncvreg.preds, 2, function(x) mean((y.test - x) ^ 2))
-plus.mse   &lt;- apply(plus.preds,   2, function(x) mean((y.test - x) ^ 2))
-
-plot(x = res1$lambda[1:150], y = spn.mse[1:150], col = &quot;red&quot;, main = &quot;MSE&quot;, type = &quot;l&quot;,
-     ylim = range(spn.mse, oem.mse, ncvreg.mse), lwd = 2, xlab = &quot;lam index&quot;, ylab = &quot;MSE&quot;)
-lines(x = res2$lambda[1:150], y = oem.mse[1:150], col = &quot;blue&quot;, lwd = 2)
-lines(x = res3$lambda[1:150], y = ncvreg.mse[1:150]-0.0005, col = &quot;darkgoldenrod2&quot;, lwd = 2) #make smaller bc of overlap
-lines(x = res4$lam[1:150], y = plus.mse[1:150], col = &quot;darkorchid1&quot;, lwd = 2)
-legend(0.115, 1.185, c(&quot;sparsenet&quot;, &quot;oem&quot;, &quot;ncvreg&quot;, &quot;plus&quot;), lty=c(1,1), # gives the legend appropriate symbols (lines)
-        lwd=c(2,2,2),col=c(&quot;red&quot;,&quot;blue&quot;, &quot;darkgoldenrod2&quot;, &quot;darkorchid1&quot;))</code></pre>
-<p><img src="data:image/png;base64,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" /></p>
+##            expr      min        lq      mean    median       uq       max
+##  sparsenet[mcp] 1535.880 1551.5570 1605.5377 1564.9102 1637.944 1737.3974
+##        oem[mcp]  133.719  136.9696  140.4288  137.7298  145.569  148.1564
+##     ncvreg[mcp] 6178.016 6258.3558 6304.6958 6274.2707 6374.116 6438.7197
+##       plus[mcp] 1479.134 1556.9671 1601.5719 1627.2505 1651.201 1693.3071
+##  neval cld
+##      5  b 
+##      5 a  
+##      5   c
+##      5  b</code></pre>
 </div>
 </div>
 

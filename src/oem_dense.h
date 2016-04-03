@@ -19,7 +19,7 @@
 // b => y
 // f(x) => 1/2 * ||Ax - b||^2
 // g(z) => lambda * ||z||_1
-class oemDense: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
+class oemDenseS: public oemBaseS<Eigen::VectorXd> //Eigen::SparseVector<double>
 {
 protected:
     typedef float Scalar;
@@ -121,7 +121,21 @@ protected:
         {
             if (standardize) 
             {
-                res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+                VectorXd adj_vec = nobs * colmeans.transpose().array() / colstd.transpose().array();
+                //VectorXd resid_cur = (    ((Y.array() - meanY) / scaleY).array() - 
+                //    (  ( (X * beta_prev).array() / colstd.transpose().array() ).matrix() - 
+                //    (beta_prev.array() *  adj_vec.array() ).matrix()  ).array()    );
+                //res = (X.rowwise() - nobs * colmeans).array().matrix().adjoint() * resid_cur;
+                //res.array() /= colstd.transpose().array();
+                //res /= double(nobs);
+                
+                res = ((X.rowwise() - nobs * colmeans).array().rowwise() / 
+                           colstd.array()).array().matrix().adjoint() * 
+                           (((Y.array() - meanY) / scaleY).matrix() - 
+                           ((X.rowwise() - nobs * colmeans).array().rowwise() / 
+                           colstd.array()).array().matrix() * beta_prev) / double(nobs);
+                //res.array() -= (nobs * adj_vec.array() * resid_cur.array()).array();
+                res += d * beta_prev;
             } else if (intercept && !standardize) 
             {
                 // need to handle differently with intercept
@@ -161,7 +175,7 @@ protected:
     
     
 public:
-    oemDense(const MapMatd &X_, 
+    oemDenseS(const MapMatd &X_, 
              const MapVecd &Y_,
              VectorXd &penalty_factor_,
              const double &alpha_,
@@ -169,7 +183,7 @@ public:
              bool &intercept_,
              bool &standardize_,
              const double tol_ = 1e-6) :
-    oemBase<Eigen::VectorXd>(X_.rows(), 
+    oemBaseS<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
                              intercept_, 
                              standardize_,
