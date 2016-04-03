@@ -81,7 +81,7 @@ void sliced_crossprod_inplace(VectorXd &res, const MatrixXd& X, const VectorXd& 
   }
   
 }
-
+/*
 void soft_threshold(SpVec &res, const VectorXd &vec, const double &penalty)
 {
   int v_size = vec.size();
@@ -208,26 +208,9 @@ void soft_threshold_mcp(VectorXd &res, const VectorXd &vec, const double &penalt
         
     }
      
-     /*
-    VectorXd signU = (vec.array()>0).select(VectorXd::Constant( vec.size(), 1 ),-1);
-    
-    for (unsigned j = 0; j < vec.size(); j++) {
-        double total_pen = pen_fact(j) * penalty;
-        if (std::abs(vec(j)) <= gamma * total_pen * d ) {
-            std::cout << "rhs       " << gamma * total_pen * d << std::endl;
-            std::cout << "gamma     " << gamma  << std::endl;
-            std::cout << "total_pen " << total_pen << std::endl;
-            std::cout << "d         " << d << std::endl;
-            std::cout << "lhs       " << std::abs(vec(j)) << std::endl;
-            res(j) = signU(j) * threshold(std::abs(vec(j)) - total_pen) 
-            / (d - 1 / gamma);
-        } else {
-            std::cout << "wtf" << vec(j) / d << std::endl;
-            res(j) = vec(j) / d;
-        }
-    }
-     */
 }
+
+*/
 
 void update_active_set(VectorXd &u, std::vector<int> &active, std::vector<int> &inactive,
                        double &lambdak, double &lambdakminus1, const int &penalty)
