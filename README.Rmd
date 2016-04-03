@@ -70,7 +70,7 @@ max(abs(coef(res1) - res2$beta[[1]]))
 
 ### Nonconvex Penalties
 
-```{r mcp}
+```{r mcp, message = FALSE, warnings = FALSE}
 library(sparsenet)
 library(ncvreg)
 library(plus)
@@ -133,18 +133,15 @@ microbenchmark(
     times = 5
 )
 
-# MCP: oem and ncvreg
-max(abs(res2$beta[[1]] - res3$beta))
 
-# SCAD: oem and ncvreg
-max(abs(res5$beta[[1]] - res6$beta))
-
-# MCP: oem and plus 
-max(abs(res2$beta[[1]][-1,1:nrow(res4$beta)] - t(res4$beta)))
-
-# SCAD: oem and plus 
-max(abs(res5$beta[[1]][-1,1:nrow(res7$beta)] - t(res7$beta)))
-
+diffs <- array(NA, dim = c(4, 1))
+colnames(diffs) <- "abs diff"
+rownames(diffs) <- c("MCP:  oem and ncvreg", "SCAD: oem and ncvreg",
+                     "MCP:  oem and plus", "SCAD: oem and plus")
+diffs[,1] <- c(max(abs(res2$beta[[1]] - res3$beta)), max(abs(res5$beta[[1]] - res6$beta)),
+               max(abs(res2$beta[[1]][-1,1:nrow(res4$beta)] - t(res4$beta))),
+               max(abs(res5$beta[[1]][-1,1:nrow(res7$beta)] - t(res7$beta))))
+diffs
 
 ```
 
