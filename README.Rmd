@@ -146,4 +146,36 @@ diffs
 ```
 
 
+### Fitting Multiple Penalties
 
+The oem algorithm is quite efficient at fitting multiple penalties simultaneously when $p$ is not too big.
+
+```{r mult}
+set.seed(123)
+n <- 100000
+p <- 100
+m <- 15
+b <- matrix(c(runif(m, -0.25, 0.25), rep(0, p - m)))
+x <- matrix(rnorm(n * p, sd = 3), n, p)
+y <- drop(x %*% b) + rnorm(n)
+
+microbenchmark(
+    "oem[lasso]"    = {res1 <- oem(x, y,
+                                   penalty = "elastic.net",
+                                   intercept = TRUE, 
+                                   standardize = TRUE,
+                                   tol = 1e-10)},
+    "oem[lasso/mcp/scad/ols]"    = {res2 <- oem(x, y,
+                                   penalty = c("elastic.net", "mcp", "scad", "ols"),
+                                   gamma = 4,
+                                   intercept = TRUE, 
+                                   standardize = TRUE,
+                                   tol = 1e-10)},
+    times = 5
+)
+
+layout(matrix(c(1,2,3), ncol=3, byrow = TRUE))
+plot(res2, which.model = 1, main = "lasso")
+plot(res2, which.model = 2, main = "mcp")
+plot(res2, which.model = 3, main = "scad")
+```

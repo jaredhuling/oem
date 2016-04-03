@@ -54,8 +54,8 @@ microbenchmark(
 ```
 ## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 6.552609 7.009217 7.360659 7.296237 7.948146 7.997088     5
-##     oem[lasso] 1.772495 1.795635 1.910014 1.841634 1.918173 2.222135     5
+##  glmnet[lasso] 6.120663 6.279004 6.714391 6.377707 6.687404 8.107179     5
+##     oem[lasso] 1.657363 1.660466 1.710677 1.668186 1.759040 1.808331     5
 ##  cld
 ##    b
 ##   a
@@ -154,21 +154,21 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1523.9828 1537.3063 1619.5215 1538.9022 1558.6842
-##        oem[mcp]  125.9019  128.1297  149.9384  130.7400  132.6604
-##     ncvreg[mcp] 7106.4325 7347.1276 7426.6376 7476.5015 7551.4094
-##       plus[mcp] 1490.1349 1530.5495 1736.5518 1577.7845 1676.5933
-##       oem[scad]  104.7593  105.8768  210.7471  107.2457  206.6580
-##    ncvreg[scad] 7269.5348 7305.2368 7553.1151 7341.2928 7352.9687
-##      plus[scad] 1655.1697 1790.4293 2130.3500 1822.0767 2421.4285
+##  sparsenet[mcp] 1448.8164 1451.6876 1478.8002 1488.3527 1498.0732
+##        oem[mcp]  132.6248  134.7694  149.0780  136.5938  144.7275
+##     ncvreg[mcp] 7127.0569 7304.4706 7676.7189 7430.6113 7965.2079
+##       plus[mcp] 1542.6019 1620.2429 1687.8928 1665.5308 1740.6475
+##       oem[scad]  105.9462  107.9688  109.7419  108.0584  109.2852
+##    ncvreg[scad] 7373.2260 7420.2782 7887.8272 7550.5781 7695.6972
+##      plus[scad] 1708.9508 1733.6277 1785.0805 1742.6069 1785.8090
 ##        max neval cld
-##  1938.7322     5  b 
-##   232.2598     5 a  
-##  7651.7170     5   c
-##  2407.6968     5  b 
-##   529.1959     5 a  
-##  8496.5424     5   c
-##  2962.6461     5  b
+##  1507.0713     5  b 
+##   196.6747     5 a  
+##  8556.2479     5   c
+##  1870.4410     5  b 
+##   117.4509     5 a  
+##  9399.3563     5   c
+##  1954.4082     5  b
 ```
 
 ```r
@@ -191,4 +191,51 @@ diffs
 ```
 
 
+### Fitting Multiple Penalties
 
+The oem algorithm is quite efficient at fitting multiple penalties simultaneously when $p$ is not too big.
+
+
+```r
+set.seed(123)
+n <- 100000
+p <- 100
+m <- 15
+b <- matrix(c(runif(m, -0.25, 0.25), rep(0, p - m)))
+x <- matrix(rnorm(n * p, sd = 3), n, p)
+y <- drop(x %*% b) + rnorm(n)
+
+microbenchmark(
+    "oem[lasso]"    = {res1 <- oem(x, y,
+                                   penalty = "elastic.net",
+                                   intercept = TRUE, 
+                                   standardize = TRUE,
+                                   tol = 1e-10)},
+    "oem[lasso/mcp/scad/ols]"    = {res2 <- oem(x, y,
+                                   penalty = c("elastic.net", "mcp", "scad", "ols"),
+                                   gamma = 4,
+                                   intercept = TRUE, 
+                                   standardize = TRUE,
+                                   tol = 1e-10)},
+    times = 5
+)
+```
+
+```
+## Unit: milliseconds
+##                     expr      min       lq     mean   median       uq
+##               oem[lasso] 195.2687 195.4972 205.9907 198.2181 211.2017
+##  oem[lasso/mcp/scad/ols] 200.9957 205.7040 209.5185 206.4619 206.8625
+##       max neval cld
+##  229.7679     5   a
+##  227.5685     5   a
+```
+
+```r
+layout(matrix(c(1,2,3), ncol=3, byrow = TRUE))
+plot(res2, which.model = 1, main = "lasso")
+plot(res2, which.model = 2, main = "mcp")
+plot(res2, which.model = 3, main = "scad")
+```
+
+![](README_files/figure-html/mult-1.png) 
