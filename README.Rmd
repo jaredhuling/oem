@@ -148,7 +148,7 @@ diffs
 
 ### Fitting Multiple Penalties
 
-The oem algorithm is quite efficient at fitting multiple penalties simultaneously when $p$ is not too big.
+The oem algorithm is quite efficient at fitting multiple penalties simultaneously when p is not too big.
 
 ```{r mult}
 set.seed(123)
