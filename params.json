@@ -1,0 +1,6 @@
+{
+  "name": "oem",
+  "tagline": "penalized least squares estimation using the oem algorithm",
+  "body": "### Orthogonalizing EM\r\nThe orthogonalizing EM algorithm is an efficient method for the computation of penalized least squares problems. The algorithm works by \r\n\r\n1. augmenting the original design matrix such that the augmented matrix is orthogonal\r\n2. treating the augmented responses as missing\r\n3. use EM iterations with simple closed form expressions to solve original problem\r\n\r\nThe oem algorithm works for a variety of penalties including the lasso, elastic net, MCP, and SCAD.\r\n\r\n### Usage\r\n\r\n```{r}\r\nn <- 5000\r\np <- 200\r\nm <- 25\r\nb <- matrix(c(runif(m, -0.5, 0.5), rep(0, p - m)))\r\nx <- matrix(rnorm(n * p, sd = 3), n, p)\r\ny <- drop(x %*% b) + rnorm(n)\r\nfit <- oem(x, y, penalty = \"lasso\")\r\n```\r\n\r\n\r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
