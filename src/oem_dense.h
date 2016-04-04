@@ -30,23 +30,30 @@ protected:
     typedef Map<const Vector> MapVec;
     typedef Map<const MatrixXd> MapMatd;
     typedef Map<const VectorXd> MapVecd;
+    typedef Map<VectorXi> MapVeci;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MapMatd X;                  // data matrix
-    MapVec Y;                  // response vector
-    VectorXd penalty_factor;   // penalty multiplication factors 
-    int penalty_factor_size;   // size of penalty_factor vector
-    int XXdim;                 // dimension of XX (different if n > p and p >= n)
-    Vector XY;                 // X'Y
-    MatrixXd XX;               // X'X
-    MatrixXd A;                // A = d * I - X'X
-    double d;                  // d value (largest eigenvalue of X'X)
-    double alpha;              // alpha = mixing parameter for elastic net
-    double gamma;              // extra tuning parameter for mcp/scad
+    const MapMatd X;            // data matrix
+    MapVec Y;                   // response vector
+    VectorXi groups;            // vector of group membersihp indexes 
+    VectorXi unique_groups;     // vector of all unique groups
+    VectorXd penalty_factor;    // penalty multiplication factors 
+    VectorXd group_weights;     // group lasso penalty multiplication factors 
+    int penalty_factor_size;    // size of penalty_factor vector
+    int XXdim;                  // dimension of XX (different if n > p and p >= n)
+    Vector XY;                  // X'Y
+    MatrixXd XX;                // X'X
+    MatrixXd A;                 // A = d * I - X'X
+    double d;                   // d value (largest eigenvalue of X'X)
+    double alpha;               // alpha = mixing parameter for elastic net
+    double gamma;               // extra tuning parameter for mcp/scad
+    bool default_group_weights; // do we need to compute default group weights?
     
+    
+    std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
     std::string penalty;       // penalty specified
     
     double lambda;             // L1 penalty
@@ -103,7 +110,6 @@ protected:
         int v_size = vec.size();
         res.setZero();
         double gammad = gamma * d;
-        double d_minus_gammainv = d - 1 / gamma;
         double gamma_minus1_d = (gamma - 1) * d;
         
         const double *ptr = vec.data();
@@ -128,8 +134,56 @@ protected:
                 res(i) = (ptr[i] + total_pen)/d;
             
         }
-        
     }
+    
+    static void block_soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty,
+                                     VectorXd &pen_fact, double &d,
+                                     std::vector<std::vector<int> > &grp_idx, 
+                                     const int &ngroups, VectorXi &unique_grps, VectorXi &grps)
+    {
+        //int v_size = vec.size();
+        res.setZero();
+        
+        for (int g = 0; g < ngroups; ++g) 
+        {
+            double thresh_factor;
+            std::vector<int> gr_idx = grp_idx[g];
+            /*
+            for (int v = 0; v < v_size; ++v) 
+            {
+                if (grps(v) == unique_grps(g)) 
+                {
+                    gr_idx.push_back(v);
+                }
+            }
+             */
+            if (unique_grps(g) == 0) 
+            {
+                thresh_factor = 1;
+            } else 
+            {
+                double ds_norm = 0;
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    ds_norm += pow(vec(c_idx), 2);
+                }
+                ds_norm = sqrt(ds_norm);
+                // double grp_wts = sqrt(gr_idx.size());
+                double grp_wts = pen_fact(g);
+                thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
+            }
+            if (thresh_factor != 0.0)
+            {
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    res(c_idx) = vec(c_idx) * thresh_factor / d;
+                }
+            }
+        }
+    }
+    
     
     MatrixXd XtX() const {
         return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
@@ -139,6 +193,40 @@ protected:
     MatrixXd XXt() const {
         return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
         rankUpdate(X);
+    }
+    
+    void get_group_indexes()
+    {
+        if (penalty == "grp.lasso") 
+        {
+            
+            grp_idx.reserve(ngroups);
+            for (int g = 0; g < ngroups; ++g) 
+            {
+                // find all variables in group number g
+                std::vector<int> idx_tmp;
+                for (int v = 0; v < nvars; ++v) 
+                {
+                    if (groups(v) == unique_groups(g)) 
+                    {
+                        idx_tmp.push_back(v);
+                    }
+                }
+                grp_idx[g] = idx_tmp;
+            }
+            // if group weights were not specified,
+            // then set the group weight for each
+            // group to be the sqrt of the size of the
+            // group
+            if (default_group_weights)
+            {
+                group_weights.resize(ngroups);
+                for (int g = 0; g < ngroups; ++g) 
+                {
+                    group_weights(g) = sqrt(double(grp_idx[g].size()));
+                }
+            }
+        }
     }
     
     void compute_XtX_d_update_A()
@@ -202,13 +290,22 @@ protected:
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
+        } else if (penalty == "grp.lasso")
+        {
+            block_soft_threshold(beta, u, lambda, group_weights,
+                                 d, grp_idx, ngroups, 
+                                 unique_groups, groups);
         }
+        
     }
     
     
 public:
     oemDense(const Eigen::Ref<const MatrixXd>  &X_, 
              ConstGenericVector &Y_,
+             const VectorXi &groups_,
+             const VectorXi &unique_groups_,
+             VectorXd &group_weights_,
              VectorXd &penalty_factor_,
              const double &alpha_,
              const double &gamma_,
@@ -217,18 +314,25 @@ public:
              const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
+                             unique_groups_.size(),
                              intercept_, 
                              standardize_,
                              tol_),
                              X(X_.data(), X_.rows(), X_.cols()),
                              Y(Y_.data(), Y_.size()),
+                             groups(groups_),
+                             unique_groups(unique_groups_),
                              penalty_factor(penalty_factor_),
+                             group_weights(group_weights_),
                              penalty_factor_size(penalty_factor_.size()),
                              XXdim( std::min(X_.cols(), X_.rows()) ),
                              XY(X_.cols()), // add extra space if intercept but no standardize
                              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
                              alpha(alpha_),
-                             gamma(gamma_)
+                             gamma(gamma_),
+                             default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
+                             grp_idx(unique_groups_.size())
+    
     {}
     
     
@@ -238,8 +342,10 @@ public:
         XY = X.transpose() * Y;
         XY /= nobs;
         
-        
+        // compute XtX or XXt (depending on if n > p or not)
+        // and compute A = dI - XtX (if n > p)
         compute_XtX_d_update_A();
+        
         
         lambda0 = XY.cwiseAbs().maxCoeff();
         return lambda0; 
@@ -253,6 +359,10 @@ public:
         
         lambda = lambda_;
         penalty = penalty_;
+        
+        // get indexes of members of each group.
+        // best to do just once in the beginning
+        get_group_indexes();
         
     }
     // when computing for the next lambda, we can use the

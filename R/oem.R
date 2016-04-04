@@ -6,13 +6,15 @@
 oem <- function(x, 
                 y, 
                 family = c("gaussian", "binomial"),
-                penalty = c("elastic.net", "lasso", "ols", "mcp", "scad"),
+                penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
                 lambda = numeric(0),
                 nlambda = 100L,
                 lambda.min.ratio = NULL,
                 alpha = 1,
                 gamma = 3,
+                groups = numeric(0),
                 penalty.factor = NULL,
+                group.weights = NULL,
                 standardize = FALSE,
                 intercept = FALSE,
                 maxit = 500L, 
@@ -28,6 +30,13 @@ oem <- function(x,
     p <- dims[2]
     y <- drop(y)
     
+    is.sparse <- FALSE
+    if(inherits(x, "sparseMatrix")){##Sparse case
+        is.sparse <- TRUE
+        x <- as(x,"CsparseMatrix")
+        x <- as(x,"dgCMatrix")
+    }
+    
     if (length(y) != n) {
         stop("x and y lengths do not match")
     }
@@ -38,6 +47,29 @@ oem <- function(x,
     
     if (length(penalty.factor) != p) {
         stop("penalty.factor must have same length as number of columns in x")
+    }
+    penalty.factor <- drop(penalty.factor)
+    
+    if (any(penalty == "grp.lasso")) {
+        if (length(groups) != p) {
+            stop("groups must have same length as number of columns in x")
+        }
+        unique.groups <- sort(unique(groups))
+        groups <- drop(groups)
+        if (!is.null(group.weights))
+        {
+            group.weights <- drop(group.weights)
+            if (length(group.weights) != length(unique.groups)) {
+                stop("group.weights must have same length as the number of groups")
+            }
+            group.weights <- as.numeric(group.weights)
+        } else {
+            # default to sqrt(group size) for each group weight
+            group.weights <- numeric(0)
+        }
+    } else {
+        unique.groups <- numeric(0)
+        group.weights <- numeric(0)
     }
     
     
@@ -62,7 +94,8 @@ oem <- function(x,
     if (length(lambda) > 0)
         
         
-    
+    groups <- as.integer(groups)
+    unique.groups <- as.integer(unique.groups)
     nlambda <- as.integer(nlambda)
     alpha <- as.double(alpha)
     gamma <- as.double(gamma)
@@ -82,23 +115,53 @@ oem <- function(x,
         stop("tol and irls.tol should be nonnegative")
     }
     
-    res <- .Call("oem_fit_dense", 
-                 x, y, 
-                 family, 
-                 penalty, 
-                 lambda, 
-                 nlambda,
-                 lambda.min.ratio,
-                 alpha,
-                 gamma,
-                 penalty.factor,
-                 standardize,
-                 intercept,
-                 list(maxit      = maxit,
-                      tol        = tol,
-                      irls_maxit = irls.maxit,
-                      irls_tol   = irls.tol),
-                 PACKAGE = "oem")
+    fam_type <- paste0(family, is.sparse)
+    
+    
+    res <- switch(fam_type,
+                  "gaussianFALSE" = .Call("oem_fit_dense", 
+                                          x, y, 
+                                          family, 
+                                          penalty, 
+                                          groups,
+                                          unique.groups,
+                                          group.weights,
+                                          lambda, 
+                                          nlambda,
+                                          lambda.min.ratio,
+                                          alpha,
+                                          gamma,
+                                          penalty.factor,
+                                          standardize,
+                                          intercept,
+                                          list(maxit      = maxit,
+                                               tol        = tol,
+                                               irls_maxit = irls.maxit,
+                                               irls_tol   = irls.tol),
+                                          PACKAGE = "oem"),
+                  "gaussianTRUE" = .Call("oem_fit_sparse", 
+                                         x, y, 
+                                         family, 
+                                         penalty, 
+                                         groups,
+                                         unique.groups,
+                                         group.weights,
+                                         lambda, 
+                                         nlambda,
+                                         lambda.min.ratio,
+                                         alpha,
+                                         gamma,
+                                         penalty.factor,
+                                         standardize,
+                                         intercept,
+                                         list(maxit      = maxit,
+                                              tol        = tol,
+                                              irls_maxit = irls.maxit,
+                                              irls_tol   = irls.tol),
+                                         PACKAGE = "oem"),
+                  "binomialFALSE" = list(NULL),
+                  "binomialTRUE"  = list(NULL))
+    
     class(res) <- "oem.fit"
     res
 }

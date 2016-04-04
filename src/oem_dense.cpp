@@ -6,6 +6,7 @@ using Eigen::MatrixXf;
 using Eigen::VectorXf;
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
+using Eigen::VectorXi;
 using Eigen::ArrayXf;
 using Eigen::ArrayXd;
 using Eigen::ArrayXXf;
@@ -20,6 +21,7 @@ using Rcpp::CharacterVector;
 
 
 typedef Map<VectorXd> MapVecd;
+typedef Map<VectorXi> MapVeci;
 typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
@@ -29,6 +31,9 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
                               SEXP y_, 
                               SEXP family_,
                               SEXP penalty_,
+                              SEXP groups_,
+                              SEXP unique_groups_,
+                              SEXP group_weights_,
                               SEXP lambda_,
                               SEXP nlambda_, 
                               SEXP lmin_ratio_,
@@ -47,6 +52,9 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     const int n = xx.rows();
     const int p = xx.cols();
     
+    const VectorXi groups(as<VectorXi>(groups_));
+    const VectorXi unique_groups(as<VectorXi>(unique_groups_));
+    
     MatrixXd X(n, p);
     VectorXd Y(n);
     
@@ -60,9 +68,10 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     // which is equivalent to minimizing
     //   1/2 * ||y - X * beta||^2 + n * lambda * ||beta||_1
     ArrayXd lambda(as<ArrayXd>(lambda_));
+    VectorXd group_weights(as<VectorXd>(group_weights_));
     int nlambda = lambda.size();
     
-
+    
     List opts(opts_);
     const int maxit        = as<int>(opts["maxit"]);
     const int irls_maxit   = as<int>(opts["irls_maxit"]);
@@ -119,7 +128,9 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     
     if (family(0) == "gaussian")
     {
-        solver = new oemDense(X, Y, penalty_factor, alpha, gamma, intercept, standardize, tol);
+        solver = new oemDense(X, Y, groups, unique_groups, 
+                              group_weights, penalty_factor, 
+                              alpha, gamma, intercept, standardize, tol);
     } else if (family(0) == "binomial")
     {
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
@@ -201,8 +212,6 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
             beta_list(pp) = beta;
             iter_list(pp) = niter;
         }
-        
-        
         
         
     } // end loop over penalties

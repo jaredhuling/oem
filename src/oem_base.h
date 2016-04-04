@@ -12,6 +12,7 @@ protected:
     
     const int nvars;                  // dimension of beta
     const int nobs;                   // number of rows
+    const int ngroups;                // number of groups for group lasso
     
     bool intercept;                   //
     bool standardize;                 //
@@ -51,11 +52,13 @@ protected:
 public:
     oemBase(int n_, 
             int p_,
+            int ngroups_,
             bool intercept_,
             bool standardize_,
             double tol_ = 1e-6) :
     nvars(p_), 
     nobs(n_),
+    ngroups(ngroups_),
     intercept(intercept_),
     standardize(standardize_),
     u(p_),               // allocate space but do not set values
