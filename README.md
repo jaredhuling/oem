@@ -11,7 +11,7 @@ The oem package provides estimaton for various penalized linear models using the
 Install using the **devtools** package:
 
 ```r
-#devtools::install_github("jaredhuling/oem")
+devtools::install_github("jaredhuling/oem")
 ```
 
 or by cloning and building using `R CMD INSTALL`
@@ -150,18 +150,6 @@ microbenchmark(
 )
 ```
 
-```
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-```
 
 ```
 ## Unit: milliseconds
