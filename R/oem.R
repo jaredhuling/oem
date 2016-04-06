@@ -19,6 +19,7 @@
 #' when nobs < nvars.
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties
+#' @param groups A vector of describing the grouping of the coefficients. See the example below.
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
 #' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 #' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
@@ -41,15 +42,22 @@
 #' @exportPattern "^[[:alpha:]]+"
 #' @export
 #' @examples
-#' n.obs <- 1e5
-#' n.vars <- 150
+#' set.seed(123)
+#' n.obs <- 1e4
+#' n.vars <- 100
 #' 
-#' true.beta <- rnorm(n.vars)
+#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
 #' 
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
 #' fit <- oem(x = x, y = y, penalty = "lasso")
+#' 
+#' plot(fit)
+#' 
+#' fit.grp <- oem(x = x, y = y, penalty = "grp.lasso", groups = rep(1:20, each = 5))
+#' 
+#' plot(fit.grp)
 #' 
 oem <- function(x, 
                 y, 

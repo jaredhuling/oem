@@ -39,6 +39,8 @@ when nobs < nvars.}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties}
 
+\item{groups}{A vector of describing the grouping of the coefficients. See the example below.}
+
 \item{penalty.factor}{Separate penalty factors can be applied to each coefficient. 
 This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
@@ -64,15 +66,22 @@ An object with S3 class "oem.fit"
 Orthogonalizing EM
 }
 \examples{
-n.obs <- 1e5
-n.vars <- 150
+set.seed(123)
+n.obs <- 1e4
+n.vars <- 100
 
-true.beta <- rnorm(n.vars)
+true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
 
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
 fit <- oem(x = x, y = y, penalty = "lasso")
+
+plot(fit)
+
+fit.grp <- oem(x = x, y = y, penalty = "grp.lasso", groups = rep(1:20, each = 5))
+
+plot(fit.grp)
 
 }
 
