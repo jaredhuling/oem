@@ -1,8 +1,56 @@
 
+#' Orthogonalizing EM
+#'
+#' @param x input matrix or SparseMatrix (sparse not yet implemented. 
+#' Each row is an observation, each column corresponds to a covariate
+#' @param y numeric response vector of length nobs.
+#' @param family "gaussian" for least squares problems, "binomial" for binary response. "binomial" not yet implemented
+#' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
+#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp"
+#' @param lambda A user supplied lambda sequence. By default, the program computes
+#' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
+#' a value of lambda overrides this.
+#' @param nlambda The number of lambda values - default is 100.
+#' @param lambda.min.ratio Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
+#' value (i.e. the smallest value for which all coefﬁcients are zero). The default
+#' depends on the sample size nobs relative to the number of variables nvars. If
+#' nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
+#' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
+#' when nobs < nvars.
+#' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
+#' @param gamma tuning parameter for SCAD and MCP penalties
+#' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
+#' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
+#' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
+#' variables. 
+#' @param group.weights penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+#' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
+#' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
+#' groups. 
+#' @standardize Logical flag for x variable standardization, prior to fitting the model sequence. 
+#' The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
+#' variables are in the same units already, you might not wish to standardize. 
+#' @intercept Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
+#' @param maxit integer. Maximum number of OEM iterations
+#' @param tol convergence tolerance for OEM iterations
+#' @param irls.maxit integer. Maximum number of IRLS iterations
+#' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
+#' @return An object with S3 class "oem.fit" 
 #' @useDynLib oem
 #' @import Rcpp
 #' @exportPattern "^[[:alpha:]]+"
 #' @export
+#' @examples
+#' n.obs <- 1e5
+#' n.vars <- 150
+#' 
+#' true.beta <- rnorm(n.vars)
+#' 
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#' 
+#' fit <- oem(x = x, y = y, penalty = "lasso")
+#' 
 oem <- function(x, 
                 y, 
                 family = c("gaussian", "binomial"),
@@ -16,7 +64,7 @@ oem <- function(x,
                 penalty.factor = NULL,
                 group.weights = NULL,
                 standardize = FALSE,
-                intercept = FALSE,
+                intercept = TRUE,
                 maxit = 500L, 
                 tol = 1e-5,
                 irls.maxit = 100L,
