@@ -75,14 +75,11 @@ true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
-fit <- oem(x = x, y = y, penalty = "lasso")
+fit <- oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:20, each = 5))
 
+layout(matrix(1:2, ncol = 2))
 plot(fit)
-
-fit.grp <- oem(x = x, y = y, penalty = "grp.lasso", groups = rep(1:20, each = 5))
-
-plot(fit.grp)
-
+plot(fit, which.model = 2)
 
 # logistic
 y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x \%*\% true.beta)))
@@ -105,17 +102,20 @@ system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, interc
 
 library(gglasso)
 
-system.time(res <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
+system.time(res.gr <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
 
+layout(matrix(1:2, ncol = 2))
+plot(res)
+plot(res.gr)
 
-system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-8))
-max(abs(ggl$beta - res$beta[[1]][-1,]))
+system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-8))
+max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 
-system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-10))
-max(abs(ggl$beta - res$beta[[1]][-1,]))
+system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-10))
+max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 
-system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-12))
-max(abs(ggl$beta - res$beta[[1]][-1,]))
+system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-12))
+max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 
 }
 

@@ -51,14 +51,11 @@
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
-#' fit <- oem(x = x, y = y, penalty = "lasso")
+#' fit <- oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:20, each = 5))
 #' 
+#' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
-#' 
-#' fit.grp <- oem(x = x, y = y, penalty = "grp.lasso", groups = rep(1:20, each = 5))
-#' 
-#' plot(fit.grp)
-#' 
+#' plot(fit, which.model = 2)
 #' 
 #' # logistic
 #' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
@@ -81,17 +78,20 @@
 #' 
 #' library(gglasso)
 #' 
-#' system.time(res <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
+#' system.time(res.gr <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
 #' 
+#' layout(matrix(1:2, ncol = 2))
+#' plot(res)
+#' plot(res.gr)
 #' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-8))
-#' max(abs(ggl$beta - res$beta[[1]][-1,]))
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-8))
+#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 #' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-10))
-#' max(abs(ggl$beta - res$beta[[1]][-1,]))
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-10))
+#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 #' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-12))
-#' max(abs(ggl$beta - res$beta[[1]][-1,]))
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-12))
+#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 #' 
 oem <- function(x, 
                 y, 
@@ -119,7 +119,7 @@ oem <- function(x,
     n <- dims[1]
     p <- dims[2]
     y <- drop(y)
-    
+    y.vals <- unique(y)
     is.sparse <- FALSE
     if(inherits(x, "sparseMatrix")){##Sparse case
         is.sparse <- TRUE
@@ -129,6 +129,10 @@ oem <- function(x,
     
     if (length(y) != n) {
         stop("x and y lengths do not match")
+    }
+    
+    if (family == "binomial" & length(y.vals) > 2) {
+        stop("y must be a binary outcome")
     }
     
     if (is.null(penalty.factor)) {
@@ -205,74 +209,173 @@ oem <- function(x,
         stop("tol and irls.tol should be nonnegative")
     }
     
-    fam_type <- paste0(family, is.sparse)
     
+    options <- list(maxit      = maxit,
+                    tol        = tol,
+                    irls_maxit = irls.maxit,
+                    irls_tol   = irls.tol)
     
-    res <- switch(fam_type,
-                  "gaussianFALSE" = .Call("oem_fit_dense", 
-                                          x, y, 
-                                          family, 
-                                          penalty, 
-                                          groups,
-                                          unique.groups,
-                                          group.weights,
-                                          lambda, 
-                                          nlambda,
-                                          lambda.min.ratio,
-                                          alpha,
-                                          gamma,
-                                          penalty.factor,
-                                          standardize,
-                                          intercept,
-                                          list(maxit      = maxit,
-                                               tol        = tol,
-                                               irls_maxit = irls.maxit,
-                                               irls_tol   = irls.tol),
-                                          PACKAGE = "oem"),
-                  "gaussianTRUE" = .Call("oem_fit_sparse", 
-                                         x, y, 
-                                         family, 
-                                         penalty, 
-                                         groups,
-                                         unique.groups,
-                                         group.weights,
-                                         lambda, 
-                                         nlambda,
-                                         lambda.min.ratio,
-                                         alpha,
-                                         gamma,
-                                         penalty.factor,
-                                         standardize,
-                                         intercept,
-                                         list(maxit      = maxit,
-                                              tol        = tol,
-                                              irls_maxit = irls.maxit,
-                                              irls_tol   = irls.tol),
-                                         PACKAGE = "oem"),
-                  "binomialFALSE" = .Call("oem_fit_logistic_dense", 
-                                          x, y, 
-                                          family, 
-                                          penalty, 
-                                          groups,
-                                          unique.groups,
-                                          group.weights,
-                                          lambda, 
-                                          nlambda,
-                                          lambda.min.ratio,
-                                          alpha,
-                                          gamma,
-                                          penalty.factor,
-                                          standardize,
-                                          intercept,
-                                          list(maxit      = maxit,
-                                               tol        = tol,
-                                               irls_maxit = irls.maxit,
-                                               irls_tol   = irls.tol),
-                                          PACKAGE = "oem"),
-                  "binomialTRUE"  = list(NULL))
+    res <- switch(family,
+                  "gaussian" = oemfit.gaussian(is.sparse,
+                                               x, y, 
+                                               family, 
+                                               penalty, 
+                                               groups,
+                                               unique.groups,
+                                               group.weights,
+                                               lambda, 
+                                               nlambda,
+                                               lambda.min.ratio,
+                                               alpha,
+                                               gamma,
+                                               penalty.factor,
+                                               standardize,
+                                               intercept,
+                                               options),
+                  "binomial" = oemfit.binomial(is.sparse, 
+                                               x, y, 
+                                               family, 
+                                               penalty, 
+                                               groups,
+                                               unique.groups,
+                                               group.weights,
+                                               lambda, 
+                                               nlambda,
+                                               lambda.min.ratio,
+                                               alpha,
+                                               gamma,
+                                               penalty.factor,
+                                               standardize,
+                                               intercept,
+                                               options)
+                  )
     
     class(res) <- c(class(res), "oemfit")
     res
+}
+
+
+oemfit.gaussian <- function(is.sparse, 
+                            x, 
+                            y, 
+                            family, 
+                            penalty, 
+                            groups,
+                            unique.groups,
+                            group.weights,
+                            lambda, 
+                            nlambda,
+                            lambda.min.ratio,
+                            alpha,
+                            gamma,
+                            penalty.factor,
+                            standardize,
+                            intercept,
+                            options)
+{
+    if (is.sparse)
+    {
+        ret <- .Call("oem_fit_sparse", 
+                     x, y, 
+                     family, 
+                     penalty, 
+                     groups,
+                     unique.groups,
+                     group.weights,
+                     lambda, 
+                     nlambda,
+                     lambda.min.ratio,
+                     alpha,
+                     gamma,
+                     penalty.factor,
+                     standardize,
+                     intercept,
+                     options,
+                     PACKAGE = "oem")
+    } else 
+    {
+        ret <- .Call("oem_fit_dense", 
+                     x, y, 
+                     family, 
+                     penalty, 
+                     groups,
+                     unique.groups,
+                     group.weights,
+                     lambda, 
+                     nlambda,
+                     lambda.min.ratio,
+                     alpha,
+                     gamma,
+                     penalty.factor,
+                     standardize,
+                     intercept,
+                     options,
+                     PACKAGE = "oem")
+    }
+    class(ret) <- "oemfit_gaussian"
+    ret
+}
+
+
+oemfit.binomial <- function(is.sparse, 
+                            x, 
+                            y, 
+                            family, 
+                            penalty, 
+                            groups,
+                            unique.groups,
+                            group.weights,
+                            lambda, 
+                            nlambda,
+                            lambda.min.ratio,
+                            alpha,
+                            gamma,
+                            penalty.factor,
+                            standardize,
+                            intercept,
+                            options)
+{
+    if (is.sparse)
+    {
+        ret <- .Call("oem_fit_logistic_sparse", 
+                     x, y, 
+                     family, 
+                     penalty, 
+                     groups,
+                     unique.groups,
+                     group.weights,
+                     lambda, 
+                     nlambda,
+                     lambda.min.ratio,
+                     alpha,
+                     gamma,
+                     penalty.factor,
+                     standardize,
+                     intercept,
+                     options,
+                     PACKAGE = "oem")
+    } else 
+    {
+        ret <- .Call("oem_fit_logistic_dense", 
+                     x, y, 
+                     family, 
+                     penalty, 
+                     groups,
+                     unique.groups,
+                     group.weights,
+                     lambda, 
+                     nlambda,
+                     lambda.min.ratio,
+                     alpha,
+                     gamma,
+                     penalty.factor,
+                     standardize,
+                     intercept,
+                     options,
+                     PACKAGE = "oem")
+    }
+    class(ret) <- "oemfit_binomial"
+    ret
 }
 
 
