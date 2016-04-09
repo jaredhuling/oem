@@ -39,6 +39,8 @@ protected:
     const MapMatd X;            // data matrix
     MapVec Y;                   // response vector
     VectorXd W;                 // weight vector for IRLS
+    VectorXd prob;              // 1 / (1 + exp(-x * beta))
+    VectorXd grad;
     VectorXi groups;            // vector of group membersihp indexes 
     VectorXi unique_groups;     // vector of all unique groups
     VectorXd penalty_factor;    // penalty multiplication factors 
@@ -54,6 +56,7 @@ protected:
     bool default_group_weights; // do we need to compute default group weights?
     int irls_maxit;
     double irls_tol;
+    double dev, dev0;
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
@@ -234,17 +237,18 @@ protected:
         }
     }
     
+    // deviance residuals for logistic glm
     double sum_dev_resid(MapVec &y, VectorXd &prob)
     {
         double dev;
-        for (int i = 0; i < nobs; ++i)
+        for (int ii = 0; ii < nobs; ++ii)
         {
-            if (y(i) == 1)
+            if (y(ii) == 1)
             {
-                dev += std::sqrt(2 * std::log(1/prob(i)));
+                dev += std::sqrt(2 * std::log(1/prob(ii)));
             } else 
             {
-                dev += std::sqrt(2 * std::log(1/(1 - prob(i))));
+                dev += std::sqrt(2 * std::log(1/(1 - prob(ii))));
             }
         }
         return dev;
@@ -333,7 +337,7 @@ public:
                      bool &intercept_,
                      bool &standardize_,
                      const int &irls_maxit_ = 100,
-                     const double &irls_tol = 1e-6,
+                     const double &irls_tol_ = 1e-6,
                      const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
@@ -344,6 +348,8 @@ public:
                              X(X_.data(), X_.rows(), X_.cols()),
                              Y(Y_.data(), Y_.size()),
                              W(X_.rows()),
+                             prob(X_.rows()),
+                             grad(X_.cols()),
                              groups(groups_),
                              unique_groups(unique_groups_),
                              penalty_factor(penalty_factor_),
@@ -355,6 +361,8 @@ public:
                              alpha(alpha_),
                              gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
+                             irls_maxit(irls_maxit_),
+                             irls_tol(irls_tol_),
                              grp_idx(unique_groups_.size())
     
     {}
@@ -398,19 +406,15 @@ public:
     virtual int solve(int maxit)
     {
         VectorXd beta_prev_irls;
-        double dev = 1e6;
-        double dev0;
+        dev = 1e6;
         
         int i;
         int j;
-        for (int i = 0; i < irls_maxit; ++i)
+        for (i = 0; i < irls_maxit; ++i)
         {
             
             dev0 = dev;
-            VectorXd prob;
-            VectorXd grad;
             
-            beta_prev = beta;
             
             // calculate mu hat
             prob = 1 / (1 + (-1 * (X * beta).array()).exp().array());
@@ -447,6 +451,8 @@ public:
             
             for(j = 0; j < maxit; ++j)
             {
+                
+                beta_prev = beta;
                     
                 update_u();
                 
@@ -457,8 +463,9 @@ public:
                 
             }
             
+            // update deviance residual
             dev = sum_dev_resid(Y, prob);
-            std::cout << "dev resid" << dev << std::endl;
+            
             if (std::abs(dev - dev0) / (0.1 + std::abs(dev) ) < irls_tol)
                 break;
         }
