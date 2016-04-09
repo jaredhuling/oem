@@ -1,3 +1,6 @@
+## the code here is largely based on the code
+## from the glmnet package (no reason to reinvent the wheel)
+
 #' Prediction method for Orthogonalizing EM fitted objects
 #'
 #' @param object fitted "oem" model object
