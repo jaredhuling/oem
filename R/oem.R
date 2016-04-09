@@ -46,7 +46,7 @@
 #' n.obs <- 1e4
 #' n.vars <- 100
 #' 
-#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+#' true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 #' 
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
@@ -58,6 +58,40 @@
 #' fit.grp <- oem(x = x, y = y, penalty = "grp.lasso", groups = rep(1:20, each = 5))
 #' 
 #' plot(fit.grp)
+#' 
+#' 
+#' # logistic
+#' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
+#' 
+#' system.time(res <- oem(x, y, intercept = FALSE, penalty = "lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8))
+#' 
+#' library(glmnet)
+#' 
+#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-12))
+#' 
+#' max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+#' 
+#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-15))
+#' 
+#' max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+#' 
+#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-18))
+#'
+#' ## group lasso (logistic model)
+#' 
+#' library(gglasso)
+#' 
+#' system.time(res <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
+#' 
+#' 
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-8))
+#' max(abs(ggl$beta - res$beta[[1]][-1,]))
+#' 
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-10))
+#' max(abs(ggl$beta - res$beta[[1]][-1,]))
+#' 
+#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res$lambda, intercept = FALSE, eps = 1e-12))
+#' max(abs(ggl$beta - res$beta[[1]][-1,]))
 #' 
 oem <- function(x, 
                 y, 
@@ -74,9 +108,9 @@ oem <- function(x,
                 standardize = FALSE,
                 intercept = TRUE,
                 maxit = 500L, 
-                tol = 1e-5,
+                tol = 1e-7,
                 irls.maxit = 100L,
-                irls.tol = 1e-5) 
+                irls.tol = 1e-3) 
 {
     family  <- match.arg(family)
     penalty <- match.arg(penalty, several.ok = TRUE)
