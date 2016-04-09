@@ -36,7 +36,7 @@
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
-#' @return An object with S3 class "oem.fit" 
+#' @return An object with S3 class "oemfit" 
 #' @useDynLib oem
 #' @import Rcpp
 #' @exportPattern "^[[:alpha:]]+"
@@ -271,6 +271,9 @@ oem <- function(x,
                                           PACKAGE = "oem"),
                   "binomialTRUE"  = list(NULL))
     
-    class(res) <- "oem.fit"
+    class(res) <- c(class(res), "oemfit")
     res
 }
+
+
+

@@ -60,7 +60,7 @@ groups.}
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if family != "gaussian"}
 }
 \value{
-An object with S3 class "oem.fit"
+An object with S3 class "oemfit"
 }
 \description{
 Orthogonalizing EM
