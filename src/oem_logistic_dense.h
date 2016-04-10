@@ -185,12 +185,12 @@ protected:
     
     
     MatrixXd XtWX() const {
-        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
         rankUpdate(X.adjoint() * (W.array().sqrt().matrix()).asDiagonal() );
     }
     
     MatrixXd XWXt() const {
-        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
         rankUpdate( (W.array().sqrt().matrix()).asDiagonal() * X );
     }
     
@@ -265,7 +265,7 @@ protected:
         {
             if (intercept)
             {
-                colsums = ((W.array().sqrt().matrix()).asDiagonal() * X).colwise().sum(); 
+                //colsums.noalias() = (((W.array().sqrt().matrix()).asDiagonal() * X).colwise().sum()).matrix(); 
                 XX.bottomRightCorner(nvars, nvars) = XtWX();
                 XX.block(0,1,1,nvars) = colsums;
                 XX.block(1,0,nvars,1) = colsums.transpose();
@@ -304,7 +304,7 @@ protected:
     {
         if (nobs > nvars + int(intercept))
         {
-            res = A * beta_prev + XY;
+            res.noalias() = A * beta_prev + XY;
         } else 
         {
             if (intercept)
@@ -317,7 +317,8 @@ protected:
                 res(0) = resid.sum() + d * beta_prev(0);
             } else 
             {
-                res = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix() + d * beta_prev;
+                res.noalias() = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix();
+                res += d * beta_prev;
             }
             
         }
@@ -403,11 +404,18 @@ protected:
                 u.resize(nvars + 1);
                 beta.resize(nvars + 1);
                 beta_prev.resize(nvars + 1);
+                
+                XY.tail(nvars) = X.transpose() * Y;
+                XY(0) = Y.sum();
+                
+                colsums = X.colwise().sum();
+            } else 
+            {
+                XY.noalias() = X.transpose() * Y;
             }
             
-            XY = X.transpose() * Y;
-            XY /= nobs;
             
+            XY /= nobs;
             
             lambda0 = XY.cwiseAbs().maxCoeff();
             return lambda0; 
@@ -455,13 +463,14 @@ protected:
                 
                 dev0 = dev;
                 
+                
                 // calculate mu hat
                 if (intercept)
                 {
                     prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
                 } else
                 {
-                    prob = 1 / (1 + (-1 * (X * beta).array()).exp().array());
+                    prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
                 }
                 
                 
@@ -493,17 +502,21 @@ protected:
                         VectorXd presid = Y.array() - prob.array();
                         grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
                         grad(0) = presid.sum() / double(nobs);
+                        
                     } else 
                     {
-                        grad = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
+                        grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
+                        
                     }
+                    
                     
                     // not sure why the following doesn't 
                     // work but the above, which seems
                     // wrong does work
                     //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
-                    XY = XX * beta + grad;
+                    XY.noalias() = XX * beta + grad;
                 }
+                
                 
                 for(j = 0; j < maxit; ++j)
                 {

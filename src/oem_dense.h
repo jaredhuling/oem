@@ -264,10 +264,10 @@ protected:
     {
         if (nobs > nvars)
         {
-            res = A * beta_prev + XY;
+            res.noalias() = A * beta_prev + XY;
         } else 
         {
-            res = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+            res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
         }
     }
     
@@ -339,7 +339,7 @@ public:
     double compute_lambda_zero() 
     { 
         
-        XY = X.transpose() * Y;
+        XY.noalias() = X.transpose() * Y;
         XY /= nobs;
         
         // compute XtX or XXt (depending on if n > p or not)
