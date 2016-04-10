@@ -94,7 +94,6 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     if (family(0) != "gaussian")
     {
         standardize = false;
-        intercept = false;
         
         if (intercept_bin)
         {
@@ -117,8 +116,6 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         }
     }
     
-    DataStd<double> datstd(n, p + add, standardize, intercept);
-    datstd.standardize(X, Y);
     
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
@@ -139,7 +136,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     
     
     double lmax = 0.0;
-    lmax = solver->compute_lambda_zero() * datstd.get_scaleY(); // 
+    lmax = solver->compute_lambda_zero(); // 
     
     
     if (nlambda < 1) {
@@ -170,7 +167,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         for(int i = 0; i < nlambda; i++)
         {
             
-            ilambda = lambda[i] / datstd.get_scaleY(); // * n; //     
+            ilambda = lambda[i]; // * n; //     
             if(i == 0)
                 solver->init(ilambda, penalty[pp]);
             else
@@ -179,10 +176,14 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
             niter[i] = solver->solve(maxit);
             VectorXd res = solver->get_beta();
             
-            double beta0 = 0.0;
-            datstd.recover(beta0, res);
-            beta(0,i) = beta0;
-            beta.block(1, i, p, 1) = res;
+            if (fullbetamat)
+            {
+                beta.block(0, i, p + 1, 1) = res;
+            } else 
+            {
+                beta(0,i) = 0;
+                beta.block(1, i, p, 1) = res;
+            }
             
             // if the design matrix includes the intercept
             // then don't back into the intercept with

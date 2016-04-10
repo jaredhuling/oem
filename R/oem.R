@@ -19,7 +19,8 @@
 #' when nobs < nvars.
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties
-#' @param groups A vector of describing the grouping of the coefficients. See the example below.
+#' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
+#' should be put in group 0
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
 #' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 #' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
@@ -66,11 +67,11 @@
 #' 
 #' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-12))
 #' 
-#' max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+#' max(abs(coef(glmn) - res$beta[[1]]))
 #' 
 #' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-15))
 #' 
-#' max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+#' max(abs(coef(glmn) - res$beta[[1]]))
 #' 
 #' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-18))
 #'
@@ -148,10 +149,27 @@ oem <- function(x,
         if (length(groups) != p) {
             stop("groups must have same length as number of columns in x")
         }
+        
         unique.groups <- sort(unique(groups))
+        zero.idx <- unique.groups[which(unique.groups == 0)]
         groups <- drop(groups)
         if (!is.null(group.weights))
         {
+            
+            if (length(zero.idx) > 0)
+            {
+                # force group weight for 0 group to be zero
+                group.weights[zero.idx] <- 0
+            } else 
+            {
+                if (intercept & family != "gaussian")
+                {
+                    ## add group for zero term if it's not here
+                    ## and add penalty weight of zero
+                    unique.groups <- c(0, unique.groups)
+                    group.weights <- c(0, group.weights)
+                }
+            }
             group.weights <- drop(group.weights)
             if (length(group.weights) != length(unique.groups)) {
                 stop("group.weights must have same length as the number of groups")
@@ -160,7 +178,25 @@ oem <- function(x,
         } else {
             # default to sqrt(group size) for each group weight
             group.weights <- numeric(0)
+            
+            if (length(zero.idx) == 0)
+            {
+                if (intercept & family != "gaussian")
+                {
+                    ## add group for zero term if it's not here
+                    unique.groups <- sort(c(0, unique.groups))
+                }
+            }
         }
+        
+        
+        
+        if (intercept & family != "gaussian")
+        {
+            ## add intercept to group with no penalty
+            groups <- c(0, groups)
+        }
+        
     } else {
         unique.groups <- numeric(0)
         group.weights <- numeric(0)

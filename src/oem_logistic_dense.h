@@ -57,13 +57,13 @@ protected:
     int irls_maxit;
     double irls_tol;
     double dev, dev0;
-    
+    Eigen::RowVectorXd colsums;
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
-    std::string penalty;       // penalty specified
+    std::string penalty;        // penalty specified
     
-    double lambda;             // L1 penalty
-    double lambda0;            // minimum lambda to make coefficients all zero
+    double lambda;              // L1 penalty
+    double lambda0;             // minimum lambda to make coefficients all zero
     
     double threshval;
     
@@ -154,18 +154,11 @@ protected:
         {
             double thresh_factor;
             std::vector<int> gr_idx = grp_idx[g];
-            /*
-            for (int v = 0; v < v_size; ++v) 
-            {
-                if (grps(v) == unique_grps(g)) 
-                {
-                    gr_idx.push_back(v);
-                }
-            }
-             */
+            
             if (unique_grps(g) == 0) 
             {
                 thresh_factor = 1;
+                
             } else 
             {
                 double ds_norm = 0;
@@ -213,7 +206,7 @@ protected:
             {
                 // find all variables in group number g
                 std::vector<int> idx_tmp;
-                for (int v = 0; v < nvars; ++v) 
+                for (int v = 0; v < nvars + int(intercept); ++v) 
                 {
                     if (groups(v) == unique_groups(g)) 
                     {
@@ -222,6 +215,8 @@ protected:
                 }
                 grp_idx[g] = idx_tmp;
             }
+            
+            
             // if group weights were not specified,
             // then set the group weight for each
             // group to be the sqrt of the size of the
@@ -231,7 +226,14 @@ protected:
                 group_weights.resize(ngroups);
                 for (int g = 0; g < ngroups; ++g) 
                 {
-                    group_weights(g) = sqrt(double(grp_idx[g].size()));
+                    if (unique_groups(g) == 0)
+                    {
+                        // don't apply group lasso
+                        // penalty for group 0
+                        group_weights(g) = 0;
+                    } else {
+                        group_weights(g) = sqrt(double(grp_idx[g].size()));
+                    }
                 }
             }
         }
@@ -257,14 +259,26 @@ protected:
     void compute_XtX_d_update_A()
     {
         
-        // compute X'X
-        
-        if (nobs > nvars) 
+        // compute X'X or XX'
+        // must handle differently if p > n
+        if (nobs > nvars + int(intercept)) 
         {
-            XX = XtWX();
+            if (intercept)
+            {
+                colsums = ((W.array().sqrt().matrix()).asDiagonal() * X).colwise().sum(); 
+                XX.bottomRightCorner(nvars, nvars) = XtWX();
+                XX.block(0,1,1,nvars) = colsums;
+                XX.block(1,0,nvars,1) = colsums.transpose();
+                XX(0,0) = W.array().sqrt().sum();
+            } else 
+            {
+                XX = XtWX();
+            }
         } else 
         {
             XX = XWXt();
+            if (intercept)
+                XX.array() += 1; // adding 1 to all of XX' for the intercept
         }
         
         
@@ -278,21 +292,34 @@ protected:
         Vector eigenvals = eigs.eigenvalues();
         d = eigenvals[0];
         
-        if (nobs > nvars)
+        if (nobs > nvars + int(intercept))
         {
             A = -XX;
             A.diagonal().array() += d;
         }
+        
     }
     
     void next_u(Vector &res)
     {
-        if (nobs > nvars)
+        if (nobs > nvars + int(intercept))
         {
             res = A * beta_prev + XY;
         } else 
         {
-            res = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix() + d * beta_prev;
+            if (intercept)
+            {
+                // need to handle differently with intercept
+                VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
+                resid.array() -= beta_prev(0);
+                resid /=  double(nobs);
+                res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
+                res(0) = resid.sum() + d * beta_prev(0);
+            } else 
+            {
+                res = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix() + d * beta_prev;
+            }
+            
         }
     }
     
@@ -325,160 +352,190 @@ protected:
     }
     
     
-public:
-    oemLogisticDense(const Eigen::Ref<const MatrixXd>  &X_, 
-                     ConstGenericVector &Y_,
-                     const VectorXi &groups_,
-                     const VectorXi &unique_groups_,
-                     VectorXd &group_weights_,
-                     VectorXd &penalty_factor_,
-                     const double &alpha_,
-                     const double &gamma_,
-                     bool &intercept_,
-                     bool &standardize_,
-                     const int &irls_maxit_ = 100,
-                     const double &irls_tol_ = 1e-6,
-                     const double tol_ = 1e-6) :
-    oemBase<Eigen::VectorXd>(X_.rows(), 
-                             X_.cols(),
-                             unique_groups_.size(),
-                             intercept_, 
-                             standardize_,
-                             tol_),
-                             X(X_.data(), X_.rows(), X_.cols()),
-                             Y(Y_.data(), Y_.size()),
-                             W(X_.rows()),
-                             prob(X_.rows()),
-                             grad(X_.cols()),
-                             groups(groups_),
-                             unique_groups(unique_groups_),
-                             penalty_factor(penalty_factor_),
-                             group_weights(group_weights_),
-                             penalty_factor_size(penalty_factor_.size()),
-                             XXdim( std::min(X_.cols(), X_.rows()) ),
-                             XY(X_.cols()), // add extra space if intercept but no standardize
-                             XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
-                             alpha(alpha_),
-                             gamma(gamma_),
-                             default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
-                             irls_maxit(irls_maxit_),
-                             irls_tol(irls_tol_),
-                             grp_idx(unique_groups_.size())
-    
-    {}
-    
-    
-    double compute_lambda_zero() 
-    { 
+    public:
+        oemLogisticDense(const Eigen::Ref<const MatrixXd>  &X_, 
+                         ConstGenericVector &Y_,
+                         const VectorXi &groups_,
+                         const VectorXi &unique_groups_,
+                         VectorXd &group_weights_,
+                         VectorXd &penalty_factor_,
+                         const double &alpha_,
+                         const double &gamma_,
+                         bool &intercept_,
+                         bool &standardize_,
+                         const int &irls_maxit_ = 100,
+                         const double &irls_tol_ = 1e-6,
+                         const double tol_ = 1e-6) :
+        oemBase<Eigen::VectorXd>(X_.rows(), 
+                                 X_.cols(),
+                                 unique_groups_.size(),
+                                 intercept_, 
+                                 standardize_,
+                                 tol_),
+                                 X(X_.data(), X_.rows(), X_.cols()),
+                                 Y(Y_.data(), Y_.size()),
+                                 W(X_.rows()),
+                                 prob(X_.rows()),
+                                 grad(X_.cols() + int(intercept_)),
+                                 groups(groups_),
+                                 unique_groups(unique_groups_),
+                                 penalty_factor(penalty_factor_),
+                                 group_weights(group_weights_),
+                                 penalty_factor_size(penalty_factor_.size()),
+                                 XXdim( std::min(X_.cols(), X_.rows()) + int(intercept_) ),
+                                 XY(X_.cols() + int(intercept)), // add extra space if intercept but no standardize
+                                 XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
+                                 alpha(alpha_),
+                                 gamma(gamma_),
+                                 default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
+                                 irls_maxit(irls_maxit_),
+                                 irls_tol(irls_tol_),
+                                 colsums(X_.cols()),
+                                 grp_idx(unique_groups_.size())
+        {}
         
-        XY = X.transpose() * Y;
-        XY /= nobs;
-        
-        
-        lambda0 = XY.cwiseAbs().maxCoeff();
-        return lambda0; 
-    }
-    double get_d() { return d; }
-    
-    // init() is a cold start for the first lambda
-    void init(double lambda_, std::string penalty_)
-    {
-        beta.setZero();
-        
-        lambda = lambda_;
-        penalty = penalty_;
-        
-        // get indexes of members of each group.
-        // best to do just once in the beginning
-        get_group_indexes();
-        
-    }
-    // when computing for the next lambda, we can use the
-    // current main_x, aux_z, dual_y and rho as initial values
-    void init_warm(double lambda_)
-    {
-        lambda = lambda_;
-        
-    }
-    
-    // re-define solve to do IRLS
-    // iterations
-    virtual int solve(int maxit)
-    {
-        VectorXd beta_prev_irls;
-        dev = 1e6;
-        
-        int i;
-        int j;
-        for (i = 0; i < irls_maxit; ++i)
-        {
-            
-            dev0 = dev;
-            
-            
-            // calculate mu hat
-            prob = 1 / (1 + (-1 * (X * beta).array()).exp().array());
-            
-            
-            // calculate Jacobian
-            W = prob.array() * (1 - prob.array());
-            
-            
-            // make sure no weights are too small
-            for (int kk = 0; kk < nobs; ++kk)
+        double compute_lambda_zero() 
+        { 
+            if (intercept)
             {
-                if (W(i) < 1e-5) 
-                {
-                    W(i) = 1e-5;
-                }
+                // these need to be one element
+                // larger for model with intercept
+                u.resize(nvars + 1);
+                beta.resize(nvars + 1);
+                beta_prev.resize(nvars + 1);
             }
             
-            // compute XtX or XXt (depending on if n > p or not)
-            // and compute A = dI - XtX (if n > p)
-            compute_XtX_d_update_A();
+            XY = X.transpose() * Y;
+            XY /= nobs;
             
             
-            // compute X'Wz
-            // only for p < n case
-            if (nobs > nvars)
+            lambda0 = XY.cwiseAbs().maxCoeff();
+            return lambda0; 
+        }
+        double get_d() { return d; }
+        
+        // init() is a cold start for the first lambda
+        void init(double lambda_, std::string penalty_)
+        {
+            beta.setZero();
+            
+            if (intercept)
             {
-                grad = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
-                // not sure why the following doesn't work but the above, which seems
-                // wrong does work
-                //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
-                XY = XX * beta + grad;
-            } 
+                double ymean = Y.mean();
+                beta(0) = std::log(ymean / (1 - ymean));
+            }
             
-            for(j = 0; j < maxit; ++j)
+            lambda = lambda_;
+            penalty = penalty_;
+            
+            // get indexes of members of each group.
+            // best to do just once in the beginning
+            get_group_indexes();
+            
+        }
+        
+        // when computing for the next lambda, we can use the
+        // current main_x, aux_z, dual_y and rho as initial values
+        void init_warm(double lambda_)
+        {
+            lambda = lambda_;
+        }
+        
+        // re-define solve to do IRLS
+        // iterations
+        virtual int solve(int maxit)
+        {
+            
+            dev = 1e30;
+            
+            int i;
+            int j;
+            for (i = 0; i < irls_maxit; ++i)
             {
                 
-                beta_prev = beta;
+                dev0 = dev;
+                
+                // calculate mu hat
+                if (intercept)
+                {
+                    prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
+                } else
+                {
+                    prob = 1 / (1 + (-1 * (X * beta).array()).exp().array());
+                }
+                
+                
+                // calculate Jacobian (or weight vector)
+                W = prob.array() * (1 - prob.array());
+                
+                // make sure no weights are too small
+                for (int kk = 0; kk < nobs; ++kk)
+                {
+                    if (W(i) < 1e-5) 
+                    {
+                        W(i) = 1e-5;
+                    }
+                }
+                
+                
+                // compute XtX or XXt (depending on if n > p or not)
+                // and compute A = dI - XtX (if n > p)
+                compute_XtX_d_update_A();
+                
+                
+                // compute X'Wz
+                // only for p < n case
+                if (nobs > nvars + int(intercept))
+                {
                     
-                update_u();
+                    if (intercept)
+                    {
+                        VectorXd presid = Y.array() - prob.array();
+                        grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
+                        grad(0) = presid.sum() / double(nobs);
+                    } else 
+                    {
+                        grad = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
+                    }
+                    
+                    // not sure why the following doesn't 
+                    // work but the above, which seems
+                    // wrong does work
+                    //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
+                    XY = XX * beta + grad;
+                }
                 
-                update_beta();
+                for(j = 0; j < maxit; ++j)
+                {
+                    
+                    beta_prev = beta;
+                    
+                    update_u();
+                    
+                    update_beta();
+                    
+                    if(converged())
+                        break;
+                    
+                }
                 
-                if(converged())
+                // update deviance residual
+                dev = sum_dev_resid(Y, prob);
+                
+                if (std::abs(dev - dev0) / (0.1 + std::abs(dev) ) < irls_tol)
                     break;
                 
             }
             
-            // update deviance residual
-            dev = sum_dev_resid(Y, prob);
-            
-            if (std::abs(dev - dev0) / (0.1 + std::abs(dev) ) < irls_tol)
-                break;
+            return i + 1;
         }
         
+        VectorXd get_beta() 
+        { 
+            return beta;
+        }
         
-        return i + 1;
-    }
-    
-    VectorXd get_beta() 
-    { 
-        return beta;
-    }
-};
+        };
 
 
 

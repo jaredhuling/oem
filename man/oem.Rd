@@ -39,7 +39,8 @@ when nobs < nvars.}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties}
 
-\item{groups}{A vector of describing the grouping of the coefficients. See the example below.}
+\item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
+should be put in group 0}
 
 \item{penalty.factor}{Separate penalty factors can be applied to each coefficient. 
 This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
@@ -90,11 +91,11 @@ library(glmnet)
 
 system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-12))
 
-max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+max(abs(coef(glmn) - res$beta[[1]]))
 
 system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-15))
 
-max(abs(coef(glmn)[-1,] - res$beta[[1]][-1,]))
+max(abs(coef(glmn) - res$beta[[1]]))
 
 system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-18))
 
