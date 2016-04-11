@@ -4571,8 +4571,9 @@ li.comment-item {
   border-bottom: 1px solid #e4e4f2;
 }
 .category-item {
-  display: inline-block;
-  height: 100%;
+    display:inline-block;
+    width:100%;
+    height:100%;
   padding: 10px 0;
   border-bottom: 1px solid #e4e4f2;
 }
