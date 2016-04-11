@@ -570,7 +570,7 @@
                     // apply your matchHeight on DOM ready (they will be automatically re-applied on load or resize)
 
                     // get test settings
-                    var byRow = $('body').hasClass('row');
+                    var byRow = $('body'); //.hasClass('row');
 
                     // apply matchHeight to each item container's items
                     $('.items-container').each(function() {
