@@ -4579,7 +4579,7 @@ li.comment-item {
     width:100%;
     height:100%;
     margin-top:0;
-    vertical-align:middle;
+    /*vertical-align:middle;*/
 }
 .middle-poster {
   background-size: cover;
