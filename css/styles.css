@@ -1662,6 +1662,7 @@ small,
 }
 /* Transparent Sticky Navbar */
 .transp-nav.sticky-navbar #nav {
+  visibility: visible;  /*  remove for fade in  */
   position: absolute;
   width: 100%;
   top: auto;
