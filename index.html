@@ -366,54 +366,66 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
                               <div class="category-item content"> 
                                 <div class = "cat-it-inside">
                                   penalty.factor
                                 </div>
                               </div>
+                        </div>
                     </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item content"> 
-                            <div class = "cat-it-inside">
-                                Separate penalty factors can be applied to each coefficient. This is a number that 
-                                multiplies lambda to allow differential penalization. Can be 0 for some variables, 
-                                which implies no penalization, and that variable is always included in the model. Default is 1 for all 
-                                variables. 
+                    <div class="row-height">
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                    Separate penalty factors can be applied to each coefficient. This is a number that 
+                                    multiplies lambda to allow differential penalization. Can be 0 for some variables, 
+                                    which implies no penalization, and that variable is always included in the model. Default is 1 for all 
+                                    variables. 
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item content"> 
-                            <div class = "cat-it-inside">
-                                group.weights
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                    group.weights
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item content"> 
-                            <div class = "cat-it-inside">
-                                penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
-                                this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
-                                which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
-                                groups. 
+                    <div class="row-height">
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                    penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+                                    this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
+                                    which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
+                                    groups. 
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item content"> 
-                            <div class = "cat-it-inside">
-                                standardize
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                    standardize
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item content"> 
-                            <div class = "cat-it-inside">
-                                Logical flag for column-wise standardization of <code>x</code> 
-                                prior to fitting the models. 
-                                The coefficients are always returned on the original scale. Default is <code>standardize = FALSE</code>. If 
-                                variables are in the same units already, you might not wish to standardize. 
+                    <div class="row-height">
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                    Logical flag for column-wise standardization of <code>x</code> 
+                                    prior to fitting the models. 
+                                    The coefficients are always returned on the original scale. Default is <code>standardize = FALSE</code>. If 
+                                    variables are in the same units already, you might not wish to standardize. 
+                                </div>
                             </div>
                         </div>
                     </div>
