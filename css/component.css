@@ -661,9 +661,9 @@ nav a:focus {
 
 .cl-effect-15 a:hover span[data-hover],
 .cl-effect-15 a:focus span[data-hover] {
-	-webkit-transform: scale(0.9);
-	-moz-transform: scale(0.9);
-	transform: scale(0.9);
+	-webkit-transform: scale(1.2);
+	-moz-transform: scale(1.2);
+	transform: scale(1.2);
 	opacity: 0;
 }
 
