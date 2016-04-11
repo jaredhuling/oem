@@ -492,7 +492,7 @@ body ::selection {
 .home-section.overlay:before,
 .home-section .overlay:before {
   background-color: #0139e0; /*rgba(12, 12, 23, 0.7);*/
-  opacity: .4;
+  opacity: .9;
 }
 .home-section .fss.overlay:before {
   background-color: #0139e0;  /* waS 000000 */
