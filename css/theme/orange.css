@@ -485,7 +485,7 @@ body ::selection {
   color: rgba(255, 255, 255, 0.95);
 }
 .overlay:before {
-  background-color: rgba(12, 12, 23, 0.8);
+  background-color: #1969b9;/*rgba(12, 12, 23, 0.8);*/
   opacity: .7;
 }
 .home-section.overlay:before,
@@ -494,7 +494,7 @@ body ::selection {
   opacity: .6;
 }
 .home-section .fss.overlay:before {
-  background-color: #000000;
+  background-color: #1969b9;  /* waS 000000 */
   opacity: .8;
 }
 .as-overlay .as-background:after {
