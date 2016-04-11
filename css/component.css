@@ -651,7 +651,7 @@ nav a:focus {
 }
 
 .cl-effect-15 > li > a span[data-hover]:before {
-	color: #fff;
+	color: #1e7ddc; /* was #fff */
 	content: attr(data-hover);
 	position: absolute;
 	-webkit-transition: -webkit-transform 0.3s, opacity 0.3s;
