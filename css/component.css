@@ -650,7 +650,7 @@ nav a:focus {
 	text-shadow: none;
 }
 
-.cl-effect-15 a::before {
+.cl-effect-15 > li > a span[data-hover]:before {
 	color: #fff;
 	content: attr(data-hover);
 	position: absolute;
@@ -659,8 +659,8 @@ nav a:focus {
 	transition: transform 0.3s, opacity 0.3s;
 }
 
-.cl-effect-15 a:hover::before,
-.cl-effect-15 a:focus::before {
+.cl-effect-15 a:hover span[data-hover],
+.cl-effect-15 a:focus span[data-hover] {
 	-webkit-transform: scale(0.9);
 	-moz-transform: scale(0.9);
 	transform: scale(0.9);
