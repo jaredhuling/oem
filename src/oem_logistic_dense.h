@@ -386,7 +386,7 @@ protected:
                                  XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
                                  alpha(alpha_),
                                  gamma(gamma_),
-                                 default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
+                                 default_group_weights( bool(group_weights_.size() < 1) ),  // compute default weights if none given
                                  irls_maxit(irls_maxit_),
                                  irls_tol(irls_tol_),
                                  colsums(X_.cols()),
