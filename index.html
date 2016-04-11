@@ -291,12 +291,19 @@
                     </div>
                     <div class="row-height">
                         <div class="col-md-2 col-sm-6 col-height">
-                            <div class="category-item"> lambda</div>
+                            <div class="category-item"> 
+                              <div class = "cat-it-inside">
+                                lambda
+                              </div>
+                            </div>
                         </div>
                         <div class="col-md-10 col-sm-6 col-height">
-                            <div class="category-item"> A user supplied lambda sequence. By default, the program computes its own lambda sequence based on 
-                            <code>nlambda</code> and <code>lambda.min.ratio</code>. Supplying
-                            a value of lambda overrides this.
+                            <div class="category-item"> 
+                              <div class = "cat-it-inside">
+                                A user supplied lambda sequence. By default, the program computes its own lambda sequence based on 
+                                <code>nlambda</code> and <code>lambda.min.ratio</code>. Supplying
+                                a value of lambda overrides this.
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -312,13 +319,16 @@
                             <div class="category-item"> lambda.min.ratio</div>
                         </div>
                         <div class="col-md-10 col-sm-6 col-height">
-                            <div class="category-item"> Smallest value for lambda, as a fraction of the maximum lambda, 
-                            the (data derived) initial value (i.e. the smallest value for which all coefﬁcients are zero). 
-                            The default
-                            depends on the sample size nobs relative to the number of variables nvars. If
-                            nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
-                            is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
-                            when nobs < nvars.
+                            <div class="category-item"> 
+                              <div class = "cat-it-inside">
+                                Smallest value for lambda, as a fraction of the maximum lambda, 
+                                the (data derived) initial value (i.e. the smallest value for which all coefﬁcients are zero). 
+                                The default
+                                depends on the sample size nobs relative to the number of variables nvars. If
+                                nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
+                                is 0.01. A very small value of <code>lambda.min.ratio</code> will lead to a saturated fit
+                                when nobs < nvars.
+                              </div>
                             </div>
                         </div>
                     </div>
@@ -339,13 +349,20 @@
                     </div>
                     <div class="row-height">
                         <div class="col-md-2 col-sm-6 col-height">
-                            <div class="category-item"> groups</div>
+                            <div class="category-item"> 
+                              <div class = "cat-it-inside">
+                                groups
+                              </div>
+                            </div>
                         </div>
                         <div class="col-md-10 col-sm-6 col-height">
-                            <div class="category-item"> A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
-                            should be put in group 0. For example, if <code>x</code> has 6 columns, to put the first two variables in 
-                            one group and the second three in another group and prevent penalization on the 6th variable, 
-                            set <code>groups = c(1,1,2,2,2,0)</code>
+                            <div class="category-item"> 
+                              <div class = "cat-it-inside">
+                                A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
+                                should be put in group 0. For example, if <code>x</code> has 6 columns, to put the first two variables in 
+                                one group and the second three in another group and prevent penalization on the 6th variable, 
+                                set <code>groups = c(1,1,2,2,2,0)</code>
+                              </div>
                             </div>
                         </div>
                     </div>
