@@ -20,7 +20,7 @@ p a:hover {
 body {
   /*color: #0c0c17;*/
   color: #ffffff;
-  background: #ffffff;
+  /*background: #ffffff;*/
 }
 body ::-moz-selection {
   background: #ff4c05;
