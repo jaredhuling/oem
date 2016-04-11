@@ -554,11 +554,43 @@
 <script src="js/jquery.counterup.min.js"></script>
 <script src="js/owl.carousel.min.js"></script>
 <script src="js/animateSlider.js"></script>
+<script src="js/jquery.matchHeight.js" type="text/javascript"></script> <!-- code to match grid heights -->
 <script src="js/animated-headlines.js"></script>
 <script src="http://cdn.bootcss.com/retina.js/1.3.0/retina.min.js"></script>
 <script src="http://cdn.bootcss.com/jquery.isotope/2.2.2/isotope.pkgd.min.js"></script>
 <script src="js/nivo-lightbox.min.js"></script>
 <script src="js/scripts.min.js"></script>
+
+        <script type="text/javascript">
+            (function() {
+
+                /* matchHeight example */
+
+                $(function() {
+                    // apply your matchHeight on DOM ready (they will be automatically re-applied on load or resize)
+
+                    // get test settings
+                    var byRow = $('body').hasClass('row');
+
+                    // apply matchHeight to each item container's items
+                    $('.items-container').each(function() {
+                        $(this).children('.item').matchHeight({
+                            byRow: byRow
+                        });
+                    });
+
+                    // test target
+                    $('.target-items').each(function() {
+                        $(this).children('.item-0, .item-2, .item-3').matchHeight({
+                            target: $(this).find('.item-1')
+                        });
+                    });
+
+                    
+                });
+
+            })();
+        </script>
 
   <!-- MathJax support -->
   <script type="text/x-mathjax-config">
