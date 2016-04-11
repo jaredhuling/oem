@@ -20,7 +20,7 @@ p a:hover {
 body {
   /*color: #0c0c17;*/
   color: #ffffff;
-  /*background: #ffffff;*/
+  background: #ffffff;
 }
 body ::-moz-selection {
   background: #ff4c05;
@@ -492,7 +492,7 @@ body ::selection {
 .home-section.overlay:before,
 .home-section .overlay:before {
   background-color: #0139e0; /*rgba(12, 12, 23, 0.7);*/
-  opacity: .7;
+  opacity: .4;
 }
 .home-section .fss.overlay:before {
   background-color: #0139e0;  /* waS 000000 */
