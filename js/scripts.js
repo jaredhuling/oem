@@ -47,17 +47,20 @@
     function init_transparent_nav() {
         if ($navWrapper.hasClass("transp-nav")) {
             if ($window.scrollTop() < 130) {
+                $nav.removeClass("navbar-transparent");
                 //$nav.addClass("navbar-transparent");
             } else {
-                //$nav.removeClass("navbar-transparent");
+                $nav.removeClass("navbar-transparent");
             }
         }
         $window.scroll(function() {
             var scroll = $window.scrollTop();
             if ($navWrapper.hasClass("transp-nav")) {
                 if (scroll < 130) {
+                    $nav.removeClass("navbar-transparent");
                     //$nav.addClass("navbar-transparent");
                 } else {
+                    $nav.removeClass("navbar-transparent");
                     //$nav.removeClass("navbar-transparent");
                 }
             }
