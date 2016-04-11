@@ -18,8 +18,7 @@ p a:hover {
   border-bottom: 1px solid #b73400;
 }
 body {
-  /*color: #0c0c17;*/
-  color: #ffffff;
+  color: #0c0c17;
   background: #ffffff;
 }
 body ::-moz-selection {
