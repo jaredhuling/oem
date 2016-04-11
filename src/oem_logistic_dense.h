@@ -1,5 +1,5 @@
-#ifndef OEM_DENSE_H
-#define OEM_DENSE_H
+#ifndef OEM_LOGISTIC_DENSE_H
+#define OEM_LOGISTIC_DENSE_H
 
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
@@ -200,7 +200,6 @@ protected:
     {
         if (penalty == "grp.lasso") 
         {
-            
             grp_idx.reserve(ngroups);
             for (int g = 0; g < ngroups; ++g) 
             {
@@ -215,7 +214,6 @@ protected:
                 }
                 grp_idx[g] = idx_tmp;
             }
-            
             
             // if group weights were not specified,
             // then set the group weight for each
@@ -552,4 +550,4 @@ protected:
 
 
 
-#endif // OEM_DENSE_TALL_H
+#endif // OEM_LOGISTIC_DENSE_H

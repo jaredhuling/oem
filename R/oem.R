@@ -6,7 +6,7 @@
 #' @param y numeric response vector of length nobs.
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
-#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp"
+#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
 #' @param lambda A user supplied lambda sequence. By default, the program computes
 #' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
 #' a value of lambda overrides this.
@@ -18,7 +18,7 @@
 #' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
 #' when nobs < nvars.
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
-#' @param gamma tuning parameter for SCAD and MCP penalties
+#' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 #' should be put in group 0
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
@@ -29,10 +29,10 @@
 #' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
-#' @standardize Logical flag for x variable standardization, prior to fitting the model sequence. 
+#' @param standardize Logical flag for x variable standardization, prior to fitting the models. 
 #' The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
 #' variables are in the same units already, you might not wish to standardize. 
-#' @intercept Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
+#' @param intercept Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations

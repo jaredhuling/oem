@@ -20,7 +20,7 @@ Each row is an observation, each column corresponds to a covariate}
 \item{family}{"gaussian" for least squares problems, "binomial" for binary response.}
 
 \item{penalty}{Specification of penalty type in lowercase letters. Choices include "lasso", 
-"ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp"}
+"ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"}
 
 \item{lambda}{A user supplied lambda sequence. By default, the program computes
 its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
@@ -37,7 +37,7 @@ when nobs < nvars.}
 
 \item{alpha}{mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)}
 
-\item{gamma}{tuning parameter for SCAD and MCP penalties}
+\item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}
@@ -51,6 +51,12 @@ variables.}
 this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 groups.}
+
+\item{standardize}{Logical flag for x variable standardization, prior to fitting the models. 
+The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
+variables are in the same units already, you might not wish to standardize.}
+
+\item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)}
 
 \item{maxit}{integer. Maximum number of OEM iterations}
 

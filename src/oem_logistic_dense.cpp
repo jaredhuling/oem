@@ -1,6 +1,5 @@
 
 #include "oem_logistic_dense.h"
-#include "DataStd.h"
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
@@ -123,16 +122,16 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     
     // initialize classes
     
-    if (family(0) == "gaussian")
-    {
-
-    } else if (family(0) == "binomial")
-    {
-        solver = new oemLogisticDense(X, Y, groups, unique_groups, 
-                                      group_weights, penalty_factor, 
-                                      alpha, gamma, intercept, standardize, 
-                                      irls_maxit, irls_tol, tol);
-    }
+    //if (family(0) == "gaussian")
+    //{
+    //
+    //} else if (family(0) == "binomial")
+    //{
+    solver = new oemLogisticDense(X, Y, groups, unique_groups, 
+                                  group_weights, penalty_factor, 
+                                  alpha, gamma, intercept, standardize, 
+                                  irls_maxit, irls_tol, tol);
+    //}
     
     
     double lmax = 0.0;
