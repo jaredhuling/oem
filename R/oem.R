@@ -4,7 +4,7 @@
 #' @param x input matrix or SparseMatrix (sparse not yet implemented. 
 #' Each row is an observation, each column corresponds to a covariate
 #' @param y numeric response vector of length nobs.
-#' @param family "gaussian" for least squares problems, "binomial" for binary response. "binomial" not yet implemented
+#' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp"
 #' @param lambda A user supplied lambda sequence. By default, the program computes

@@ -17,7 +17,7 @@ Each row is an observation, each column corresponds to a covariate}
 
 \item{y}{numeric response vector of length nobs.}
 
-\item{family}{"gaussian" for least squares problems, "binomial" for binary response. "binomial" not yet implemented}
+\item{family}{"gaussian" for least squares problems, "binomial" for binary response.}
 
 \item{penalty}{Specification of penalty type in lowercase letters. Choices include "lasso", 
 "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp"}
