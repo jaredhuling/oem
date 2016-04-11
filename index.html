@@ -367,33 +367,54 @@
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> penalty.factor</div>
+                              <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                  penalty.factor
+                                </div>
+                              </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Separate penalty factors can be applied to each coefficient. This is a number that 
-                        multiplies lambda to allow differential penalization. Can be 0 for some variables, 
-                        which implies no penalization, and that variable is always included in the model. Default is 1 for all 
-                        variables. 
+                        <div class="category-item content"> 
+                            <div class = "cat-it-inside">
+                                Separate penalty factors can be applied to each coefficient. This is a number that 
+                                multiplies lambda to allow differential penalization. Can be 0 for some variables, 
+                                which implies no penalization, and that variable is always included in the model. Default is 1 for all 
+                                variables. 
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> group.weights</div>
+                        <div class="category-item content"> 
+                            <div class = "cat-it-inside">
+                                group.weights
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
-                        this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
-                        which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
-                        groups. 
+                        <div class="category-item content"> 
+                            <div class = "cat-it-inside">
+                                penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+                                this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
+                                which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
+                                groups. 
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> standardize</div>
+                        <div class="category-item content"> 
+                            <div class = "cat-it-inside">
+                                standardize
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Logical flag for column-wise standardization of <code>x</code> 
-                        prior to fitting the models. 
-                        The coefficients are always returned on the original scale. Default is <code>standardize = FALSE</code>. If 
-                        variables are in the same units already, you might not wish to standardize. 
+                        <div class="category-item content"> 
+                            <div class = "cat-it-inside">
+                                Logical flag for column-wise standardization of <code>x</code> 
+                                prior to fitting the models. 
+                                The coefficients are always returned on the original scale. Default is <code>standardize = FALSE</code>. If 
+                                variables are in the same units already, you might not wish to standardize. 
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
@@ -436,21 +457,21 @@
                     <div class="row">
                     </div>
                     
-                    <div>
-                        <h5>
-                        <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
-                        
-                        <div class="highlight highlight-source-r"><pre>
-                        <span class="pl-smi">n</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">5000</span>
-                        <span class="pl-smi">p</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">200</span>
-                        <span class="pl-smi">m</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">25</span>
-                        <span class="pl-smi">b</span> <span class="pl-k">&lt;-</span> <span class="pl-k">matrix</span>(c(runif(<span class="pl-smi">m</span>, <span class="pl-k">-</span><span class="pl-c1">0.5</span>, <span class="pl-c1">0.5</span>), rep(<span class="pl-c1">0</span>, <span class="pl-smi">p</span> <span class="pl-k">-</span> <span class="pl-smi">m</span>)))
-                        <span class="pl-smi">x</span> <span class="pl-k">&lt;-</span> <span class="pl-k">matrix</span>(rnorm(<span class="pl-smi">n</span> <span class="pl-k">*</span> <span class="pl-smi">p</span>, <span class="pl-v">sd</span> <span class="pl-k">=</span> <span class="pl-c1">3</span>), <span class="pl-smi">n</span>, <span class="pl-smi">p</span>)
-                        <span class="pl-smi">y</span> <span class="pl-k">&lt;-</span> drop(<span class="pl-smi">x</span> <span class="pl-k">%*%</span> <span class="pl-smi">b</span>) <span class="pl-k">+</span> rnorm(<span class="pl-smi">n</span>)
-                        <span class="pl-smi">fit</span> <span class="pl-k">&lt;-</span> oem(<span class="pl-smi">x</span>, <span class="pl-smi">y</span>, <span class="pl-v">penalty</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>lasso<span class="pl-pds">"</span></span>)</pre></div>
-                        
-                    </div>
-                </div>
+                  <div class="row items-container">
+                      <div class="work-category-title col-md-12">
+                          <h4>Usage</h4>
+                      </div>
+                          
+                      <div class="highlight highlight-source-r"><pre>
+                      <span class="pl-smi">n</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">5000</span>
+                      <span class="pl-smi">p</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">200</span>
+                      <span class="pl-smi">m</span> <span class="pl-k">&lt;-</span> <span class="pl-c1">25</span>
+                      <span class="pl-smi">b</span> <span class="pl-k">&lt;-</span> <span class="pl-k">matrix</span>(c(runif(<span class="pl-smi">m</span>, <span class="pl-k">-</span><span class="pl-c1">0.5</span>, <span class="pl-c1">0.5</span>), rep(<span class="pl-c1">0</span>, <span class="pl-smi">p</span> <span class="pl-k">-</span> <span class="pl-smi">m</span>)))
+                      <span class="pl-smi">x</span> <span class="pl-k">&lt;-</span> <span class="pl-k">matrix</span>(rnorm(<span class="pl-smi">n</span> <span class="pl-k">*</span> <span class="pl-smi">p</span>, <span class="pl-v">sd</span> <span class="pl-k">=</span> <span class="pl-c1">3</span>), <span class="pl-smi">n</span>, <span class="pl-smi">p</span>)
+                      <span class="pl-smi">y</span> <span class="pl-k">&lt;-</span> drop(<span class="pl-smi">x</span> <span class="pl-k">%*%</span> <span class="pl-smi">b</span>) <span class="pl-k">+</span> rnorm(<span class="pl-smi">n</span>)
+                      <span class="pl-smi">fit</span> <span class="pl-k">&lt;-</span> oem(<span class="pl-smi">x</span>, <span class="pl-smi">y</span>, <span class="pl-v">penalty</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>lasso<span class="pl-pds">"</span></span>)</pre></div>
+                      
+                  </div>
 
                 <p></p>
 
