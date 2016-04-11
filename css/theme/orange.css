@@ -515,13 +515,13 @@ body ::selection {
 }
 .home-section .carousel .dotstyle-fall li:after,
 .home-section .carousel .dotstyle-fall div:after {
-  background: rgba(255, 255, 255, 0.4);
+  background: #1969b9; /*rgba(255, 255, 255, 0.4);*/
 }
 .home-section .carousel .dotstyle-fall li a,
 .home-section .carousel .dotstyle-fall div a,
 .home-section .carousel .dotstyle-fall li span,
 .home-section .carousel .dotstyle-fall div span {
-  background: rgba(255, 255, 255, 0.4);
+  background: #1969b9; /*rgba(255, 255, 255, 0.4);*/
 }
 .home-section .carousel .dotstyle-fall li a:focus,
 .home-section .carousel .dotstyle-fall div a:focus,
