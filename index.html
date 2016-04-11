@@ -62,14 +62,14 @@
             <!-- Home Section -->
     <section id="home-section" class="home-section overlay full-screen">
       <!-- options in below div: data-top="transform: translate3d(0px, 0px, 0px)" data-top-bottom="transform: translate3d(0px, -200px, 0px)" -->
-        <div class="parallax-hero full-screen overlay home-bg"  data-anchor-target="#home-section">
+        <div class="parallax-hero full-screen overlay home-bg" data-top="transform: translate3d(0px, 0px, 0px)" data-top-bottom="transform: translate3d(0px, -200px, 0px)" data-anchor-target="#home-section">
         </div>
         <div class="hs-content">
             <div class="hs-content-inner">
-                <div class="margin-bottom-10 init-animation-5 delay0-8s">
+                <div class="margin-bottom-10 ">  <!-- init-animation-5 delay0-8s -->
                     <h2 class="hs-text-6">Orthogonalizing EM for Penalized Estimation</h2>
                 </div>
-                <div class="margin-bottom-30 init-animation-2 delay0-2s">
+                <div class="margin-bottom-30 ">  <!-- init-animation-2 delay0-2s -->
                     <h1 class="hs-text-10 uppercase padding-top-40 font-second"><p style="text-transform:lowercase">oem<p></h1>
                 </div>
                 <div class="inline-block margin-top-10 padding-top-10 padding-left-sm-10">
@@ -91,15 +91,18 @@
     <!--/ End Home Section -->
     <!-- Navbar -->
     <div class="position-relative">
-        <div id="nav-wrapper" class="transp-nav">
-            <nav id="nav" class="navbar navbar-transparent navbar-fixed-top navbar-default ripple-group-parent init-animation-5" role="navigation">
+        <div id="nav-wrapper" >  <!-- class="transp-nav"  -->
+          <!-- classes for below nav: init-animation-5    -->
+            <nav id="nav" class="navbar navbar-transparent navbar-fixed-top navbar-default ripple-group-parent " role="navigation">
                 <!-- progressbar -->
+                <!-- 
                 <div id="scroll-progressbar" class="scroll-progressbar">
                     <div>
                         <span class="scroll-shadow"></span>
                     </div>
                 </div>
-                <div class="container in-page-scroll">
+                -->
+                <div class="container ">  <!--   in-page-scroll    -->
                     <!-- Brand and toggle get grouped for better mobile display -->
                     <div class="navbar-header">
                         <button type="button" id="animated-navicon" class="navbar-toggle" data-toggle="collapse" data-target="#mobile-navbar-collapse">
