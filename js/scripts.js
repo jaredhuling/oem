@@ -47,25 +47,25 @@
     function init_transparent_nav() {
         if ($navWrapper.hasClass("transp-nav")) {
             if ($window.scrollTop() < 130) {
-                $nav.addClass("navbar-transparent");
+                //$nav.addClass("navbar-transparent");
             } else {
-                $nav.removeClass("navbar-transparent");
+                //$nav.removeClass("navbar-transparent");
             }
         }
         $window.scroll(function() {
             var scroll = $window.scrollTop();
             if ($navWrapper.hasClass("transp-nav")) {
                 if (scroll < 130) {
-                    $nav.addClass("navbar-transparent");
+                    //$nav.addClass("navbar-transparent");
                 } else {
-                    $nav.removeClass("navbar-transparent");
+                    //$nav.removeClass("navbar-transparent");
                 }
             }
             if ($navWrapper.hasClass("elastic-nav")) {
                 if (scroll < 1) {
-                    $nav.addClass("navbar-elastic");
+                    //$nav.addClass("navbar-elastic");
                 } else {
-                    $nav.removeClass("navbar-elastic");
+                    //$nav.removeClass("navbar-elastic");
                 }
             }
         });
