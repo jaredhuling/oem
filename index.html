@@ -299,7 +299,8 @@
                         <div class="category-item"> alpha</div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> mixing value for <code>elastic.net</code> penalty. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
+                        <div class="category-item"> mixing value for <code>elastic.net</code> penalty. penalty applied is $(1 - \alpha) * \lambda \sum_{j=1}^p \beta_j^2 + 
+                        \alpha * \lambda \sum_{j = 1}^p|\beta_j|$
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
