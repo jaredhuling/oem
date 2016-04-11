@@ -302,6 +302,88 @@
                         <div class="category-item"> mixing value for <code>elastic.net</code> penalty. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
                         </div>
                     </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> gamma</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> tuning parameter for SCAD and MCP penalties
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> groups</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
+                        should be put in group 0. For example, if <code>x</code> has 6 columns, to put the first two variables in 
+                        one group and the second three in another group and the prevent penalization on the 6th variable, 
+                        set <code>groups = c(1,1,2,2,2,0)</code>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> penalty.factor</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> Separate penalty factors can be applied to each coefficient. This is a number that 
+                        multiplies lambda to allow differential penalization. Can be 0 for some variables, 
+                        which implies no penalization, and that variable is always included in the model. Default is 1 for all 
+                        variables. 
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> group.weights</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+                        this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
+                        which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
+                        groups. 
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> standardize</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> Logical flag for column-wise standardization of <code>x</code> 
+                        prior to fitting the models. 
+                        The coefficients are always returned on the original scale. Default is <code>standardize = FALSE</code>. If 
+                        variables are in the same units already, you might not wish to standardize. 
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> intercept</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> maxit</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> (integer) maximum number of OEM iterations (default is 500)
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> tol</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> convergence tolerance for OEM iterations (default = <code>1e-7</code>)
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> irls.maxit</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> (integer) maximum number of IRLS iterations (default is 100)
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> irls.tol</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> convergence tolerance for IRLS iterations. Only used if family != "gaussian" (default = <code>1e-3</code>)
+                        </div>
+                    </div>
                 </div>
 
                 <p></p>
@@ -386,6 +468,35 @@
 <script src="http://cdn.bootcss.com/jquery.isotope/2.2.2/isotope.pkgd.min.js"></script>
 <script src="js/nivo-lightbox.min.js"></script>
 <script src="js/scripts.min.js"></script>
+
+  <!-- MathJax support -->
+  <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    config: ["MMLorHTML.js"],
+    jax: ["input/TeX","input/MathML","input/AsciiMath","output/HTML-CSS","output/NativeMML"],
+    extensions: ["tex2jax.js","mml2jax.js","asciimath2jax.js","MathMenu.js","MathZoom.js"],
+    displayAlign: "left",
+    TeX: {
+      extensions: ["AMSmath.js", "AMSfonts.js","AMSsymbols.js","noErrors.js","noUndefined.js","color.js"],
+      Macros: {
+        D: "{\\mathcal{D}}",
+        argmin: "{\\operatorname*{argmin}}",
+        argmax: "{\\operatorname*{argmax}}"
+    	}
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+  </script>
+  <!--<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>-->
+
+  <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default.js"></script>
+
 
   </body>
 </html>
