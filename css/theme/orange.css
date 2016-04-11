@@ -490,27 +490,27 @@ body ::selection {
 }
 .home-section.overlay:before,
 .home-section .overlay:before {
-  background-color: #1969b9; /*rgba(12, 12, 23, 0.7);*/
-  opacity: .6;
+  background-color: #0139e0; /*rgba(12, 12, 23, 0.7);*/
+  opacity: .7;
 }
 .home-section .fss.overlay:before {
-  background-color: #1969b9;  /* waS 000000 */
+  background-color: #0139e0;  /* waS 000000 */
   opacity: .8;
 }
 .as-overlay .as-background:after {
-  background-color: #1969b9; /*rgba(12, 12, 23, 0.7);*/
-  opacity: .6;
+  background-color: #0139e0; /*rgba(12, 12, 23, 0.7);*/
+  opacity: .7;
 }
 .equal .home-section.overlay:before,
 .equal .home-section .overlay:before {
   opacity: .7;
 }
 .equal .home-section .fss.overlay:before {
-  background-color: #000000;
+  background-color: #0139e0;
   opacity: .95;
 }
 .equal .as-overlay .as-background:after {
-  background-color: #1969b9 ;/*rgba(12, 12, 23, 0.9);*/
+  background-color: #0139e0 ;/*rgba(12, 12, 23, 0.9);*/
   opacity: .7;
 }
 .home-section .carousel .dotstyle-fall li:after,
