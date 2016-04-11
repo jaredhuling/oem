@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8">
     <title>oem by jaredhuling</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
     <!--
@@ -189,8 +190,7 @@
                             oem is a ...
                         </p>
                         <p>
-                            The <code>plot.oem()</code> function helps us plot nomograms for
-                            penalized Cox models built with <code>hdcox.*()</code> functions.
+                            The <code>plot.oem()</code> function helps us plot estimated pathwise solutions.
                         </p>
                     </div>
 
@@ -204,7 +204,7 @@
                                     <!--<img src="img/hdnom.nomogram.png" alt="nomogram" />-->
                                 </div>
                                 <div class="portfolio-item-info font-second">
-                                    <h3 class="portfolio-item-title">Plotted Nomogram</h3>
+                                    <h3 class="portfolio-item-title">Plotted Lambda Path</h3>
                                     <div class="portfolio-item-detail">
                                         <p>Click the icon to enlarge</p>
                                         <!-- LightBox Button -->
@@ -225,19 +225,27 @@
 
                 <div class="row">
                     <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdcox.lasso() / hdcox.alasso()</p></h4>
+                        <h4><p style="text-transform:lowercase">oem()</p></h4>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nfolds</div>
+                        <div class="category-item"> x</div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fold numbers of cross-validation.</div>
+                        <div class="category-item"> design matrix. can be matrix or sparse matrix object</div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> rule</div>
+                        <div class="category-item"> y</div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Model selection criterion, <code>"lambda.min"</code> or <code>"lambda.1se"</code>. </div>
+                        <div class="category-item"> response vector. can be continuous or 0/1</div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> penalty</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> penalty to apply. <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
+                        , <code>"mcp"</code>, <code>"scad"</code>, or <code>"grp.lasso"</code>. Can select any number of penalties simultaneously
+                        </div>
                     </div>
                 </div>
 
@@ -246,118 +254,24 @@
 
                 <div class="row">
                     <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdcox.flasso()</p></h4>
+                        <h4><p style="text-transform:lowercase">plot.oemfit()</p></h4>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nfolds</div>
+                        <div class="category-item"> object</div>
                     </div>
                     <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fold numbers of cross-validation.</div>
+                        <div class="category-item"> fitted oem object.</div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> which.model</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> which model to plot (if multiple penalties selected)</div>
                     </div>
                 </div>
 
                 <p></p>
 
-                <div class="row">
-                    <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdcox.enet() / hdcox.aenet()</p></h4>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nfolds</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fold numbers of cross-validation.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> alphas</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Numeric vector. Alphas to tune, from 0 to 1.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> rule</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Model selection criterion, <code>"lambda.min"</code> or <code>"lambda.1se"</code>. </div>
-                    </div>
-                </div>
-
-                <p></p>
-
-                <div class="row">
-                    <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdcox.scad() / hdcox.mcp()</p></h4>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nfolds</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fold numbers of cross-validation.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> gammas</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Numeric vector. Gammas to tune.</div>
-                    </div>
-                </div>
-
-                <p></p>
-
-                <div class="row">
-                    <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdcox.mnet() / hdcox.snet()</p></h4>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nfolds</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fold numbers of cross-validation.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> gammas</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Numeric vector. Gammas to tune.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> alphas</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Numeric vector. Alphas to tune, from 0 to 1.</div>
-                    </div>
-                </div>
-
-                <p></p>
-
-                <div class="row">
-                    <div class="work-category-title col-md-12">
-                        <h4><p style="text-transform:lowercase">hdnom.nomogram()</p></h4>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> model.type</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Fitted model type. One of
-                            <code>"lasso"</code>, <code>"alasso"</code>, <code>"flasso"</code>, <code>"enet"</code>,
-                            <code>"aenet"</code>, <code>"mcp"</code>, <code>"mnet"</code>, <code>"scad"</code>,
-                            or <code>"snet"</code>.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> lambda</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Value of the penalty parameter <code>lambda</code>.
-                            Selected variables are used at <code>lambda</code> to build the nomogram,
-                            and make predictions.</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> pred.at</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> Time point at which to plot nomogram prediction axis.</div>
-                    </div>
-                </div>
 
             </div>
         </section>
