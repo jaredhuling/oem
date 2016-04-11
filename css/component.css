@@ -664,7 +664,7 @@ nav a:focus {
 	-webkit-transform: scale(1.2);
 	-moz-transform: scale(1.2);
 	transform: scale(1.2);
-	opacity: 0;
+	opacity: 0.5;
 }
 
 /* Effect 16: fall down */
