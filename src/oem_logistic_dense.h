@@ -263,11 +263,11 @@ protected:
         {
             if (intercept)
             {
-                //colsums.noalias() = (((W.array().sqrt().matrix()).asDiagonal() * X).colwise().sum()).matrix(); 
+                colsums.noalias() = (((W.array().matrix()).asDiagonal() * X).colwise().sum()).matrix(); 
                 XX.bottomRightCorner(nvars, nvars) = XtWX();
                 XX.block(0,1,1,nvars) = colsums;
                 XX.block(1,0,nvars,1) = colsums.transpose();
-                XX(0,0) = W.array().sqrt().sum();
+                XX(0,0) = W.array().sum();
             } else 
             {
                 XX = XtWX();
