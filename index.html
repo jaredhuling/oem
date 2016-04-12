@@ -487,7 +487,8 @@
 
                 <p></p>
 
-
+                <!--  plot   -->
+                
                 <div class="row">
                     <div class="work-category-title col-md-12">
                         <h4><p style="text-transform:lowercase">plot.oemfit()</p></h4>
@@ -543,6 +544,100 @@
                 </div>
 
                 <p></p>
+                
+                <!--  predict   -->
+                
+                <div class="row">
+                    <div class="work-category-title col-md-12">
+                        <h4><p style="text-transform:lowercase">predict.oemfit()</p></h4>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> object</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> fitted oem object.</div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    newx
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Matrix of new values for x at which predictions are to be made. 
+                                    Must be a matrix; can be sparse as in Matrix package. This argument is 
+                                    not used for <code>type=c("coefficients","nonzero")</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    s
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                      Value(s) of the penalty parameter lambda at which predictions are required. 
+                                      Default is the entire sequence used to create the model.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    which.model
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                      If multiple penalties are fit and returned in the same oem object, the <code>which.model</code> 
+                                      argument is used to specify which model to make predictions for. For example, if the oem object 
+                                      <code>oemobj</code> was fit with argument <code>penalty = c("lasso", "grp.lasso")</code>, 
+                                      then <code>which.model = 2</code> provides 
+                                      predictions for the group lasso model.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    type
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                      Type of prediction required. <code>type == "link"</code> gives the linear predictors for the 
+                                      <code>"binomial"</code> model; for <code>"gaussian"</code> models it gives the 
+                                      fitted values. <code>type == "response"</code>
+                                      gives the fitted probabilities for <code>"binomial"</code>.  <code>type == "coefficients"</code> 
+                                      computes the 
+                                      coefficients at the requested values for <code>s</code>. <code>type == "class"</code> applies only to 
+                                      <code>"binomial"</code> and produces the class label corresponding to the maximum probability.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <p></p>
+
 
 
             </div>
