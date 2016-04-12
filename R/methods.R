@@ -45,6 +45,13 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
                                     "class"), ...) 
 {
     type <- match.arg(type)
+    
+    num.models <- length(object$beta)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
     if(missing(newx)){
         if(!match(type, c("coefficients", "nonzero"), FALSE))stop("A value for 'newx' must be supplied")
     }
@@ -106,6 +113,13 @@ plot.oemfit <- function(x, which.model = 1,
                         xlab = iname, ylab = "Coefficients", 
                         ...) 
 {
+    num.models <- length(x$beta)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
     xvar <- match.arg(xvar)
     nbeta <- as.matrix(x$beta[[which.model]])
     switch(xvar,

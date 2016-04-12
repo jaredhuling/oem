@@ -8,6 +8,10 @@
   "loglambda", "dev"), xlab = iname, ylab = "Coefficients", ...)
 }
 \arguments{
+\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
+penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.}
+
 \item{xvar}{What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
 against the percent deviance explained.}
 
