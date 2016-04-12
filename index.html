@@ -283,7 +283,7 @@
                       <div class="col-md-10 col-sm-6 col-height">
                               <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                  penalty to apply. <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
+                                  penalty to apply. Currently available: <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
                                   , <code>"mcp"</code>, <code>"scad"</code>, or <code>"grp.lasso"</code>. Can select any number of penalties simultaneously
                                 </div>
                               </div>
@@ -499,6 +499,42 @@
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> which model to plot (if multiple penalties selected)</div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    xvar
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    One of <code>c("norm", "lambda",
+                                    loglambda", "dev")</code> What is on the X-axis. <code>norm</code> 
+                                    plots against the L1-norm of the coefficients, 
+                                    <code>lambda</code> against the log-lambda sequence, and <code>dev</code> against 
+                                    the percent deviance explained.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                  <code>...</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Other graphical parameters for the plot
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
