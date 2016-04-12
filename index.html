@@ -214,7 +214,9 @@
                 <div class="row">
                     <div class="col-sm-6">
                         <p class="workDesc">
-                            oem is a ...
+                            oem is a package for the estimation of various penalized regression models. The focus of oem is to provide 
+                            high performance computation for big <b>tall</b> data. Many applications not only have 
+                            a large number of variables, but a vast number of observations; oem is designed to perform well in these settings.
                         </p>
                         <p>
                             The <code>plot.oem()</code> function helps us plot estimated pathwise solutions.
@@ -254,19 +256,19 @@
                         <h4><p style="text-transform:lowercase">oem()</p></h4>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> x</div>
+                        <div class="category-item"> <code>x</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> design matrix. can be matrix or sparse matrix object</div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> y</div>
+                        <div class="category-item"> <code>y</code> </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> response vector. can be continuous or 0/1</div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> family</div>
+                        <div class="category-item"> <code>family</code> </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> model family. Currently available: <code>"gaussian"</code>, <code>"binomial"</code>.
@@ -276,14 +278,14 @@
                       <div class="col-md-2 col-sm-6  col-height">
                               <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                  penalty
+                                  <code>penalty</code>
                                 </div>
                               </div>
                       </div>
                       <div class="col-md-10 col-sm-6 col-height">
                               <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                  penalty to apply. <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
+                                  penalty to apply. Currently available: <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
                                   , <code>"mcp"</code>, <code>"scad"</code>, or <code>"grp.lasso"</code>. Can select any number of penalties simultaneously
                                 </div>
                               </div>
@@ -293,7 +295,7 @@
                         <div class="col-md-2 col-sm-6 col-height">
                             <div class="category-item content"> 
                               <div class = "cat-it-inside">
-                                lambda
+                                <code>lambda</code>
                               </div>
                             </div>
                         </div>
@@ -308,7 +310,7 @@
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> nlambda</div>
+                        <div class="category-item"> <code>nlambda</code> </div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> The number of lambda values to compute - default is 100.
@@ -316,7 +318,7 @@
                     </div>
                     <div class="row-height">
                         <div class="col-md-2 col-sm-6 col-height">
-                            <div class="category-item"> lambda.min.ratio</div>
+                            <div class="category-item"> <code>lambda.min.ratio</code></div>
                         </div>
                         <div class="col-md-10 col-sm-6 col-height">
                             <div class="category-item"> 
@@ -334,7 +336,7 @@
                     </div>
                     <div class="row-height">
                         <div class="col-md-2 col-sm-6 col-height">
-                            <div class="category-item"> alpha</div>
+                            <div class="category-item"> <code>alpha</code></div>
                         </div>
                         <div class="col-md-10 col-sm-6 col-height">
                             <div class="category-item"> mixing value for <code>elastic.net</code> penalty. penalty applied is $(1 - \alpha) * \lambda \sum_{j=1}^p \beta_j^2 + 
@@ -343,7 +345,7 @@
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> gamma</div>
+                        <div class="category-item"> <code>gamma</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> tuning parameter for SCAD and MCP penalties. Must be >= 1
@@ -353,7 +355,7 @@
                         <div class="col-md-2 col-sm-6 col-height">
                             <div class="category-item"> 
                               <div class = "cat-it-inside">
-                                groups
+                                <code>groups</code>
                               </div>
                             </div>
                         </div>
@@ -372,7 +374,7 @@
                         <div class="col-md-2 col-sm-6 col-height">
                               <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                  penalty.factor
+                                  <code>penalty.factor</code>
                                 </div>
                               </div>
                         </div>
@@ -391,7 +393,7 @@
                         <div class="col-md-2 col-sm-6 col-height">
                             <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                    group.weights
+                                    <code>group.weights</code>
                                 </div>
                             </div>
                         </div>
@@ -410,7 +412,7 @@
                         <div class="col-md-2 col-sm-6 col-height">
                             <div class="category-item content"> 
                                 <div class = "cat-it-inside">
-                                    standardize
+                                    <code>standardize</code>
                                 </div>
                             </div>
                         </div>
@@ -426,35 +428,35 @@
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> intercept</div>
+                        <div class="category-item"> <code>intercept</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> maxit</div>
+                        <div class="category-item"> <code>maxit</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> (integer) maximum number of OEM iterations (default is 500)
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> tol</div>
+                        <div class="category-item"> <code>tol</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> convergence tolerance for OEM iterations (default = <code>1e-7</code>)
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> irls.maxit</div>
+                        <div class="category-item"> <code>irls.maxit</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> (integer) maximum number of IRLS iterations (default is 100)
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> irls.tol</div>
+                        <div class="category-item"> <code>irls.tol</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> convergence tolerance for IRLS iterations. Only used if family != "gaussian" (default = <code>1e-3</code>)
@@ -489,16 +491,25 @@
                         <h4><p style="text-transform:lowercase">plot.oemfit()</p></h4>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> object</div>
+                        <div class="category-item"> <code>object</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> fitted oem object.</div>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> which.model</div>
+                        <div class="category-item"> <code>which.model</code></div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> which model to plot (if multiple penalties selected)</div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> <code>xvar</code></div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> One of: <code>c("norm", "lambda",
+      "loglambda", "dev")</code>. What is on the x-axis. <code>norm</code> plots against the L1-norm of the coefficients, <code>lambda</code> against the log-lambda sequence, and <code>dev</code> against the percent deviance explained.</div>
+                        </div>
                     </div>
                 </div>
 
