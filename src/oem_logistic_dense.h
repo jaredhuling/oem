@@ -286,9 +286,9 @@ protected:
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
         
         eigs.init();
-        eigs.compute(1000, 1e-10);
+        eigs.compute(1000, 1e-6);
         Vector eigenvals = eigs.eigenvalues();
-        d = eigenvals[0] * 1.005; // multiply by an increasing factor to be safe
+        d = eigenvals[0] * 1.0005; // multiply by an increasing factor to be safe
         
         if (nobs > nvars + int(intercept))
         {
