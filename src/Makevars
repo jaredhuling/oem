@@ -5,4 +5,5 @@ PKG_CPPFLAGS = -I${R_HOME}/library/Rcpp/include \
                -I${R_HOME}/library/RcppEigen/include  -I. -DNDEBUG
 
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
-PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(BLAS_LIBS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(BLAS_LIBS) $(FLIBS)
+

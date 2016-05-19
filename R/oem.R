@@ -12,7 +12,7 @@
 #' a value of lambda overrides this.
 #' @param nlambda The number of lambda values - default is 100.
 #' @param lambda.min.ratio Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
-#' value (i.e. the smallest value for which all coefﬁcients are zero). The default
+#' value (i.e. the smallest value for which all coefficients are zero). The default
 #' depends on the sample size nobs relative to the number of variables nvars. If
 #' nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
 #' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
@@ -40,7 +40,8 @@
 #' @return An object with S3 class "oemfit" 
 #' @useDynLib oem
 #' @import Rcpp
-#' @exportPattern "^[[:alpha:]]+"
+#' @import Matrix
+#' @import foreach
 #' @export
 #' @examples
 #' set.seed(123)
@@ -52,7 +53,9 @@
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
-#' fit <- oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:20, each = 5))
+#' fit <- oem(x = x, y = y, 
+#'            penalty = c("lasso", "grp.lasso"), 
+#'            groups = rep(1:20, each = 5))
 #' 
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
@@ -61,38 +64,20 @@
 #' # logistic
 #' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
 #' 
-#' system.time(res <- oem(x, y, intercept = FALSE, penalty = "lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8))
+#' system.time(res <- oem(x, y, intercept = FALSE, 
+#'                        penalty = "lasso", 
+#'                        family = "binomial", 
+#'                        irls.tol = 1e-3, tol = 1e-8))
 #' 
-#' library(glmnet)
-#' 
-#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-12))
-#' 
-#' max(abs(coef(glmn) - res$beta[[1]]))
-#' 
-#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-15))
-#' 
-#' max(abs(coef(glmn) - res$beta[[1]]))
-#' 
-#' system.time(glmn <- glmnet(x, y, lambda = res$lambda, standardize =FALSE, intercept = FALSE, family = "binomial", thresh = 1e-18))
-#'
-#' ## group lasso (logistic model)
-#' 
-#' library(gglasso)
-#' 
-#' system.time(res.gr <- oem(x, y, intercept = FALSE, penalty = "grp.lasso", family = "binomial", irls.tol = 1e-3, tol = 1e-8, groups = rep(1:10, each = 10)))
+#' system.time(res.gr <- oem(x, y, intercept = FALSE, 
+#'                           penalty = "grp.lasso", 
+#'                           family = "binomial", 
+#'                           groups = rep(1:10, each = 10), 
+#'                           irls.tol = 1e-3, tol = 1e-8))
 #' 
 #' layout(matrix(1:2, ncol = 2))
 #' plot(res)
 #' plot(res.gr)
-#' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-8))
-#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
-#' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-10))
-#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
-#' 
-#' system.time(ggl <- gglasso(x, 2 * y - 1, group = rep(1:10, each = 10), loss = "logit", lambda = res.gr$lambda, intercept = FALSE, eps = 1e-12))
-#' max(abs(ggl$beta - res.gr$beta[[1]][-1,]))
 #' 
 oem <- function(x, 
                 y, 

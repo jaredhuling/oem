@@ -14,7 +14,9 @@
 #' @param type Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
 #' Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 #' Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.
+#' @param ... not used
 #' @return An object depending on the type argument
+#' @rdname predict
 #' @export
 #' @examples
 #' set.seed(123)
@@ -29,7 +31,10 @@
 #' x.test <- matrix(rnorm(n.obs.test * n.vars), n.obs.test, n.vars)
 #' y.test <- rnorm(n.obs.test, sd = 3) + x.test %*% true.beta
 #' 
-#' fit <- oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10, each = 10), nlambda = 10)
+#' fit <- oem(x = x, y = y, 
+#'            penalty = c("lasso", "grp.lasso"), 
+#'            groups = rep(1:10, each = 10), 
+#'            nlambda = 10)
 #' 
 #' preds.lasso <- predict(fit, newx = x.test, type = "response", which.model = 1)
 #' preds.grp.lasso <- predict(fit, newx = x.test, type = "response", which.model = 2)
@@ -83,13 +88,16 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 
 #' Prediction method for Orthogonalizing EM fitted objects
 #'
-#' @param object fitted "oem" model object
+#' @param x fitted "oem" model object
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
 #' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
 #' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.
 #' @param xvar What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
 #' against the percent deviance explained.
+#' @param xlab label for x-axis
+#' @param ylab label for y-axis
 #' @param ... other graphical parameters for the plot
+#' @rdname plot
 #' @export
 #' @examples
 #' set.seed(123)
@@ -149,7 +157,8 @@ plot.oemfit <- function(x, which.model = 1,
 }
 
 
-
+#' @rdname predict
+#' @export
 predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
                                     type = c("link", 
                                              "response",
@@ -159,6 +168,9 @@ predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
     NextMethod("predict")
 } 
 
+
+#' @rdname predict
+#' @export
 predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
                                     type=c("link", 
                                            "response", 

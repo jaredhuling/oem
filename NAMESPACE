@@ -2,7 +2,10 @@
 
 S3method(plot,oemfit)
 S3method(predict,oemfit)
+S3method(predict,oemfit_binomial)
+S3method(predict,oemfit_gaussian)
 export(oem)
-exportPattern("^[[:alpha:]]+")
+import(Matrix)
 import(Rcpp)
+import(foreach)
 useDynLib(oem)

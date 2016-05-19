@@ -2,10 +2,18 @@
 % Please edit documentation in R/methods.R
 \name{predict.oemfit}
 \alias{predict.oemfit}
+\alias{predict.oemfit_binomial}
+\alias{predict.oemfit_gaussian}
 \title{Prediction method for Orthogonalizing EM fitted objects}
 \usage{
 \method{predict}{oemfit}(object, newx, s = NULL, which.model = 1,
   type = c("link", "response", "coefficients", "nonzero", "class"), ...)
+
+\method{predict}{oemfit_gaussian}(object, newx, s = NULL, which.model = 1,
+  type = c("link", "response", "coefficients", "nonzero"), ...)
+
+\method{predict}{oemfit_binomial}(object, newx, s = NULL, which.model = 1,
+  type = c("link", "response", "coefficients", "class", "nonzero"), ...)
 }
 \arguments{
 \item{object}{fitted "oem" model object}
@@ -23,6 +31,8 @@ penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for
 \item{type}{Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
 Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.}
+
+\item{...}{not used}
 }
 \value{
 An object depending on the type argument
@@ -43,7 +53,10 @@ y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 x.test <- matrix(rnorm(n.obs.test * n.vars), n.obs.test, n.vars)
 y.test <- rnorm(n.obs.test, sd = 3) + x.test \%*\% true.beta
 
-fit <- oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10, each = 10), nlambda = 10)
+fit <- oem(x = x, y = y, 
+           penalty = c("lasso", "grp.lasso"), 
+           groups = rep(1:10, each = 10), 
+           nlambda = 10)
 
 preds.lasso <- predict(fit, newx = x.test, type = "response", which.model = 1)
 preds.grp.lasso <- predict(fit, newx = x.test, type = "response", which.model = 2)
