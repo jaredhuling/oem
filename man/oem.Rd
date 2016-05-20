@@ -5,11 +5,11 @@
 \title{Orthogonalizing EM}
 \usage{
 oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
-  "lasso", "ols", "mcp", "scad", "grp.lasso"), lambda = numeric(0),
-  nlambda = 100L, lambda.min.ratio = NULL, alpha = 1, gamma = 3,
-  groups = numeric(0), penalty.factor = NULL, group.weights = NULL,
-  standardize = FALSE, intercept = TRUE, maxit = 500L, tol = 1e-07,
-  irls.maxit = 100L, irls.tol = 0.001)
+  "lasso", "ols", "mcp", "scad", "grp.lasso"), weights = numeric(0),
+  lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
+  alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
+  group.weights = NULL, standardize = FALSE, intercept = TRUE,
+  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001)
 }
 \arguments{
 \item{x}{input matrix or SparseMatrix (sparse not yet implemented. 
@@ -21,6 +21,9 @@ Each row is an observation, each column corresponds to a covariate}
 
 \item{penalty}{Specification of penalty type in lowercase letters. Choices include "lasso", 
 "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"}
+
+\item{weights}{observation weights. defaults to 1 for each observation (setting weight vector to 
+length 0 will default all weights to 1)}
 
 \item{lambda}{A user supplied lambda sequence. By default, the program computes
 its own lambda sequence based on nlambda and lambda.min.ratio. Supplying

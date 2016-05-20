@@ -1,4 +1,5 @@
 
+# taken from glmnet
 getmin <- function(lambda, cvm, cvsd){
     #copied from glmnet package
     cvmin <- min(cvm)
@@ -11,6 +12,7 @@ getmin <- function(lambda, cvm, cvsd){
     list(lambda.min = lambda.min, lambda.1se = lambda.1se)
 }
 
+# taken from caret
 createFolds <- function (y, k = 10, list = TRUE, returnTrain = FALSE) {
     #copied from caret package
     if (is.numeric(y)) {
@@ -45,8 +47,9 @@ createFolds <- function (y, k = 10, list = TRUE, returnTrain = FALSE) {
     out
 }
 
+# taken from glmnet
 lambda.interp <- function(lambda, s) {
-    #copied from glmnet package
+    ## copied from glmnet package
     ## interpolation of lambda according to s
     ## take lambda = sfrac * left + (1 - sfrac * right)
     
@@ -68,4 +71,36 @@ lambda.interp <- function(lambda, s) {
         sfrac[left==right] <- 1
     }
     list(left = left, right = right, frac = sfrac)
+}
+
+# taken from glmnet
+auc=function(y,prob,w){
+    if(missing(w)){
+        rprob=rank(prob)
+        n1=sum(y);n0=length(y)-n1
+        u=sum(rprob[y==1])-n1*(n1+1)/2
+        u/(n1*n0)
+    }
+    else{
+        rprob=runif(length(prob))
+        op=order(prob,rprob)#randomize ties
+        y=y[op]
+        w=w[op]
+        cw=cumsum(w)
+        w1=w[y==1]
+        cw1=cumsum(w1)
+        wauc=sum(w1*(cw[y==1]-cw1))
+        sumw=cw1[length(cw1)]
+        sumw=sumw*(cw[length(cw)]-sumw)
+        wauc/sumw
+    }
+}
+
+# taken from glmnet
+auc.mat=function(y,prob,weights=rep(1,nrow(y))){
+    Weights=as.vector(weights*y)
+    ny=nrow(y)
+    Y=rep(c(0,1),c(ny,ny))
+    Prob=c(prob,prob)
+    auc(Y,Prob,Weights)
 }

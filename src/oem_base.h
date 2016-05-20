@@ -114,6 +114,8 @@ public:
     Eigen::RowVectorXd get_X_colmeans() {return colmeans;}
     Eigen::RowVectorXd get_X_colstd() {return colstd;}
     
+    virtual double get_loss() { return 1e99; }
+    
     virtual void init(double lambda_, std::string penalty_) {}
     virtual void init_warm(double lambda_) {}
 };

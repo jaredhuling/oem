@@ -7,6 +7,8 @@
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
+#' @param weights observation weights. defaults to 1 for each observation (setting weight vector to 
+#' length 0 will default all weights to 1)
 #' @param lambda A user supplied lambda sequence. By default, the program computes
 #' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
 #' a value of lambda overrides this.
@@ -83,6 +85,7 @@ oem <- function(x,
                 y, 
                 family = c("gaussian", "binomial"),
                 penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
+                weights = numeric(0),
                 lambda = numeric(0),
                 nlambda = 100L,
                 lambda.min.ratio = NULL,
@@ -123,6 +126,15 @@ oem <- function(x,
     
     if (is.null(penalty.factor)) {
         penalty.factor <- rep(1, p)
+    }
+    
+    if (length(weights))
+    {
+        if (length(weights) != n)
+        {
+            stop("length of weights not same as number of observations in x")
+        }
+        
     }
     
     if (length(penalty.factor) != p) {
@@ -241,6 +253,7 @@ oem <- function(x,
                                                x, y, 
                                                family, 
                                                penalty, 
+                                               weights,
                                                groups,
                                                unique.groups,
                                                group.weights,
@@ -257,6 +270,7 @@ oem <- function(x,
                                                x, y, 
                                                family, 
                                                penalty, 
+                                               weights,
                                                groups,
                                                unique.groups,
                                                group.weights,
@@ -281,6 +295,7 @@ oemfit.gaussian <- function(is.sparse,
                             y, 
                             family, 
                             penalty, 
+                            weights,
                             groups,
                             unique.groups,
                             group.weights,
@@ -300,6 +315,7 @@ oemfit.gaussian <- function(is.sparse,
                      x, y, 
                      family, 
                      penalty, 
+                     weights,
                      groups,
                      unique.groups,
                      group.weights,
@@ -319,6 +335,7 @@ oemfit.gaussian <- function(is.sparse,
                      x, y, 
                      family, 
                      penalty, 
+                     weights,
                      groups,
                      unique.groups,
                      group.weights,
@@ -343,6 +360,7 @@ oemfit.binomial <- function(is.sparse,
                             y, 
                             family, 
                             penalty, 
+                            weights,
                             groups,
                             unique.groups,
                             group.weights,
@@ -361,7 +379,8 @@ oemfit.binomial <- function(is.sparse,
         ret <- .Call("oem_fit_logistic_sparse", 
                      x, y, 
                      family, 
-                     penalty, 
+                     penalty,
+                     weights,
                      groups,
                      unique.groups,
                      group.weights,
@@ -381,6 +400,7 @@ oemfit.binomial <- function(is.sparse,
                      x, y, 
                      family, 
                      penalty, 
+                     weights,
                      groups,
                      unique.groups,
                      group.weights,

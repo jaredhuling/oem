@@ -30,6 +30,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
                                        SEXP y_, 
                                        SEXP family_,
                                        SEXP penalty_,
+                                       SEXP weights_,
                                        SEXP groups_,
                                        SEXP unique_groups_,
                                        SEXP group_weights_,
@@ -67,8 +68,10 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     // which is equivalent to minimizing
     //   1/2 * ||y - X * beta||^2 + n * lambda * ||beta||_1
     ArrayXd lambda(as<ArrayXd>(lambda_));
+    VectorXd weights(as<VectorXd>(weights_));
     VectorXd group_weights(as<VectorXd>(group_weights_));
     int nlambda = lambda.size();
+    int nweights = weights.size();
     
     
     List opts(opts_);
@@ -127,7 +130,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     //
     //} else if (family(0) == "binomial")
     //{
-    solver = new oemLogisticDense(X, Y, groups, unique_groups, 
+    solver = new oemLogisticDense(X, Y, weights, groups, unique_groups, 
                                   group_weights, penalty_factor, 
                                   alpha, gamma, intercept, standardize, 
                                   irls_maxit, irls_tol, tol);
@@ -151,6 +154,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     MatrixXd beta(p + 1, nlambda);
     List beta_list(penalty.size());
     List iter_list(penalty.size());
+    List loss_list(penalty.size());
     
     IntegerVector niter(nlambda);
     int nlambda_store = nlambda;
@@ -161,7 +165,9 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         if (penalty[pp] == "ols")
         {
             nlambda = 1L;
-        } 
+        }
+        
+        VectorXd loss(nlambda);
         
         for(int i = 0; i < nlambda; i++)
         {
@@ -183,6 +189,9 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
                 beta(0,i) = 0;
                 beta.block(1, i, p, 1) = res;
             }
+            
+            // get associated loss
+            loss(i) = solver->get_loss();
             
             // if the design matrix includes the intercept
             // then don't back into the intercept with
@@ -208,10 +217,12 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
             nlambda = nlambda_store;
             beta_list(pp) = beta.col(0);
             iter_list(pp) = niter(0);
+            loss_list(pp) = loss(0);
         } else 
         {
             beta_list(pp) = beta;
             iter_list(pp) = niter;
+            loss_list(pp) = loss;
         }
         
         

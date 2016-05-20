@@ -38,6 +38,7 @@ protected:
     
     const MapMatd X;            // data matrix
     MapVec Y;                   // response vector
+    VectorXd weights;
     VectorXi groups;            // vector of group membersihp indexes 
     VectorXi unique_groups;     // vector of all unique groups
     VectorXd penalty_factor;    // penalty multiplication factors 
@@ -60,6 +61,7 @@ protected:
     double lambda0;            // minimum lambda to make coefficients all zero
     
     double threshval;
+    int wt_len;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -195,6 +197,16 @@ protected:
         rankUpdate(X);
     }
     
+    MatrixXd XtWX() const {
+        return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
+        rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
+    }
+    
+    MatrixXd XWXt() const {
+        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+        rankUpdate( (weights.array().sqrt().matrix()).asDiagonal() * X );
+    }
+    
     void get_group_indexes()
     {
         if (penalty == "grp.lasso") 
@@ -233,15 +245,26 @@ protected:
     {
         
         // compute X'X
-        
-        if (nobs > nvars) 
+        // if weights specified, compute X'WX instead
+        if (wt_len)
         {
-            XX = XtX();
+            if (nobs > nvars) 
+            {
+                XX = XtWX();
+            } else 
+            {
+                XX = XWXt();
+            }
         } else 
         {
-            XX = XXt();
+            if (nobs > nvars) 
+            {
+                XX = XtX();
+            } else 
+            {
+                XX = XXt();
+            }
         }
-        
         
         XX /= nobs;
         
@@ -303,6 +326,7 @@ protected:
 public:
     oemDense(const Eigen::Ref<const MatrixXd>  &X_, 
              ConstGenericVector &Y_,
+             const VectorXd &weights_,
              const VectorXi &groups_,
              const VectorXi &unique_groups_,
              VectorXd &group_weights_,
@@ -320,6 +344,7 @@ public:
                              tol_),
                              X(X_.data(), X_.rows(), X_.cols()),
                              Y(Y_.data(), Y_.size()),
+                             weights(weights_),
                              groups(groups_),
                              unique_groups(unique_groups_),
                              penalty_factor(penalty_factor_),
@@ -339,7 +364,16 @@ public:
     double compute_lambda_zero() 
     { 
         
-        XY.noalias() = X.transpose() * Y;
+        wt_len = weights.size();
+        
+        if (wt_len)
+        {
+            XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
+        } else
+        {
+            XY.noalias() = X.transpose() * Y;
+        }
+        
         XY /= nobs;
         
         // compute XtX or XXt (depending on if n > p or not)
@@ -376,6 +410,13 @@ public:
     VectorXd get_beta() 
     { 
         return beta;
+    }
+    
+    virtual double get_loss()
+    {
+        double loss;
+        loss = (Y - X * beta).array().square().sum();
+        return loss;
     }
 };
 
