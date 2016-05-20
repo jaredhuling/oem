@@ -7,7 +7,7 @@
 cv.oem(x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
   "grp.lasso"), weights = numeric(0), lambda = NULL,
   type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10,
-  foldid, grouped = TRUE, keep = FALSE, parallel = FALSE, ...)
+  foldid = NULL, grouped = TRUE, keep = FALSE, parallel = FALSE, ...)
 }
 \arguments{
 \item{x}{input matrix or SparseMatrix (sparse not yet implemented. 

@@ -71,7 +71,7 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
     }
     if (type == "coefficients") return(nbeta)
     if (type == "nonzero") {
-        newbeta <- abs(as.matrix(object$beta)) > 0
+        newbeta <- abs(as.matrix(object$beta[[which.model]])) > 0
         index <- 1:(dim(newbeta)[1])
         nzel <- function(x, index) if(any(x)) index[x] else NULL
         betaList <- apply(newbeta, 2, nzel, index)

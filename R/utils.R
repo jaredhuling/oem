@@ -1,15 +1,26 @@
 
-# taken from glmnet
+
 getmin <- function(lambda, cvm, cvsd){
-    #copied from glmnet package
-    cvmin <- min(cvm)
-    idmin <- cvm <= cvmin
-    lambda.min <- max(lambda[idmin])
-    idmin <- match(lambda.min, lambda)
-    semin <- (cvm + cvsd)[idmin]
-    idmin <- cvm < semin
-    lambda.1se <- max(lambda[idmin])
-    list(lambda.min = lambda.min, lambda.1se = lambda.1se)
+    #modified from glmnet package
+    
+    lambda.min.models <- lambda.1se.models <- numeric(length(cvm))
+    
+    for (m in 1:length(cvm))
+    {
+        cvmin <- min(cvm[[m]])
+        idmin <- cvm[[m]] <= cvmin
+        lambda.min.models[m] <- max(lambda[idmin])
+        idmin <- match(lambda.min.models[m], lambda)
+        semin <- (cvm[[m]] + cvsd[[m]])[idmin]
+        idmin <- cvm[[m]] < semin
+        lambda.1se.models[m] <- max(lambda[idmin])
+    }
+    mmin <- which.min(lambda.min.models)
+    lambda.min <- lambda.min.models[mmin]
+    lambda.1se <- lambda.1se.models[mmin]
+    
+    list(lambda.min = lambda.min, model.min = mmin, lambda.1se = lambda.1se,
+         lambda.min.models = lambda.min.models, lambda.1se.models = lambda.1se.models)
 }
 
 # taken from caret
@@ -103,4 +114,22 @@ auc.mat=function(y,prob,weights=rep(1,nrow(y))){
     Y=rep(c(0,1),c(ny,ny))
     Prob=c(prob,prob)
     auc(Y,Prob,Weights)
+}
+
+# modified from glmnet
+cvcompute=function(mat,weights,foldid,nlams){
+    ###Computes the weighted mean and SD within folds, and hence the se of the mean
+    wisum=tapply(weights,foldid,sum)
+    nfolds=max(foldid)
+    outmat=matrix(NA,nfolds,ncol(mat))
+    good=matrix(0,nfolds,ncol(mat))
+    mat[is.infinite(mat)]=NA#just in case some infinities crept in
+    for(i in seq(nfolds)){
+        mati=mat[foldid==i,,drop=FALSE]
+        wi=weights[foldid==i]
+        outmat[i,]=apply(mati,2,weighted.mean,w=wi,na.rm=TRUE)
+        good[i,seq(nlams[i])]=1
+    }
+    N=apply(good,2,sum)
+    list(cvraw=outmat,weights=wisum,N=N)
 }
