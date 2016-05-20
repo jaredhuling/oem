@@ -41,12 +41,13 @@
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
-#' fit <- oem(x = x, y = y, 
-#'            penalty = c("lasso", "grp.lasso"), 
-#'            groups = rep(1:20, each = 5))
+#' fit <- cv.oem(x = x, y = y, 
+#'               penalty = c("lasso", "grp.lasso"), 
+#'               groups = rep(1:20, each = 5))
 #' 
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
+#' plot(fit, which.model = 2)
 cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
                     weights = numeric(0), lambda = NULL, 
                     type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10, foldid = NULL, 
