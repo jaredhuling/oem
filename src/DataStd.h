@@ -89,22 +89,38 @@ public:
             scaleX.resize(p);
     }
 
-    void standardize(MatrixXd &X, Vector &Y)
+    void standardize(MatrixXd &X, Vector &Y, Vector &wts)
     {
         double n_invsqrt = 1.0 / std::sqrt(Double(n));
+        int wt_len = wts.size();
 
         // standardize Y
         switch(flag)
         {
             case 1:
-                scaleY = sd_n(Y);
+                if (wt_len)
+                {
+                    scaleY = sd_n( (Y.array() * wts.array()).matrix() );
+                } else 
+                {
+                    scaleY = sd_n(Y);
+                }
                 Y.array() /= scaleY;
                 break;
             case 2:
             case 3:
-                meanY = Y.mean();
-                Y.array() -= meanY;
-                scaleY = Y.norm() * n_invsqrt;
+                if (wt_len)
+                {
+                    meanY = (Y.array() * wts.array()).matrix().mean();
+                    Y.array() -= meanY;
+                    scaleY = (Y.array() * wts.array()).matrix().norm() * n_invsqrt;
+                } else
+                {
+                    meanY = Y.mean();
+                    Y.array() -= meanY;
+                    scaleY = Y.norm() * n_invsqrt;
+                }
+                
                 Y.array() /= scaleY;
                 break;
             default:
@@ -112,19 +128,21 @@ public:
         }
 
         // standardize X
-        switch(flag)
+        if (wt_len)
         {
+            switch(flag)
+            {
             case 1:
                 for(int i = 0; i < p; i++)
                 {
-                    scaleX[i] = sd_n(X.col(i));
+                    scaleX[i] = sd_n((X.col(i).array() * wts.array()).matrix() );
                     X.col(i).array() *= (1.0 / scaleX[i]);
                 }
                 break;
             case 2:
                 for(int i = 0; i < p; i++)
                 {
-                    meanX[i] = X.col(i).mean();
+                    meanX[i] = (X.col(i).array() * wts.array()).matrix().mean();
                     X.col(i).array() -= meanX[i];
                 }
                 break;
@@ -135,25 +153,71 @@ public:
                     X.col(i).array() -= meanX[i];
                     scaleX[i] = X.col(i).norm() * n_invsqrt;
                     X.col(i).array() /= scaleX[i];*/
-    #ifdef __AVX__
+#ifdef __AVX__
                     double *begin = &X(0, i);
                     double s, ss;
                     get_ss_avx<double>(begin, n, s, ss);
                     meanX[i] = s / n;
                     scaleX[i] = std::sqrt(ss - s * s / n) * n_invsqrt;
                     standardize_vec_avx<double>(begin, n, meanX[i], 1.0 / scaleX[i]);
-    #else
+#else
                     double *begin = &X(0, i);
                     double *end = begin + n;
-                    meanX[i] = X.col(i).mean();
+                    meanX[i] = (X.col(i).array() * wts.array()).matrix().mean();
                     std::transform(begin, end, begin, std::bind2nd(std::minus<double>(), meanX[i]));
-                    scaleX[i] = X.col(i).norm() * n_invsqrt;
+                    scaleX[i] = (X.col(i).array() * wts.array()).matrix().norm() * n_invsqrt;
                     std::transform(begin, end, begin, std::bind2nd(std::multiplies<double>(), 1.0 / scaleX[i]));
-    #endif
+#endif
                 }
                 break;
             default:
                 break;
+            }
+        } else 
+        {
+            switch(flag)
+            {
+                case 1:
+                    for(int i = 0; i < p; i++)
+                    {
+                        scaleX[i] = sd_n(X.col(i));
+                        X.col(i).array() *= (1.0 / scaleX[i]);
+                    }
+                    break;
+                case 2:
+                    for(int i = 0; i < p; i++)
+                    {
+                        meanX[i] = X.col(i).mean();
+                        X.col(i).array() -= meanX[i];
+                    }
+                    break;
+                case 3:
+                    for(int i = 0; i < p; i++)
+                    {
+                        /*meanX[i] = X.col(i).mean();
+                        X.col(i).array() -= meanX[i];
+                        scaleX[i] = X.col(i).norm() * n_invsqrt;
+                        X.col(i).array() /= scaleX[i];*/
+        #ifdef __AVX__
+                        double *begin = &X(0, i);
+                        double s, ss;
+                        get_ss_avx<double>(begin, n, s, ss);
+                        meanX[i] = s / n;
+                        scaleX[i] = std::sqrt(ss - s * s / n) * n_invsqrt;
+                        standardize_vec_avx<double>(begin, n, meanX[i], 1.0 / scaleX[i]);
+        #else
+                        double *begin = &X(0, i);
+                        double *end = begin + n;
+                        meanX[i] = X.col(i).mean();
+                        std::transform(begin, end, begin, std::bind2nd(std::minus<double>(), meanX[i]));
+                        scaleX[i] = X.col(i).norm() * n_invsqrt;
+                        std::transform(begin, end, begin, std::bind2nd(std::multiplies<double>(), 1.0 / scaleX[i]));
+        #endif
+                    }
+                    break;
+                default:
+                    break;
+            }
         }
     }
 

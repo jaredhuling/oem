@@ -121,7 +121,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     }
     
     DataStd<double> datstd(n, p + add, standardize, intercept);
-    datstd.standardize(X, Y);
+    datstd.standardize(X, Y, weights);
     
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
