@@ -90,8 +90,8 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 #'
 #' @param x fitted "oem" model object
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.
+#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
 #' @param xvar What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
 #' against the percent deviance explained.
 #' @param xlab label for x-axis
@@ -154,6 +154,64 @@ plot.oemfit <- function(x, which.model = 1,
     )
     matplot(index, t(nbeta), lty = 1, xlab = xlab, ylab = ylab, xlim = xlim,
             type = 'l', ...)
+}
+
+#' Prediction method for Orthogonalizing EM fitted objects
+#'
+#' @param object fitted "cv.oem" model object
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
+#' @param sign.lambda Either plot against log(lambda) (default) or its negative if sign.lambda=-1
+#' @param ... other graphical parameters for the plot
+#' @rdname plot
+#' @export
+#' @examples
+#' set.seed(123)
+#' n.obs <- 1e4
+#' n.vars <- 100
+#' n.obs.test <- 1e3
+#' 
+#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+#' 
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#' 
+#' fit <- cv.oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10, each = 10))
+#' 
+#' layout(matrix(1:2, ncol = 2))
+#' plot(fit, which.model = 1)
+#' plot(fit, which.model = 2)
+#' 
+plot.cv.oem=function(object, which.model = 1, sign.lambda=1, ...)
+{
+    # modified from glmnet
+    
+    num.models <- length(object$cvm)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
+    xlab="log(Lambda)"
+    if(sign.lambda<0)xlab=paste("-",xlab,sep="")
+    plot.args=list(x    = sign.lambda * log(object$lambda),
+                   y    = object$cvm[[which.model]],
+                   ylim = range(object$cvup[[which.model]], object$cvlo[[which.model]]),
+                   xlab = xlab,
+                   ylab = object$name,type="n")
+    new.args=list(...)
+    if(length(new.args))plot.args[names(new.args)]=new.args
+    do.call("plot", plot.args)
+    error.bars(sign.lambda * log(object$lambda), 
+               object$cvup[[which.model]], 
+               object$cvlo[[which.model]], width=0.01, col="darkgrey")
+    points(sign.lambda*log(object$lambda), object$cvm[[which.model]], pch=20, col="red")
+    axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0)
+    abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=3)
+    abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=3)
+    invisible()
 }
 
 
