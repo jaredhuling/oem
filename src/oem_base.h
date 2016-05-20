@@ -24,6 +24,7 @@ protected:
     
     VecTypeBeta beta;                 // parameters to be optimized
     VecTypeBeta beta_prev;            // parameters from previous iteration
+    VecTypeBeta beta_prev_irls;       // parameters from previous irls iteration
     
     Eigen::RowVectorXd colmeans;      // column means of X
     Eigen::RowVectorXd colstd;        // column std devs of X
@@ -64,6 +65,7 @@ public:
     u(p_),               // allocate space but do not set values
     beta(p_),            // allocate space but do not set values
     beta_prev(p_),       // allocate space but do not set values
+    beta_prev_irls(p_),
     colmeans(p_),
     colstd(p_),
     tol(tol_)

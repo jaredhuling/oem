@@ -252,3 +252,104 @@ predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
            nfit
     )
 }  
+
+
+#' log likelihood function for fitted oem objects
+#'
+#' @param object fitted "oem" model object.
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
+#' @param ... not used
+#' @rdname logLik
+#' @export
+#' @examples
+#' set.seed(123)
+#' n.obs <- 2000
+#' n.vars <- 50
+#' 
+#' true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#'
+#' fit <- oem(x = x, y = y)
+#'
+#' logLik(fit)
+#'
+logLik.oemfit <- function(object, which.model = 1, ...) {
+    # taken from ncvreg. Thanks to Patrick Breheny.
+    n <- as.numeric(object$nobs)
+    
+    if (object$family == "gaussian")
+    {
+        
+        resid.ss <- object$loss[[which.model]]
+        logL <- -0.5 * n * (log(2 * pi) - log(n) + log(resid.ss)) - 0.5 * n
+    } else if (object$family == "binomial")
+    {
+        logL <- -1 * object$loss[[which.model]]
+    } else if (object$family == "poisson")
+    {
+        stop("poisson not complete yet")
+        #y <- object$y
+        #ind <- y != 0
+        #logL <- -object$loss + sum(y[ind] * log(y[ind])) - sum(y) - sum(lfactorial(y))
+    } else if (object$family == "coxph")
+    {
+        logL <- -1e99
+    }
+    
+    logL
+}
+
+
+#' log likelihood function for fitted cross validation oem objects
+#'
+#' @param object fitted "cv.oem" model object.
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
+#' @param ... not used
+#' @rdname logLik
+#' @export
+#' @examples
+#' set.seed(123)
+#' n.obs <- 2000
+#' n.vars <- 50
+#' 
+#' true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#'
+#' fit <- cv.oem(x = x, y = y)
+#'
+#' logLik(fit)
+#'
+logLik.cv.oem <- function(object, which.model = 1, ...) {
+    
+    object <- object$oem.fit
+    # taken from ncvreg. Thanks to Patrick Breheny.
+    n <- as.numeric(object$nobs)
+    
+    if (object$family == "gaussian")
+    {
+        
+        resid.ss <- object$loss[[which.model]]
+        logL <- -0.5 * n * (log(2 * pi) - log(n) + log(resid.ss)) - 0.5 * n
+    } else if (object$family == "binomial")
+    {
+        logL <- -1 * object$loss[[which.model]]
+    } else if (object$family == "poisson")
+    {
+        stop("poisson not complete yet")
+        #y <- object$y
+        #ind <- y != 0
+        #logL <- -object$loss + sum(y[ind] * log(y[ind])) - sum(y) - sum(lfactorial(y))
+    } else if (object$family == "coxph")
+    {
+        logL <- -1e99
+    }
+    
+    logL
+}
+

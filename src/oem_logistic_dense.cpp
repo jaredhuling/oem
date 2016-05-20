@@ -235,6 +235,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     return List::create(Named("beta")   = beta_list,
                         Named("lambda") = lambda,
                         Named("niter")  = iter_list,
+                        Named("loss")   = loss_list,
                         Named("d")      = d);
     END_RCPP
 }

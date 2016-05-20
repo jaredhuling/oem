@@ -61,6 +61,7 @@ protected:
     
     double threshval;
     int wt_len;
+    bool on_lam_1;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -437,6 +438,7 @@ public:
     {
         beta.setZero();
         
+        on_lam_1 = true;
         if (intercept)
         {
             double ymean = Y.mean();
@@ -456,6 +458,7 @@ public:
     // current main_x, aux_z, dual_y and rho as initial values
     void init_warm(double lambda_)
     {
+        on_lam_1 = false;
         lambda = lambda_;
     }
     
@@ -472,67 +475,70 @@ public:
         {
             
             dev0 = dev;
+            beta_prev_irls = beta;
             
-            
-            // calculate mu hat
-            if (intercept)
+            if (!(i == 0 && !on_lam_1))
             {
-                prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
-            } else
-            {
-                prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
-            }
-            
-            
-            // calculate Jacobian (or weight vector)
-            W = prob.array() * (1 - prob.array());
-            
-            
-            // if observation weights specified, use them
-            if (wt_len)
-            {
-                W.array() *= weights.array();
-            }
-            
-            
-            // make sure no weights are too small
-            for (int kk = 0; kk < nobs; ++kk)
-            {
-                if (W(i) < 1e-5) 
-                {
-                    W(i) = 1e-5;
-                }
-            }
-            
-            
-            // compute XtX or XXt (depending on if n > p or not)
-            // and compute A = dI - XtX (if n > p)
-            compute_XtX_d_update_A();
-            
-            
-            // compute X'Wz
-            // only for p < n case
-            if (nobs > nvars + int(intercept))
-            {
-                
+                // calculate mu hat
                 if (intercept)
                 {
-                    VectorXd presid = Y.array() - prob.array();
-                    grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
-                    grad(0) = presid.sum() / double(nobs);
-                    
-                } else 
+                    prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
+                } else
                 {
-                    grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
-                    
+                    prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
                 }
                 
                 
-                // not sure why the following doesn't 
-                // work but the above, which seems
-                // wrong does work
-                //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
-                XY.noalias() = XX * beta + grad;
+                // calculate Jacobian (or weight vector)
+                W = prob.array() * (1 - prob.array());
+                
+                
+                // if observation weights specified, use them
+                if (wt_len)
+                {
+                    W.array() *= weights.array();
+                }
+                
+                
+                // make sure no weights are too small
+                for (int kk = 0; kk < nobs; ++kk)
+                {
+                    if (W(i) < 1e-5) 
+                    {
+                        W(i) = 1e-5;
+                    }
+                }
+                
+                
+                // compute XtX or XXt (depending on if n > p or not)
+                // and compute A = dI - XtX (if n > p)
+                compute_XtX_d_update_A();
+                
+                
+                // compute X'Wz
+                // only for p < n case
+                if (nobs > nvars + int(intercept))
+                {
+                    
+                    if (intercept)
+                    {
+                        VectorXd presid = Y.array() - prob.array();
+                        grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
+                        grad(0) = presid.sum() / double(nobs);
+                        
+                    } else 
+                    {
+                        grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
+                        
+                    }
+                    
+                    
+                    // not sure why the following doesn't 
+                    // work but the above, which seems
+                    // wrong does work
+                    //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
+                    XY.noalias() = XX * beta + grad;
+                }
             }
             
             
@@ -553,8 +559,11 @@ public:
             // update deviance residual
             dev = sum_dev_resid(Y, prob);
             
-            if (std::abs(dev - dev0) / (0.1 + std::abs(dev) ) < irls_tol)
+            //if (std::abs(dev - dev0) / (0.1 + std::abs(dev) ) < irls_tol)
+            if (stopRule(beta, beta_prev_irls, irls_tol))
+            {
                 break;
+            }
             
         }
         
@@ -599,8 +608,8 @@ public:
         }
         return loss;
     }
+    
 };
-
 
 
 #endif // OEM_LOGISTIC_DENSE_H

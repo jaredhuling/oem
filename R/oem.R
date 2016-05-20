@@ -284,7 +284,10 @@ oem <- function(x,
                                                intercept,
                                                options)
                   )
-    
+    res$nobs    <- n
+    res$nvars   <- p
+    res$penalty <- penalty
+    res$family  <- family
     class(res) <- c(class(res), "oemfit")
     res
 }
