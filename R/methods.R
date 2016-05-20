@@ -280,6 +280,13 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
     n <- as.numeric(object$nobs)
     
+    num.models <- length(object$beta)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
     if (object$family == "gaussian")
     {
         
@@ -331,6 +338,13 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
     n <- as.numeric(object$nobs)
     
+    num.models <- length(object$cvm)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
     if (object$family == "gaussian")
     {
         
@@ -352,4 +366,75 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
     
     logL
 }
+
+
+#' Prediction method for Orthogonalizing EM fitted objects
+#'
+#' @param object fitted "oem" model object
+#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
+#' This argument is not used for type=c("coefficients","nonzero")
+#' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
+#' the model. Can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. Can specify
+#' "best.model" to use the best model as estimated by cross-validation
+#' @param ... other parameters to send to predict.oemfit
+#' @return An object depending on the type argument
+#' @rdname predict
+#' @export
+#' @examples
+#' set.seed(123)
+#' n.obs <- 1e4
+#' n.vars <- 100
+#' n.obs.test <- 1e3
+#' 
+#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+#' 
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#' x.test <- matrix(rnorm(n.obs.test * n.vars), n.obs.test, n.vars)
+#' y.test <- rnorm(n.obs.test, sd = 3) + x.test %*% true.beta
+#' 
+#' fit <- cv.oem(x = x, y = y, 
+#'               penalty = c("lasso", "grp.lasso"), 
+#'               groups = rep(1:10, each = 10), 
+#'               nlambda = 10)
+#' 
+#' preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
+#' 
+#' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
+#' 
+predict.cv.oem <- function(object, newx, which.model = "best.model",
+                           s=c("lambda.1se","lambda.min"),...)
+{
+    if(is.numeric(s))lambda=s
+    else 
+        if(is.character(s)){
+            s=match.arg(s)
+            lambda=object[[s]]
+        }
+    if( is.numeric(which.model) )
+    {
+        mod.num <- as.integer(which.model)
+        
+        num.models <- length(object$cvm)
+        if (mod.num > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    }
+    else if(is.character(which.model))
+    {
+        mod.num <- match.arg(which.model)
+        lambda      <- object[["model.min"]]
+    }
+    
+    else stop("Invalid form for s")
+    predict(object$oem.fit, newx, s=lambda, which.model = mod.num, ...)
+}
+
+
+
 
