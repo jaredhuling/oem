@@ -9,17 +9,40 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+`oem` is a package for the estimation of various penalized regression models. The focus of `oem` is to provide high performance computation for big **tall** data. Many applications not only have a large number of variables, but a vast number of observations; `oem` is designed to perform well in these settings.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+- Fast computation for big **tall** data
+- Efficient computation for computation for multiple penalties simultaneously
+- Efficient cross-validation 
 
-## Vignette Info
+## Installation
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+The simplest way to install `oem` is via the CRAN repositories as the following:
 
-## Styles
+```{r, echo=FALSE}
+install.packages("oem")
+```
+
+To install the development version, first install the `devtools` package
+
+```{r, echo=FALSE}
+install.packages("devtools")
+```
+
+and then installl `oem` via the `install_github` function
+```{r, echo=FALSE}
+devtools::install_github("jaredhuling/oem")
+```
+
+
+## Quick Start
+
+Load `oem` 
+
+```{r, echo=FALSE}
+library(oem)
+```
+
 
 The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
 
