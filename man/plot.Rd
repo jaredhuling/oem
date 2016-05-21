@@ -25,6 +25,8 @@ against the percent deviance explained.}
 \item{ylab}{label for y-axis}
 
 \item{...}{other graphical parameters for the plot}
+
+\item{sign.lambda}{Either plot against log(lambda) (default) or its negative if sign.lambda=-1.}
 }
 \description{
 Plot method for Orthogonalizing EM fitted objects

@@ -7,18 +7,15 @@
 #' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
 #' This argument is not used for type=c("coefficients","nonzero")
 #' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
+#' the model.
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
 #' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
-#' predict.cv.oem, can specify
-#' "best.model" to use the best model as estimated by cross-validation
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.
 #' @param type Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
 #' Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 #' Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.
-#' @param ... not used except for predict.cv.oem, in which case it is used to pass the other arguments for predict.oemfit
+#' @param ... not used 
 #' @return An object depending on the type argument
-#' @rdname predict
 #' @export
 #' @examples
 #' set.seed(123)
@@ -159,10 +156,10 @@ plot.oemfit <- function(x, which.model = 1,
 }
 
 
-#' 
+#' @param sign.lambda Either plot against log(lambda) (default) or its negative if sign.lambda=-1.
 #' @rdname plot
 #' @method plot cv.oem
-#' @S3method plot cv.oem
+#' @export 
 #' @examples
 #' set.seed(123)
 #' n.obs <- 1e4
@@ -212,9 +209,7 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
 }
 
 
-#' @rdname predict
-#' @method predict oemfit_gaussian
-#' @S3method predict oemfit_gaussian
+#' @export 
 predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
                                     type = c("link", 
                                              "response",
@@ -225,9 +220,7 @@ predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
 } 
 
 
-#' @rdname predict
-#' @method predict oemfit_binomial
-#' @S3method predict oemfit_binomial
+#' @export
 predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
                                     type=c("link", 
                                            "response", 
@@ -313,15 +306,8 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
 #'
 #' @rdname logLik
 #' @method logLik cv.oem
-#' @S3method logLik cv.oem
+#' @export 
 #' @examples
-#' set.seed(123)
-#' n.obs <- 2000
-#' n.vars <- 50
-#' 
-#' true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
-#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
-#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #'
 #' fit <- cv.oem(x = x, y = y, penalty = "lasso")
 #'
@@ -333,7 +319,7 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
     n <- as.numeric(object$nobs)
     
-    num.models <- length(object$cvm)
+    num.models <- length(object$beta)
     if (which.model > num.models)
     {
         err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
@@ -363,10 +349,27 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 }
 
 
+## the code here is largely based on the code
+## from the glmnet package (no reason to reinvent the wheel)
+
+
+
+#' Prediction function for fitted cross validation oem objects
 #'
-#' @rdname predict
+#' @param object fitted "cv.oem" model object
+#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
+#' This argument is not used for type=c("coefficients","nonzero")
+#' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
+#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
+#' predict.cv.oem, can specify
+#' "best.model" to use the best model as estimated by cross-validation
+#' @param ... used to pass the other arguments for predict.oemfit
+#' @return An object depending on the type argument
 #' @method predict cv.oem
-#' @S3method predict cv.oem
+#' @export 
 #' @examples
 #' set.seed(123)
 #' n.obs <- 1e4
@@ -388,7 +391,6 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 #' preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
 #' 
 #' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
-#' 
 predict.cv.oem <- function(object, newx, which.model = "best.model",
                            s=c("lambda.1se","lambda.min"),...)
 {
@@ -411,8 +413,7 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
     }
     else if(is.character(which.model))
     {
-        mod.num <- match.arg(which.model)
-        lambda      <- object[["model.min"]]
+        mod.num <- object[["model.min"]]
     }
     
     else stop("Invalid form for s")

@@ -36,13 +36,6 @@ fit <- oem(x = x, y = y, penalty = "lasso")
 
 logLik(fit)
 
-set.seed(123)
-n.obs <- 2000
-n.vars <- 50
-
-true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
-x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
-y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
 fit <- cv.oem(x = x, y = y, penalty = "lasso")
 
