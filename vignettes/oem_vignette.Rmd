@@ -20,13 +20,13 @@ vignette: >
 The simplest way to install `oem` is via the CRAN repositories as the following:
 
 ```{r, echo=FALSE}
-install.packages("oem")
+install.packages("oem", repos = "http://cran.us.r-project.org")
 ```
 
 To install the development version, first install the `devtools` package
 
 ```{r, echo=FALSE}
-install.packages("devtools")
+install.packages("devtools", repos = "http://cran.us.r-project.org")
 ```
 
 and then installl `oem` via the `install_github` function

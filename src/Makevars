@@ -1,11 +1,14 @@
 ## Use the R_HOME indirection to support installations of multiple R version
-# PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
+PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"`
+
+PKG_CPPFLAGS = -I${R_HOME}/library/Rcpp/include \
+               -I${R_HOME}/library/RcppEigen/include  -I. -DNDEBUG
 
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
-PKG_LIBS = PKG_LIBS=`$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(SHLIB_OPENMP_CXXFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
+FLIBS=`gfortran -print-search-dirs | grep ^libraries: | sed 's|libraries: =||' | sed 's|:| -L|g' | sed 's|^|-L|'`
 
-.PHONY: all clean
 
 all: $(SHLIB)
 
