@@ -7,14 +7,16 @@
 #' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
 #' This argument is not used for type=c("coefficients","nonzero")
 #' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-#' the model.
+#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
 #' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
+#' predict.cv.oem, can specify
+#' "best.model" to use the best model as estimated by cross-validation
 #' @param type Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
 #' Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 #' Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.
-#' @param ... not used
+#' @param ... not used except for predict.cv.oem, in which case it is used to pass the other arguments for predict.oemfit
 #' @return An object depending on the type argument
 #' @rdname predict
 #' @export
@@ -86,7 +88,7 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
     as.matrix(newx %*% nbeta)
 }
 
-#' Prediction method for Orthogonalizing EM fitted objects
+#' Plot method for Orthogonalizing EM fitted objects
 #'
 #' @param x fitted "oem" model object
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
@@ -156,16 +158,11 @@ plot.oemfit <- function(x, which.model = 1,
             type = 'l', ...)
 }
 
-#' Prediction method for Orthogonalizing EM fitted objects
-#'
-#' @param object fitted "cv.oem" model object
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
-#' @param sign.lambda Either plot against log(lambda) (default) or its negative if sign.lambda=-1
-#' @param ... other graphical parameters for the plot
+
+#' 
 #' @rdname plot
-#' @export
+#' @method plot cv.oem
+#' @S3method plot cv.oem
 #' @examples
 #' set.seed(123)
 #' n.obs <- 1e4
@@ -183,10 +180,10 @@ plot.oemfit <- function(x, which.model = 1,
 #' plot(fit, which.model = 1)
 #' plot(fit, which.model = 2)
 #' 
-plot.cv.oem=function(object, which.model = 1, sign.lambda=1, ...)
+plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
 {
     # modified from glmnet
-    
+    object = x
     num.models <- length(object$cvm)
     if (which.model > num.models)
     {
@@ -216,7 +213,8 @@ plot.cv.oem=function(object, which.model = 1, sign.lambda=1, ...)
 
 
 #' @rdname predict
-#' @export
+#' @method predict oemfit_gaussian
+#' @S3method predict oemfit_gaussian
 predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
                                     type = c("link", 
                                              "response",
@@ -228,7 +226,8 @@ predict.oemfit_gaussian <- function(object, newx, s = NULL, which.model = 1,
 
 
 #' @rdname predict
-#' @export
+#' @method predict oemfit_binomial
+#' @S3method predict oemfit_binomial
 predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
                                     type=c("link", 
                                            "response", 
@@ -272,7 +271,7 @@ predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #'
-#' fit <- oem(x = x, y = y)
+#' fit <- oem(x = x, y = y, penalty = "lasso")
 #'
 #' logLik(fit)
 #'
@@ -312,13 +311,9 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
 
 #' log likelihood function for fitted cross validation oem objects
 #'
-#' @param object fitted "cv.oem" model object.
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
-#' @param ... not used
 #' @rdname logLik
-#' @export
+#' @method logLik cv.oem
+#' @S3method logLik cv.oem
 #' @examples
 #' set.seed(123)
 #' n.obs <- 2000
@@ -328,7 +323,7 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #'
-#' fit <- cv.oem(x = x, y = y)
+#' fit <- cv.oem(x = x, y = y, penalty = "lasso")
 #'
 #' logLik(fit)
 #'
@@ -368,21 +363,10 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 }
 
 
-#' Prediction method for Orthogonalizing EM fitted objects
 #'
-#' @param object fitted "oem" model object
-#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
-#' This argument is not used for type=c("coefficients","nonzero")
-#' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-#' the model. Can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. Can specify
-#' "best.model" to use the best model as estimated by cross-validation
-#' @param ... other parameters to send to predict.oemfit
-#' @return An object depending on the type argument
 #' @rdname predict
-#' @export
+#' @method predict cv.oem
+#' @S3method predict cv.oem
 #' @examples
 #' set.seed(123)
 #' n.obs <- 1e4

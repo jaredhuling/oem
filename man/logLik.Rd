@@ -17,14 +17,6 @@ specify which model to plot. For example, if the oem object "oemobj" was fit wit
 penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.}
 
 \item{...}{not used}
-
-\item{object}{fitted "cv.oem" model object.}
-
-\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.}
-
-\item{...}{not used}
 }
 \description{
 log likelihood function for fitted oem objects
@@ -40,7 +32,7 @@ true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
-fit <- oem(x = x, y = y)
+fit <- oem(x = x, y = y, penalty = "lasso")
 
 logLik(fit)
 
@@ -52,7 +44,7 @@ true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
-fit <- cv.oem(x = x, y = y)
+fit <- cv.oem(x = x, y = y, penalty = "lasso")
 
 logLik(fit)
 

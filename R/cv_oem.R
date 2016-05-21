@@ -172,8 +172,8 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
                nzero = nz, name = cvname, oem.fit = oem.object)
     if (keep) 
         out = c(out, list(fit.preval = cvstuff$fit.preval, foldid = foldid))
-    lamin=if(cvname=="AUC")oem:::getmin(lambda,lapply(cvm, function(ccvvmm) -ccvvmm),cvsd)
-    else oem:::getmin(lambda, cvm, cvsd)
+    lamin=if(cvname=="AUC")getmin(lambda,lapply(cvm, function(ccvvmm) -ccvvmm),cvsd)
+    else getmin(lambda, cvm, cvsd)
     obj = c(out, as.list(lamin))
     class(obj) = "cv.oem"
     obj
@@ -271,7 +271,7 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
                            }, class = y[, 1] * (predlist[[xx]] > 0.5) + y[, 2] * (predlist[[xx]] <= 0.5))
         )
         if (grouped) {
-            cvob = lapply(1:nmodels, function(xx) oem:::cvcompute(cvraw[[xx]], weights, foldid, nlams))
+            cvob = lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
             cvraw = lapply(cvob, function(x) x$cvraw)
             weights = lapply(cvob, function(x) x$weights)
             N = lapply(cvob, function(x) x$N)
@@ -340,7 +340,7 @@ cv.oemfit_gaussian <- function (outlist, lambda, x, y, weights, foldid, type.mea
         grouped = FALSE
     }
     if (grouped) {
-        cvob = lapply(1:nmodels, function(xx) oem:::cvcompute(cvraw[[xx]], weights, foldid, nlams))
+        cvob = lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
         cvraw = lapply(cvob, function(x) x$cvraw)
         weights = lapply(cvob, function(x) x$weights)
         N = lapply(cvob, function(x) x$N)

@@ -26,41 +26,24 @@
 This argument is not used for type=c("coefficients","nonzero")}
 
 \item{s}{Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-the model.}
+the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation}
 
 \item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
 specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.}
+penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
+predict.cv.oem, can specify
+"best.model" to use the best model as estimated by cross-validation}
 
 \item{type}{Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
 Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.}
 
-\item{...}{not used}
-
-\item{object}{fitted "oem" model object}
-
-\item{newx}{Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
-This argument is not used for type=c("coefficients","nonzero")}
-
-\item{s}{Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-the model. Can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation}
-
-\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. Can specify
-"best.model" to use the best model as estimated by cross-validation}
-
-\item{...}{other parameters to send to predict.oemfit}
+\item{...}{not used except for predict.cv.oem, in which case it is used to pass the other arguments for predict.oemfit}
 }
 \value{
 An object depending on the type argument
-
-An object depending on the type argument
 }
 \description{
-Prediction method for Orthogonalizing EM fitted objects
-
 Prediction method for Orthogonalizing EM fitted objects
 }
 \examples{

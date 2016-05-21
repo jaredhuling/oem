@@ -3,12 +3,12 @@
 \name{plot.oemfit}
 \alias{plot.cv.oem}
 \alias{plot.oemfit}
-\title{Prediction method for Orthogonalizing EM fitted objects}
+\title{Plot method for Orthogonalizing EM fitted objects}
 \usage{
 \method{plot}{oemfit}(x, which.model = 1, xvar = c("norm", "lambda",
   "loglambda", "dev"), xlab = iname, ylab = "Coefficients", ...)
 
-\method{plot}{cv.oem}(object, which.model = 1, sign.lambda = 1, ...)
+\method{plot}{cv.oem}(x, which.model = 1, sign.lambda = 1, ...)
 }
 \arguments{
 \item{x}{fitted "oem" model object}
@@ -25,21 +25,9 @@ against the percent deviance explained.}
 \item{ylab}{label for y-axis}
 
 \item{...}{other graphical parameters for the plot}
-
-\item{object}{fitted "cv.oem" model object}
-
-\item{sign.lambda}{Either plot against log(lambda) (default) or its negative if sign.lambda=-1}
-
-\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.}
-
-\item{...}{other graphical parameters for the plot}
 }
 \description{
-Prediction method for Orthogonalizing EM fitted objects
-
-Prediction method for Orthogonalizing EM fitted objects
+Plot method for Orthogonalizing EM fitted objects
 }
 \examples{
 set.seed(123)
