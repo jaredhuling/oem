@@ -91,7 +91,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
     bool fullbetamat = false;
-    int add = 0;
+    // int add = 0;
     if (family(0) != "gaussian")
     {
         standardize = false;
@@ -99,7 +99,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         if (intercept_bin)
         {
             fullbetamat = true;
-            add = 1;
+            // add = 1;
             // dont penalize the intercept
             VectorXd penalty_factor_tmp(p+1);
             

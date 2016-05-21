@@ -130,6 +130,8 @@ plot.oemfit <- function(x, which.model = 1,
         stop(err.txt)
     }
     
+    main.txt <- x$penalty[which.model]
+    
     xvar <- match.arg(xvar)
     nbeta <- as.matrix(x$beta[[which.model]])
     switch(xvar,
@@ -154,7 +156,9 @@ plot.oemfit <- function(x, which.model = 1,
                xlim <- range(index)
            }
     )
-    matplot(index, t(nbeta), lty = 1, xlab = xlab, ylab = ylab, xlim = xlim,
+    matplot(index, t(nbeta), lty = 1, xlab = xlab, 
+            ylab = ylab, xlim = xlim,
+            main = main.txt,
             type = 'l', ...)
 }
 
@@ -191,13 +195,17 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
         stop(err.txt)
     }
     
+    main.txt <- x$penalty[which.model]
+    
     xlab="log(Lambda)"
     if(sign.lambda<0)xlab=paste("-",xlab,sep="")
     plot.args=list(x    = sign.lambda * log(object$lambda),
                    y    = object$cvm[[which.model]],
                    ylim = range(object$cvup[[which.model]], object$cvlo[[which.model]]),
                    xlab = xlab,
-                   ylab = object$name,type="n")
+                   ylab = object$name,
+                   main = main.txt,
+                   type="n")
     new.args=list(...)
     if(length(new.args))plot.args[names(new.args)]=new.args
     do.call("plot", plot.args)
