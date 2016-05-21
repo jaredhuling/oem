@@ -2,6 +2,8 @@
 
 
 
+[![Build Status](https://travis-ci.org/hadley/devtools.svg?branch=master)](https://travis-ci.org/hadley/devtools)
+[![codecov](https://codecov.io/gh/jaredhuling/oem/branch/master/graph/badge.svg)](https://codecov.io/gh/jaredhuling/oem)
 
 
 ## Introduction

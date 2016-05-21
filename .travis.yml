@@ -9,7 +9,10 @@ notifications:
   email:
     on_success: change
     on_failure: always
-    
+
+r_packages:
+  - covr
+  
 after_success:
   - Rscript -e 'covr::codecov()'
 
