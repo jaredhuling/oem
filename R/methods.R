@@ -15,6 +15,9 @@
 #' Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
 #' Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.
 #' @param ... not used 
+#' @importFrom graphics abline abline axis matplot points segments
+#' @importFrom methods as
+#' @importFrom stats approx predict quantile runif weighted.mean
 #' @return An object depending on the type argument
 #' @export
 #' @examples

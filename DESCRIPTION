@@ -9,7 +9,7 @@ Description: Solves least squares problems using the orthogonalizing EM algorith
 License: GPL (>= 2)
 LazyData: TRUE
 Imports: 
-    Rcpp (>= 0.11.0), Matrix, foreach
+    Rcpp (>= 0.11.0), Matrix, foreach, methods
 LinkingTo: Rcpp, RcppEigen, BH
 RoxygenNote: 5.0.1
 Suggests: knitr,
