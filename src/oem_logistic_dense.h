@@ -236,7 +236,7 @@ protected:
     // deviance residuals for logistic glm
     double sum_dev_resid(MapVec &y, VectorXd &prob)
     {
-        double dev;
+        double dev = 0.0;
         for (int ii = 0; ii < nobs; ++ii)
         {
             if (y(ii) == 1)
@@ -577,7 +577,7 @@ public:
     
     virtual double get_loss()
     {
-        double loss;
+        double loss = 0.0;
         
         // compute logistic loss
         for (int ii = 0; ii < nobs; ++ii)

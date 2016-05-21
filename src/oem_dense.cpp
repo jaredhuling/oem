@@ -72,13 +72,10 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     VectorXd weights(as<VectorXd>(weights_));
     VectorXd group_weights(as<VectorXd>(group_weights_));
     int nlambda = lambda.size();
-    int nweights = weights.size();
     
     
     List opts(opts_);
     const int maxit        = as<int>(opts["maxit"]);
-    const int irls_maxit   = as<int>(opts["irls_maxit"]);
-    const double irls_tol  = as<double>(opts["irls_tol"]);
     const double tol       = as<double>(opts["tol"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);

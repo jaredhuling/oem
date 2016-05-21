@@ -71,7 +71,6 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     VectorXd weights(as<VectorXd>(weights_));
     VectorXd group_weights(as<VectorXd>(group_weights_));
     int nlambda = lambda.size();
-    int nweights = weights.size();
     
     
     List opts(opts_);
