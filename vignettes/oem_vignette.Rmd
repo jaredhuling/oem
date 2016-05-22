@@ -2,7 +2,6 @@
 title: "Usage of the oem Package"
 author: "Jared Huling"
 date: "`r Sys.Date()`"
-bibliography: oem.bib
 output: 
     rmarkdown::html_vignette:
         toc: true
@@ -12,11 +11,28 @@ vignette: >
   %\VignetteIndexEntry{Usage of the oem Package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+
+references:
+- id: xiong16
+  title: 'Orthogonalizing EM: A Design-Based Least Squares Algorithm'
+  author:
+  - family: Xiong
+    given: Shifeng
+  - family: Dai
+    given: Bin
+  - family: Huling
+    given: Jared
+  - family: Qian
+    given: Peter Z.G.
+  container-title: Technometrics, in press
+  type: article-journal
+  issued:
+    year: 2016
 ---
 
 # Introduction
 
-`oem` is a package for the estimation of various penalized regression models using the oem algorithm of [@xiong13]. The focus of `oem` is to provide high performance computation for big **tall** data. Many applications not only have a large number of variables, but a vast number of observations; `oem` is designed to perform well in these settings.
+`oem` is a package for the estimation of various penalized regression models using the oem algorithm of [@xiong16]. The focus of `oem` is to provide high performance computation for big **tall** data. Many applications not only have a large number of variables, but a vast number of observations; `oem` is designed to perform well in these settings.
 
 - Fast computation for big **tall** data
 - Efficient computation for computation for multiple penalties simultaneously
