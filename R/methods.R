@@ -275,7 +275,7 @@ predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #'
-#' fit <- oem(x = x, y = y, penalty = "lasso")
+#' fit <- oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
 #'
 #' logLik(fit)
 #'
@@ -325,7 +325,7 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
 #' @export 
 #' @examples
 #'
-#' fit <- cv.oem(x = x, y = y, penalty = "lasso")
+#' fit <- cv.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
 #'
 #' logLik(fit)
 #'
