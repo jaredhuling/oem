@@ -645,8 +645,9 @@
 
                 <p></p>
                 
+                <section id = "#validate-section">
                 <div>
-                    <h4 id = "#validate-section" class="section-title-heading"><span>Cross Validation</span></h4>
+                    <h4  class="section-title-heading"><span>Cross Validation</span></h4>
                 </div>
 
                <div class="row items-container">
@@ -666,13 +667,6 @@
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> response vector. can be continuous or 0/1</div>
-                    </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> family</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> model family. Currently available: <code>"gaussian"</code>, <code>"binomial"</code>.
-                        </div>
                     </div>
                     <div class="row-height">
                       <div class="col-md-2 col-sm-6  col-height">
@@ -716,11 +710,25 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> type.measure</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> measure to evaluate for cross-validation
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                type.measure
+                              </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                measure to evaluate for cross-validation. The default is <code>type.measure="deviance"</code>, which uses 
+                                squared-error for gaussian models (<code>type.measure="mse"</code>), deviance for logistic regression.
+                                <code>type.measure="class"</code> applies to binomial only. <code>type.measure="auc"</code> is for 
+                                two-class logistic regression 
+                                only. <code>type.measure="mse"</code> or <code>type.measure="mae"</code> (mean absolute error) can 
+                                be used by all models; they measure the deviation from the fitted mean to the response.
+                              </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
@@ -791,6 +799,8 @@
                         <div class="category-item"> other parameters to be passed to the <code>oem()</code> function
                         </div>
                     </div>
+                    
+                    </section>
                     
                     <p></p>
                     <div class="row">
