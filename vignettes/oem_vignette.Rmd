@@ -2,20 +2,27 @@
 title: "Usage of the oem Package"
 author: "Jared Huling"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+bibliography: oem.bib
+output: 
+    rmarkdown::html_vignette:
+        toc: true
+        number_sections: true
+        css: oem.css
 vignette: >
   %\VignetteIndexEntry{Usage of the oem Package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-`oem` is a package for the estimation of various penalized regression models. The focus of `oem` is to provide high performance computation for big **tall** data. Many applications not only have a large number of variables, but a vast number of observations; `oem` is designed to perform well in these settings.
+# Introduction
+
+`oem` is a package for the estimation of various penalized regression models using the oem algorithm of [@xiong13]. The focus of `oem` is to provide high performance computation for big **tall** data. Many applications not only have a large number of variables, but a vast number of observations; `oem` is designed to perform well in these settings.
 
 - Fast computation for big **tall** data
 - Efficient computation for computation for multiple penalties simultaneously
 - Efficient cross-validation 
 
-## Installation
+# Installation
 
 The simplest way to install `oem` is via the CRAN repositories as the following:
 
@@ -36,7 +43,7 @@ install_github("jaredhuling/oem")
 ```
 
 
-## Quick Start
+# Quick Start
 
 First load `oem` 
 
@@ -67,8 +74,29 @@ plot(fit1)
 ```
 
 
+## Available functions
 
-## Fitting multiple penalties at once
++--------------------+-----------------------------------+
+| Function Name      | Functionality                     |
++====================+===================================+
+| `oem()`            | Main fitting function             |
++--------------------+-----------------------------------+
+| `predict.oemfit()` | Prediction for oem objects        |
++--------------------+-----------------------------------+
+| `plot.oemfit()`    | Plotting for oem objects          |
++--------------------+-----------------------------------+
+| `logLik.oemfit()`  | log Likelihood for oem objects    |
++--------------------+-----------------------------------+
+| `cv.oem()`         | Cross-validation function         |
++--------------------+-----------------------------------+
+| `predict.cv.oem()` | Prediction for cv.oem objects     |
++--------------------+-----------------------------------+
+| `plot.cv.oem()`    | Plotting for cv.oem objects       |
++--------------------+-----------------------------------+
+| `logLik.cv.oem()`  | log Likelihood for cv.oem objects |
++--------------------+-----------------------------------+
+
+# Fitting multiple penalties at once
 
 The oem algorithm is well-suited to quickly estimate a solution path for multiple penalties simultaneously if the number of variables is not too large. 
 
@@ -88,7 +116,26 @@ plot(fit2, which.model = 2)
 plot(fit2, which.model = 3)
 ```
 
-## Cross Validation
+## Timing Comparison
+
+The following is a demonstration of oem's efficiency for computing solutions for tuning parameter paths for multiple
+penalties at once
+
+```{r, echo=FALSE, message = FALSE, cache=FALSE}
+nobs  <- 1e5
+nvars <- 100
+x <- matrix(rnorm(nobs * nvars), ncol = nvars)
+y <- drop(x %*% c(0.5, 0.5, -0.5, -0.5, 1, rep(0, nvars - 5))) + rnorm(nobs, sd = 2)
+
+system.time(fit2a <- oem(x = x, y = y, penalty = c("grp.lasso"),
+                         groups = rep(1:20, each = 5), nlambda = 100L))
+system.time(fit2b <- oem(x = x, y = y, penalty = c("grp.lasso", "lasso", "mcp", "scad", "elastic.net"),
+                         groups = rep(1:20, each = 5), nlambda = 100L))
+system.time(fit2c <- oem(x = x, y = y, penalty = c("grp.lasso", "lasso", "mcp", "scad", "elastic.net"),
+                         groups = rep(1:20, each = 5), nlambda = 500L))
+```
+
+# Cross Validation
 
 Here we use the `nfolds` argument to specify the number of folds for $k$-fold cross validation
 
@@ -107,4 +154,12 @@ plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
 ```
 
+# More Information
 
+For further information about `oem`,
+please visit:
+
+  * The oem site:        [casualinference.org/oem](http://casualinference.org/oem)
+  * The oem source code: [github.com/jaredhuling/oem](https://github.com/jaredhuling/oem)
+
+# References
