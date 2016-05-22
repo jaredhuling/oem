@@ -249,6 +249,7 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
             N[[m]] = apply(good, 2, sum)
         }
         weights = tapply(weights, foldid, sum)
+        weights = rep(list(weights), nmodels)
     }
     else {
         ywt = apply(y, 1, sum)
@@ -275,6 +276,9 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
             cvraw = lapply(cvob, function(x) x$cvraw)
             weights = lapply(cvob, function(x) x$weights)
             N = lapply(cvob, function(x) x$N)
+        } else 
+        {
+            weights = rep(list(weights), nmodels)
         }
     }
     cvm = lapply(1:length(cvraw), function(m) apply(cvraw[[m]], 2, weighted.mean, w = weights[[m]], na.rm = TRUE))
