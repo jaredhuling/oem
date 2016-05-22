@@ -1,8 +1,0 @@
-platform:
-  - x86
-
-
-environment:
-  global:
-    R_CHECK_ARGS: "--no-build-vignettes --no-manual"
-

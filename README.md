@@ -2,8 +2,6 @@
 
 
 
-[![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)
-
 
 ### Build Status
 |                 | Build           |
