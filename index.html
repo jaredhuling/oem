@@ -505,7 +505,7 @@
                         <h4><p style="text-transform:lowercase">plot.oemfit()</p></h4>
                     </div>
                     <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> object</div>
+                        <div class="category-item"> x</div>
                     </div>
                     <div class="col-md-10 col-sm-6">
                         <div class="category-item"> fitted oem object.</div>
@@ -535,6 +535,18 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> xlab</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> label for x-axis</div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> ylab</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> label for y-axis</div>
                     </div>
                     <div class = "row-height">
                         <div class="col-md-2 col-sm-6 col-height">
@@ -804,6 +816,154 @@
                         <div class="category-item"> other parameters to be passed to the <code>oem()</code> function
                         </div>
                     </div>
+                    
+                <p></p>
+                
+                <!--  predict   -->
+                
+                <div class="row">
+                    <div class="work-category-title col-md-12">
+                        <h4><p style="text-transform:lowercase">predict.cv.oem()</p></h4>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> object</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> fitted cv.oem object.</div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    newx
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Matrix of new values for x at which predictions are to be made. 
+                                    Must be a matrix; can be sparse as in Matrix package. This argument is 
+                                    not used for <code>type=c("coefficients","nonzero")</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    s
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                      Value(s) of the penalty parameter lambda at which predictions are required. 
+                                      Default is the entire sequence used to create the model. Can also specify 
+                                      "lambda.1se" or "lambda.min" 
+                                      for best (and nearly best) lambdas estimated by cross validation
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    which.model
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                      If multiple penalties are fit and returned in the same oem object, the <code>which.model</code> 
+                                      argument is used to specify which model to make predictions for. For example, if the oem object 
+                                      <code>oemobj</code> was fit with argument <code>penalty = c("lasso", "grp.lasso")</code>, 
+                                      then <code>which.model = 2</code> provides 
+                                      predictions for the group lasso model. Defaults ot <code>"best.model"</code> which uses the
+                                      model with the best cross-validation performance.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                  <code>...</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Other parameters to be passed to <code>predict.oemfit()</code>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <p></p>
+                
+                <!--  plot   -->
+                
+                <div class="row">
+                    <div class="work-category-title col-md-12">
+                        <h4><p style="text-transform:lowercase">plot.cv.oem()</p></h4>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> x</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> fitted cv.oem object.</div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> which.model</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> which model to plot (if multiple penalties selected)</div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    sign.lambda
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Either plot against $\log (\lambda)$ (default) or its negative if <code>sign.lambda=-1</code>.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class = "row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                  <code>...</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item"> 
+                                <div class = "cat-it-inside">
+                                    Other graphical parameters for the plot
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                    
                     
                     </div>
                     </section>
