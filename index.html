@@ -637,6 +637,121 @@
                 </div>
 
                 <p></p>
+                
+                <div>
+                    <h4 class="section-title-heading"><span>Cross Validation</span></h4>
+                </div>
+
+               <div class="row items-container">
+                    <div class="work-category-title col-md-12">
+                        <h4><p style="text-transform:lowercase">cv.oem()</p></h4>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> x
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> design matrix. can be matrix or sparse matrix object</div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> y
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> response vector. can be continuous or 0/1</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> model family. Currently available: <code>"gaussian"</code>, <code>"binomial"</code>.
+                        </div>
+                    </div>
+                    <div class="row-height">
+                      <div class="col-md-2 col-sm-6  col-height">
+                              <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                  penalty
+                                </div>
+                              </div>
+                      </div>
+                      <div class="col-md-10 col-sm-6 col-height">
+                              <div class="category-item content"> 
+                                <div class = "cat-it-inside">
+                                  penalty to apply. Currently available: <code>"lasso"</code>, <code>"elastic.net"</code>, <code>"ols"</code>
+                                  , <code>"mcp"</code>, <code>"scad"</code>, or <code>"grp.lasso"</code>. Can select any number of penalties simultaneously
+                                </div>
+                              </div>
+                      </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> weights
+                        </div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> observation weights</div>
+                    </div>
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                lambda
+                              </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                A user supplied lambda sequence. By default, the program computes its own lambda sequence based on 
+                                <code>nlambda</code> and <code>lambda.min.ratio</code>. Supplying
+                                a value of lambda overrides this.
+                              </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> type.measure</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> measure to evaluate for cross-validation
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> nfolds</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> number of folds for cross-validation. default is 10. 3 is smallest value allowed.
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> foldid</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> grouped</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> For all models, this refers to computing nfolds separate statistics, and then using their mean and estimated standard error to describe the CV curve
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> keep</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> If keep=TRUE, a prevalidated list of arrasy is returned containing fitted values for each observation and each value of lambda for each model.
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="category-item"> parallel</div>
+                    </div>
+                    <div class="col-md-10 col-sm-6">
+                        <div class="category-item"> If TRUE, use parallel foreach to fit each fold. Must register parallel beforehand
+                        </div>
+                    </div>
+                    
+                    <p></p>
+                    <div class="row">
+                    </div>
 
 
 
