@@ -89,6 +89,7 @@ Plot the solution path
 plot(fit1)
 ```
 
+# Key Features
 
 ## Available functions
 
@@ -112,9 +113,39 @@ plot(fit1)
 | `logLik.cv.oem()`  | log Likelihood for cv.oem objects |
 +--------------------+-----------------------------------+
 
+## Available Penalties
+
++--------------------+--------------------+--------------------------+
+| Penalty            | Option Name        |  Penalty Form            |
++====================+===============================================+
+| Lasso              | `lasso`            | $\lambda \sum_{j = 1}^pd_j|\beta_j|$ |
++--------------------+--------------------+--------------------------+
+| Elastic Net        | `elastic.net`      | $\alpha\lambda \sum_{j = 1}^pd_j|\beta_j| + (1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ |
++--------------------+--------------------+--------------------------+
+| MCP                | `mcp`              | $\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x$ |
++--------------------+--------------------+--------------------------+
+| SCAD               | `scad`             | $\lambda \sum_{j = 1}^p d_j\left\{I(\beta_j \leq \lambda d_j) + \frac{(\gamma\lambda d_j - \beta_j)_+}{(\gamma - 1)\lambda d_j}I(\beta_j > \lambda d_j) \right\}$ |
++--------------------+--------------------+--------------------------+
+| Group Lasso        | `grp.lasso`        | $\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}$ |
++--------------------+--------------------+--------------------------+
+
+## Available Model Families
+
+The following models are available currently. 
+
++---------------------+--------------------+--------------------------+
+| Model               | Option Name        |  Loss Form               |
++=====================+===============================================+
+| Linear Regression   | `gaussian`         | $\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2$ |
++---------------------+--------------------+--------------------------+
+| Logistic Regression | `binomial`         |  $-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]$|
++---------------------+--------------------+--------------------------+
+
+There are plans to include support for multiple responses, binomial models (not just logistic regression), Cox's proportional hazards model, and more if requested.
+
 # Fitting multiple penalties at once
 
-The oem algorithm is well-suited to quickly estimate a solution path for multiple penalties simultaneously if the number of variables is not too large. 
+The oem algorithm is well-suited to quickly estimate a solution path for multiple penalties simultaneously if the number of variables is not too large. The oem algorithm is only efficient for multiple penalties for linear models. 
 
 For the group lasso penalty, the `groups` argument must be used. `groups` should be a vector which indicates the group number for each variable.
 
@@ -125,7 +156,7 @@ fit2 <- oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
 
 Plot the solution paths for all models
 
-```{r, fig.show='hold', fig.width = 7.15, fig.height = 5}
+```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 5}
 layout(matrix(1:3, ncol = 3))
 plot(fit2, which.model = 1)
 plot(fit2, which.model = 2)
@@ -135,7 +166,11 @@ plot(fit2, which.model = 3)
 ## Timing Comparison
 
 The following is a demonstration of oem's efficiency for computing solutions for tuning parameter paths for multiple
-penalties at once
+penalties at once.
+
+### Linear Regression
+
+The effieciency oem for fitting multiple penalties at once only applies to linear models.
 
 ```{r, message = FALSE, cache=FALSE}
 nobs  <- 1e5
@@ -151,6 +186,27 @@ system.time(fit2c <- oem(x = x2, y = y2, penalty = c("grp.lasso", "lasso", "mcp"
                          groups = rep(1:20, each = 5), nlambda = 500L))
 ```
 
+### Logistic Regression
+
+It is still more efficient to fit multiple penalties at once instead of individually for logistic regression, but the benefit is not as dramatic as for linear models. 
+
+```{r, message = FALSE, cache=FALSE}
+nobs  <- 5e4
+nvars <- 100
+x2 <- matrix(rnorm(nobs * nvars), ncol = nvars)
+
+y2 <- rbinom(nobs, 1, prob = 1 / (1 + exp(-drop(x2 %*% c(0.15, 0.15, -0.15, -0.15, 0.25, rep(0, nvars - 5))))))
+
+
+system.time(fit2a <- oem(x = x2, y = y2, penalty = c("grp.lasso"),
+                         family = "binomial",
+                         groups = rep(1:20, each = 5), nlambda = 100L))
+system.time(fit2b <- oem(x = x2, y = y2, penalty = c("grp.lasso", "lasso", "mcp", "scad", "elastic.net"),
+                         family = "binomial",
+                         groups = rep(1:20, each = 5), nlambda = 100L))
+
+```
+
 # Cross Validation
 
 Here we use the `nfolds` argument to specify the number of folds for $k$-fold cross validation
@@ -163,12 +219,67 @@ cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
 
 Plot the cross validation results for each model
 
-```{r, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
 layout(matrix(1:3, ncol = 3))
 plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
 ```
+
+## Different Evaluation Metrics
+
+A variety of evaluation metrics can be used for cross validation. Consider a binary outcome setting with logistic regression. 
+
+```{r, message = FALSE, cache=FALSE}
+nobs  <- 2e3
+nvars <- 20
+x <- matrix(runif(nobs * nvars), ncol = nvars)
+
+y <- rbinom(nobs, 1, prob = 1 / (1 + exp(-drop(x %*% c(0.25, -1, -1, -0.5, -0.5, -0.25, rep(0, nvars - 6))))))
+```
+
+### Misclassification Rate
+
+```{r, message = FALSE, cache=FALSE}
+cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
+                 family = "binomial",
+                 type.measure = "class",
+                 groups = rep(1:10, each = 2), 
+                 nfolds = 10)
+```
+
+```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+layout(matrix(1:3, ncol = 3))
+plot(cvfit2, which.model = 1)
+plot(cvfit2, which.model = 2)
+plot(cvfit2, which.model = 3)
+```
+
+In this case, misclassification rate is not the best indicator of performance. The classes here are imbalanced:
+```{r}
+mean(y)
+```
+
+
+### Area Under the ROC Curve
+
+Area under the ROC curve is an alternative classification metric to misclassification rate. It is available by setting `type.measure = "auc"`.
+
+```{r, message = FALSE, cache=FALSE}
+cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
+                 family = "binomial",
+                 type.measure = "auc",
+                 groups = rep(1:10, each = 2), 
+                 nfolds = 10)
+```
+
+```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+layout(matrix(1:3, ncol = 3))
+plot(cvfit2, which.model = 1)
+plot(cvfit2, which.model = 2)
+plot(cvfit2, which.model = 3)
+```
+
 
 # More Information
 

@@ -195,7 +195,7 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
         stop(err.txt)
     }
     
-    main.txt <- x$penalty[which.model]
+    main.txt <- x$oem.fit$penalty[which.model]
     
     xlab="log(Lambda)"
     if(sign.lambda<0)xlab=paste("-",xlab,sep="")

@@ -1,14 +1,15 @@
 
-
-
-
-
 ### Build Status
 |                 | Build           |
 |-----------------|-----------------|
 | Linux x86_64    | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
 | OSX             | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)          |
-| Windows x86     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/w6hr575fwcgyjs8r/branch/master?svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
+| Windows x86_64     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
+
+
+
+
+
 
 
 ## Introduction
@@ -61,8 +62,8 @@ microbenchmark(
 ```
 ## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 6.431274 7.257263 7.418392 7.585342 7.661009 8.157071     5
-##     oem[lasso] 1.704183 1.709463 1.778271 1.739786 1.761598 1.976327     5
+##  glmnet[lasso] 7.292307 7.383917 7.658757 7.580808 7.671030 8.365722     5
+##     oem[lasso] 2.040648 2.047586 2.113338 2.063423 2.078822 2.336209     5
 ##  cld
 ##    b
 ##   a
@@ -158,23 +159,36 @@ microbenchmark(
 ```
 
 ```
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+```
+
+```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1514.3200 1524.7660 1815.6946 1846.6036 1998.4231
-##        oem[mcp]  125.1752  125.3524  134.4434  129.5843  131.8468
-##     ncvreg[mcp] 7221.9639 7379.2210 8180.5382 8280.0700 8436.4291
-##       plus[mcp] 1769.3068 1846.8183 1939.8442 1880.9805 1995.9837
-##       oem[scad]  108.1800  108.4531  125.1666  134.3214  137.3445
-##    ncvreg[scad] 7363.3993 7452.6045 7807.3085 7657.4050 7943.3204
-##      plus[scad] 1764.6258 1782.5155 1907.3380 1842.6493 2056.0460
-##        max neval cld
-##  2194.3604     5  b 
-##   160.2583     5 a  
-##  9585.0071     5   c
-##  2206.1315     5  b 
-##   137.5340     5 a  
-##  8619.8131     5   c
-##  2090.8536     5  b
+##  sparsenet[mcp] 1740.2711 1740.4014 1745.6558 1746.0448 1749.9996
+##        oem[mcp]  156.1490  156.3148  157.4937  156.6029  158.7574
+##     ncvreg[mcp] 8332.3995 8376.8815 8405.0775 8387.1697 8451.3359
+##       plus[mcp] 1704.8241 1723.2366 1756.4895 1727.7677 1796.3541
+##       oem[scad]  132.5754  132.5845  133.0697  132.6441  133.2717
+##    ncvreg[scad] 8527.7561 8595.5140 8637.7294 8670.6568 8692.7131
+##      plus[scad] 1886.8247 1901.8046 1982.6517 1961.2432 2041.5625
+##        max neval   cld
+##  1751.5619     5  b   
+##   159.6443     5 a    
+##  8477.6007     5    d 
+##  1830.2648     5  b   
+##   134.2728     5 a    
+##  8702.0070     5     e
+##  2121.8234     5   c
 ```
 
 ```r
@@ -190,10 +204,10 @@ diffs
 
 ```
 ##                          abs diff
-## MCP:  oem and ncvreg 5.149270e-10
-## SCAD: oem and ncvreg 2.089842e-10
-## MCP:  oem and plus   2.268799e-11
-## SCAD: oem and plus   1.426526e-11
+## MCP:  oem and ncvreg 5.134558e-10
+## SCAD: oem and ncvreg 2.087087e-10
+## MCP:  oem and plus   2.684108e-11
+## SCAD: oem and plus   1.732414e-11
 ```
 
 
@@ -244,16 +258,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr        min         lq       mean     median        uq
-##   gglasso[grp.lasso] 1802.87375 1806.41521 1935.98046 1836.21291 1964.4539
-##       oem[grp.lasso]   69.39718   71.20502   74.70511   73.58244   76.0017
-##  grplasso[grp.lasso] 2653.26790 2723.40045 3011.46649 2739.66860 2909.5715
-##    grpreg[grp.lasso] 1045.78322 1045.82151 1056.89154 1051.26239 1062.0703
-##         max neval  cld
-##  2269.94648     5   c 
-##    83.33922     5 a   
-##  4031.42396     5    d
-##  1079.52027     5  b
+##                 expr        min         lq       mean     median
+##   gglasso[grp.lasso] 1758.24982 1760.96713 1764.63203 1767.35226
+##       oem[grp.lasso]   79.10119   79.33289   79.85101   79.80578
+##  grplasso[grp.lasso] 2575.35601 2602.75647 2609.91463 2613.97859
+##    grpreg[grp.lasso] 1036.92605 1041.19859 1042.27122 1041.82265
+##          uq        max neval  cld
+##  1767.53028 1769.06064     5   c 
+##    80.06472   80.95049     5 a   
+##  2623.16826 2634.31381     5    d
+##  1044.23010 1047.17872     5  b
 ```
 
 ```r
@@ -266,8 +280,8 @@ diffs
 
 ```
 ##                      abs diff
-## oem and gglasso  1.382705e-07
-## oem and grplasso 4.818586e-08
+## oem and gglasso  8.341970e-05
+## oem and grplasso 8.341973e-05
 ```
 
 #### Bigger Group Lasso Example
@@ -292,7 +306,7 @@ system.time(res <- oem(x, y, penalty = "grp.lasso",
 
 ```
 ##    user  system elapsed 
-##    3.00    0.22    3.33
+##    3.17    0.17    3.34
 ```
 
 ```r
@@ -304,7 +318,7 @@ system.time(res2 <- grpreg(x, y, group = groups,
 
 ```
 ##    user  system elapsed 
-##   71.11    1.61   73.73
+##   73.89    1.44   75.83
 ```
 
 ```r
@@ -359,11 +373,11 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 199.4401 203.3029 210.9950 203.4785 218.7094
-##  oem[lasso/mcp/scad/ols] 212.4459 213.0695 219.2524 216.8455 219.3812
+##               oem[lasso] 236.5429 236.9945 244.4077 238.2651 249.9254
+##  oem[lasso/mcp/scad/ols] 249.6645 252.7753 260.2248 252.9913 265.3522
 ##       max neval cld
-##  230.0439     5   a
-##  234.5200     5   a
+##  260.3107     5   a
+##  280.3408     5   a
 ```
 
 ```r
@@ -371,10 +385,10 @@ microbenchmark(
 #
 
 layout(matrix(1:4, ncol=2, byrow = TRUE))
-plot(res2, which.model = 1, main = "lasso", lwd = 2)
-plot(res2, which.model = 2, main = "mcp", lwd = 2)
-plot(res2, which.model = 3, main = "scad", lwd = 2)
-plot(res2, which.model = 4, main = "group lasso", lwd = 2)
+plot(res2, which.model = 1, lwd = 2)
+plot(res2, which.model = 2, lwd = 2)
+plot(res2, which.model = 3, lwd = 2)
+plot(res2, which.model = 4, lwd = 2)
 ```
 
 <img src="README_files/figure-html/mult-1.png" title="" alt="" style="display: block; margin: auto;" />

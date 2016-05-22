@@ -9,7 +9,7 @@ output:
 |-----------------|-----------------|
 | Linux x86_64    | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
 | OSX             | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)          |
-| Windows x86     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/w6hr575fwcgyjs8r/branch/master?svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
+
 
 
 ```{r setup, include=FALSE}
@@ -26,8 +26,8 @@ The oem package provides estimaton for various penalized linear models using the
 
 Install using the **devtools** package (RcppEigen must be installed first as well):
 
-```r
-#devtools::install_github("jaredhuling/oem")
+```{r, eval = FALSE}
+devtools::install_github("jaredhuling/oem")
 ```
 
 or by cloning and building using `R CMD INSTALL`
@@ -268,8 +268,8 @@ microbenchmark(
 #
 
 layout(matrix(1:4, ncol=2, byrow = TRUE))
-plot(res2, which.model = 1, main = "lasso", lwd = 2)
-plot(res2, which.model = 2, main = "mcp", lwd = 2)
-plot(res2, which.model = 3, main = "scad", lwd = 2)
-plot(res2, which.model = 4, main = "group lasso", lwd = 2)
+plot(res2, which.model = 1, lwd = 2)
+plot(res2, which.model = 2, lwd = 2)
+plot(res2, which.model = 3, lwd = 2)
+plot(res2, which.model = 4, lwd = 2)
 ```
