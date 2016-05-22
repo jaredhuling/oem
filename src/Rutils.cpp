@@ -343,7 +343,6 @@ RcppExport SEXP LanczosBidiagSparse(SEXP A, SEXP v, SEXP k)
     using Eigen::VectorXd;
     using Eigen::JacobiSVD;
     typedef Eigen::Map<VectorXd> MapVecd;
-    typedef Eigen::Map<Eigen::MatrixXd> MapMatd;
     const SpMat AA(as<MSpMat>(A));
     const MapVecd Vinit(as<MapVecd>(v));
     const int kk(as<int>(k));
