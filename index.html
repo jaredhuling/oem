@@ -646,7 +646,7 @@
                 <p></p>
                 
                 <div>
-                    <h4 class="section-title-heading"><span>Cross Validation</span></h4>
+                    <h4 id = "#validate-section" class="section-title-heading"><span>Cross Validation</span></h4>
                 </div>
 
                <div class="row items-container">
@@ -737,18 +737,44 @@
                         <div class="category-item"> an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> grouped</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> For all models, this refers to computing nfolds separate statistics, and then using their mean and estimated standard error to describe the CV curve
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                grouped
+                              </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                Like in glmnet, this is an experimental argument, with default <code>TRUE</code>, and can 
+                                be ignored by most users. For all models, this refers to computing <code>nfolds</code>  separate statistics, 
+                                and then using their mean and estimated standard error to describe the CV curve. If 
+                                <code>grouped=FALSE</code>, 
+                                an error matrix is built up at the observation level from the predictions from the <code>nfolds</code> 
+                                fits, and then summarized (does not apply to <code>type.measure="auc"</code>).
+                              </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-2 col-sm-6">
-                        <div class="category-item"> keep</div>
-                    </div>
-                    <div class="col-md-10 col-sm-6">
-                        <div class="category-item"> If keep=TRUE, a prevalidated list of arrasy is returned containing fitted values for each observation and each value of lambda for each model.
+                    <div class="row-height">
+                        <div class="col-md-2 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                keep
+                              </div>
+                            </div>
+                        </div>
+                        <div class="col-md-10 col-sm-6 col-height">
+                            <div class="category-item content"> 
+                              <div class = "cat-it-inside">
+                                If <code>keep=TRUE</code>, a prevalidated list of arrasy is returned containing fitted values for each 
+                                observation and each value of lambda for each model. This means these fits are computed with 
+                                this observation and the rest of its fold omitted. The folid vector is also returned. 
+                                Default is <code>keep=FALSE</code>
+                              </div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-2 col-sm-6">
