@@ -23,4 +23,10 @@ after_success:
   - Rscript -e 'covr::codecov()'
 
 r_build_args: --no-build-vignettes --no-manual --no-resave-data
-r_check_args: --no-build-vignettes --no-manual
+r_check_args: --no-build-vignettes --no-manual --as-cran
+
+env:
+  global:
+    - WARNINGS_ARE_ERRORS=1
+    - R_BUILD_ARGS=--no-manual
+    - R_CHECK_ARGS=--no-manual --as-cran
