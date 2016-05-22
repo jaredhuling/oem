@@ -10,6 +10,7 @@ notifications:
     on_success: change
     on_failure: always
 
+osx_image: xcode7
 
 os:
   - linux
