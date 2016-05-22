@@ -13,7 +13,6 @@ notifications:
 
 os:
   - linux
-  - osx
 
 r_packages:
   - covr
@@ -29,3 +28,12 @@ before_script:
   - rm ${PKG_TARBALL}
   - echo "Session info:"
   - Rscript -e "library(${PKG_NAME});devtools::session_info('${PKG_NAME}')"
+  
+  
+env:
+  global:
+    - R_BUILD_ARGS="--no-build-vignettes --no-manual --no-resave-data"
+    - R_CHECK_ARGS="--no-build-vignettes --no-manual --timings"
+    - R_CHECK_TIME="TRUE"
+    - R_CHECK_TESTS="TRUE"
+    - _R_CHECK_TIMINGS_="0"
