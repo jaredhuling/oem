@@ -10,4 +10,4 @@ README_files
 ^cran-comments.md$
 ^CONTRIBUTING\.md$
 ^NEWS$
-appveyor.yml
+^appveyor\.yml$
