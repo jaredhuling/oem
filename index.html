@@ -374,7 +374,11 @@
                                 A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
                                 should be put in group 0. For example, if <code>x</code> has 6 columns, to put the first two variables in 
                                 one group and the second three in another group and prevent penalization on the 6th variable, 
-                                set <code>groups = c(1,1,2,2,2,0)</code>
+                                set <code>groups = c(1,1,2,2,2,0)</code>. 
+                                The penalty applied is $\lambda * \sum_{k = 1}^Gd_g\sqrt{\sum_{j \in g_k}\beta_j^2}$, where $k$ indexes the
+                                groups, $g_k$ is all indices of elements of group $k$, $G$ is the total number 
+                                of groups, and $d$ is a vector of group weights, specified by <code>group.weights</code>. The default 
+                                for $d_k$ is $\sqrt{|g_k|}$.
                               </div>
                             </div>
                         </div>
