@@ -13,6 +13,7 @@ notifications:
 
 os:
   - linux
+  - osx
 
 r_packages:
   - covr
