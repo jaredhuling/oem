@@ -1238,7 +1238,7 @@ body ::selection {
 }
 /* Map Mask */
 .footer-section {
-  background: #171724;
+  background: #318ae3; /* was 171724  */
 }
 .footer-logo p {
   color: #b8b7cb;
@@ -1280,7 +1280,7 @@ body ::selection {
   background: #0c0c17;
 }
 .footer-bottom {
-  background: #0c0c17;
+  background: #1e7ddc; /* was 0c0c17  */
 }
 .footer-bottom-text {
   color: #706f83;
