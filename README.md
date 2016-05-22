@@ -9,7 +9,7 @@
 |                 | Build           |
 |-----------------|-----------------|
 | Linux x86_64    | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
-| OSX             | [![Build Status](https://travis-ci.org/cdeterman/oem.svg?branch=macosx)](https://travis-ci.org/jaredhuling/oem)          |
+| OSX             | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=macosx)](https://travis-ci.org/jaredhuling/oem)          |
 | Windows x86     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/w6hr575fwcgyjs8r/branch/master?svg=true
 )](https://ci.appveyor.com/project/jaredhuling/oem)     |
 
