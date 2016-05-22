@@ -109,6 +109,8 @@ public:
         return i + 1;
     }
     
+    virtual void init_xtx() {}
+    virtual void update_xtx(int fold_) {}
     virtual double compute_lambda_zero() { return 0; }
     virtual VecTypeBeta get_beta() { return beta; }
     virtual double get_d() { return 0; }

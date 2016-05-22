@@ -39,6 +39,8 @@
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
+#' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
+#' to TRUE will dramatically increase computational time
 #' @return An object with S3 class "oemfit" 
 #' @useDynLib oem
 #' @import Rcpp
@@ -99,7 +101,8 @@ oem <- function(x,
                 maxit = 500L, 
                 tol = 1e-7,
                 irls.maxit = 100L,
-                irls.tol = 1e-3) 
+                irls.tol = 1e-3,
+                compute.loss = FALSE) 
 {
     family  <- match.arg(family)
     penalty <- match.arg(penalty, several.ok = TRUE)
@@ -218,20 +221,27 @@ oem <- function(x,
     
     lambda <- sort(as.numeric(lambda), decreasing = TRUE)
     
+
+        
+    ##    ensure types are correct
+    ##    before sending to c++
+    
     if (length(lambda) > 0)
-        
-        
-    groups <- as.integer(groups)
+    {
+        lambda    <- as.double(lambda)
+    }
+    groups        <- as.integer(groups)
     unique.groups <- as.integer(unique.groups)
-    nlambda <- as.integer(nlambda)
-    alpha <- as.double(alpha)
-    gamma <- as.double(gamma)
-    tol     <- as.double(tol)
-    irls.tol <- as.double(irls.tol)
-    irls.maxit  <- as.integer(irls.maxit)
-    maxit  <- as.integer(maxit)
-    standardize <- as.logical(standardize)
-    intercept <- as.logical(intercept)
+    nlambda       <- as.integer(nlambda)
+    alpha         <- as.double(alpha)
+    gamma         <- as.double(gamma)
+    tol           <- as.double(tol)
+    irls.tol      <- as.double(irls.tol)
+    irls.maxit    <- as.integer(irls.maxit)
+    maxit         <- as.integer(maxit)
+    standardize   <- as.logical(standardize)
+    intercept     <- as.logical(intercept)
+    compute.loss  <- as.logical(compute.loss)
     
     if(maxit <= 0 | irls.maxit <= 0)
     {
@@ -265,6 +275,7 @@ oem <- function(x,
                                                penalty.factor,
                                                standardize,
                                                intercept,
+                                               compute.loss,
                                                options),
                   "binomial" = oemfit.binomial(is.sparse, 
                                                x, y, 
@@ -282,6 +293,7 @@ oem <- function(x,
                                                penalty.factor,
                                                standardize,
                                                intercept,
+                                               compute.loss,
                                                options)
                   )
     res$nobs    <- n
@@ -310,6 +322,7 @@ oemfit.gaussian <- function(is.sparse,
                             penalty.factor,
                             standardize,
                             intercept,
+                            compute.loss,
                             options)
 {
     if (is.sparse)
@@ -330,6 +343,7 @@ oemfit.gaussian <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     compute.loss,
                      options,
                      PACKAGE = "oem")
     } else 
@@ -350,6 +364,7 @@ oemfit.gaussian <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     compute.loss,
                      options,
                      PACKAGE = "oem")
     }
@@ -375,6 +390,7 @@ oemfit.binomial <- function(is.sparse,
                             penalty.factor,
                             standardize,
                             intercept,
+                            compute.loss,
                             options)
 {
     if (is.sparse)
@@ -395,6 +411,7 @@ oemfit.binomial <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     compute.loss,
                      options,
                      PACKAGE = "oem")
     } else 
@@ -415,6 +432,7 @@ oemfit.binomial <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     compute.loss,
                      options,
                      PACKAGE = "oem")
     }

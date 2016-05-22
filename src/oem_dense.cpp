@@ -43,6 +43,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
                               SEXP penalty_factor_,
                               SEXP standardize_, 
                               SEXP intercept_,
+                              SEXP compute_loss_,
                               SEXP opts_)
 {
     BEGIN_RCPP
@@ -82,6 +83,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     bool standardize       = as<bool>(standardize_);
     bool intercept         = as<bool>(intercept_);
     bool intercept_bin     = intercept;
+    bool compute_loss      = as<bool>(compute_loss_);
     
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
@@ -168,6 +170,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
         }
         
         VectorXd loss(nlambda);
+        loss.fill(1e99);
         
         for(int i = 0; i < nlambda; i++)
         {
@@ -186,9 +189,11 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
             beta(0,i) = beta0;
             beta.block(1, i, p, 1) = res;
             
-            
-            // get associated loss
-            loss(i) = solver->get_loss();
+            if (compute_loss)
+            {
+                // get associated loss
+                loss(i) = solver->get_loss();
+            }
             
             // if the design matrix includes the intercept
             // then don't back into the intercept with

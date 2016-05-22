@@ -9,7 +9,8 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
   group.weights = NULL, standardize = FALSE, intercept = TRUE,
-  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001)
+  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
+  compute.loss = FALSE)
 }
 \arguments{
 \item{x}{input matrix or SparseMatrix (sparse not yet implemented. 
@@ -68,6 +69,9 @@ variables are in the same units already, you might not wish to standardize.}
 \item{irls.maxit}{integer. Maximum number of IRLS iterations}
 
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if family != "gaussian"}
+
+\item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
+to TRUE will dramatically increase computational time}
 }
 \value{
 An object with S3 class "oemfit"
