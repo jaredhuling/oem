@@ -290,6 +290,11 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
         stop(err.txt)
     }
     
+    if (all(object$loss[[which.model]] == 1e99))
+    {
+        stop("oem object needed compute.loss set to TRUE. logLik not returned")
+    }
+    
     if (object$family == "gaussian")
     {
         
@@ -335,6 +340,11 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
     {
         err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
         stop(err.txt)
+    }
+    
+    if (all(object$loss[[which.model]] == 1e99))
+    {
+        stop("oem object needed compute.loss set to TRUE. logLik not returned")
     }
     
     if (object$family == "gaussian")
