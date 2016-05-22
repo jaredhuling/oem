@@ -43,3 +43,15 @@ artifacts:
 
   - path: '\*_*.zip'
     name: Bits
+
+
+# Adapt as necessary starting from here
+
+environment:
+  global:
+    WARNINGS_ARE_ERRORS: 1
+
+  matrix:
+  - R_VERSION: stable
+
+  - R_VERSION: patched
