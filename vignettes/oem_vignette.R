@@ -27,7 +27,7 @@ plot(fit1)
 fit2 <- oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
             groups = rep(1:20, each = 5))
 
-## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 5----
+## ---- fig.show='hold', fig.width = 7.15, fig.height = 5------------------
 layout(matrix(1:3, ncol = 3))
 plot(fit2, which.model = 1)
 plot(fit2, which.model = 2)
