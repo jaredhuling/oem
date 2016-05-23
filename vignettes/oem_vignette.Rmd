@@ -170,7 +170,7 @@ penalties at once.
 
 ### Linear Regression
 
-The effieciency oem for fitting multiple penalties at once only applies to linear models.
+The efficiency oem for fitting multiple penalties at once only applies to linear models. However, for linear models it is quite efficient, even for a high number of tuning parameters for many different penalties.
 
 ```{r, message = FALSE, cache=FALSE}
 nobs  <- 1e5
@@ -217,16 +217,16 @@ cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  nfolds = 10)
 ```
 
-Plot the cross validation results for each model
+Plot the cross validation mean squared error results for each model
 
-```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+```{r, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
 layout(matrix(1:3, ncol = 3))
 plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
 ```
 
-## Different Evaluation Metrics
+## Evaluation Metrics
 
 A variety of evaluation metrics can be used for cross validation. The available metrics can be found in the table below
 
@@ -299,6 +299,45 @@ plot(cvfit2, which.model = 1)
 plot(cvfit2, which.model = 2)
 plot(cvfit2, which.model = 3)
 ```
+
+# Other Features
+
+## Penalty Adjustment
+If some variables should not be penalized, this can be specified through the use of the `penalty.factor` argument for all penalties other than the group lasso. For the group lasso, the group-specific weights can be modified by the `group.weights` argument. `penalty.factor` should be a vector of length equal to the number of columns in `x`. Each element in `penalty.factor` will be multiplied to the applied tuning parameter for each corresponding variable. For example, for a problem with 5 variables (`ncol(x) = 5`), setting `penalty.factor = c(1, 1, 1, 0, 0)` will effectively only allow penalization for the first three variables. The `group.weights` argument should be a vector with length equal to the number of groups. Similarly to `penalty.factor`, these weights will be multiplied to the penalty applied to each group. `penalty.factor` and `group.weights` can also be used to fit the adaptive lasso and adaptive group lasso, respectively.  
+
+The following example shows how to fit an adaptive lasso using `oem`
+```{r, message = FALSE, cache=FALSE}
+
+nobs  <- 1e4
+nvars <- 102
+x <- matrix(rnorm(nobs * nvars), ncol = nvars)
+y <- drop(x %*% c(0.5, 0.5, -0.5, -0.5, 1, 0.5, rep(0, nvars - 6))) + rnorm(nobs, sd = 4)
+
+lams <- exp(seq(log(2.5), log(5e-5), length.out = 100L))
+
+ols.estimates <- coef(lm.fit(y = y, x = cbind(1, x)))[-1]
+
+fit.adaptive <- oem(x = x, y = y, penalty = c("lasso"),
+                    penalty.factor = 1 / abs(ols.estimates),
+                    lambda = lams)
+
+group.indicators <- rep(1:34, each = 3)
+
+## norms of OLS estimates for each group
+group.norms      <- sapply(1:34, function(idx) sqrt(sum((ols.estimates[group.indicators == idx]) ^ 2)))
+fit.adaptive.grp <- oem(x = x, y = y, penalty = c("grp.lasso"),
+                        group.weights = 1 / group.norms,
+                        groups = group.indicators, 
+                        lambda = lams)
+
+```
+
+```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 4.25}
+layout(matrix(1:2, ncol = 2))
+plot(fit.adaptive)
+plot(fit.adaptive.grp)
+```
+
 
 
 # More Information

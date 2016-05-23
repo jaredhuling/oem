@@ -67,7 +67,7 @@ cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  groups = rep(1:20, each = 5), 
                  nfolds = 10)
 
-## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
+## ---- fig.show='hold', fig.width = 7.15, fig.height = 3.75---------------
 layout(matrix(1:3, ncol = 3))
 plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
@@ -108,4 +108,34 @@ layout(matrix(1:3, ncol = 3))
 plot(cvfit2, which.model = 1)
 plot(cvfit2, which.model = 2)
 plot(cvfit2, which.model = 3)
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+
+nobs  <- 1e4
+nvars <- 102
+x <- matrix(rnorm(nobs * nvars), ncol = nvars)
+y <- drop(x %*% c(0.5, 0.5, -0.5, -0.5, 1, 0.5, rep(0, nvars - 6))) + rnorm(nobs, sd = 4)
+
+lams <- exp(seq(log(2.5), log(5e-5), length.out = 100L))
+
+ols.estimates <- coef(lm.fit(y = y, x = cbind(1, x)))[-1]
+
+fit.adaptive <- oem(x = x, y = y, penalty = c("lasso"),
+                    penalty.factor = 1 / abs(ols.estimates),
+                    lambda = lams)
+
+group.indicators <- rep(1:34, each = 3)
+
+## norms of OLS estimates for each group
+group.norms      <- sapply(1:34, function(idx) sqrt(sum((ols.estimates[group.indicators == idx]) ^ 2)))
+fit.adaptive.grp <- oem(x = x, y = y, penalty = c("grp.lasso"),
+                        group.weights = 1 / group.norms,
+                        groups = group.indicators, 
+                        lambda = lams)
+
+
+## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 4.25----
+layout(matrix(1:2, ncol = 2))
+plot(fit.adaptive)
+plot(fit.adaptive.grp)
 

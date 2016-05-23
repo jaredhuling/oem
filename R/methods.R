@@ -204,7 +204,6 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
                    ylim = range(object$cvup[[which.model]], object$cvlo[[which.model]]),
                    xlab = xlab,
                    ylab = object$name,
-                   main = main.txt,
                    type="n")
     new.args=list(...)
     if(length(new.args))plot.args[names(new.args)]=new.args
@@ -216,6 +215,7 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
     axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0)
     abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=3)
     abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=3)
+    title(main.txt, line = 2.5)
     invisible()
 }
 

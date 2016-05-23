@@ -1,6 +1,6 @@
 
 ### Build Status
-|                 | Build           |
+|  OS             | Build           |
 |-----------------|-----------------|
 | Linux x86_64    | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
 | OSX             | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)          |
