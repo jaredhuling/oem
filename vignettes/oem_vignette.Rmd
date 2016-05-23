@@ -124,10 +124,18 @@ plot(fit1)
 +--------------------+--------------------+--------------------------+
 | MCP                | `mcp`              | $\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x$ |
 +--------------------+--------------------+--------------------------+
-| SCAD               | `scad`             | $\lambda \sum_{j = 1}^p d_j\left\{I(\beta_j \leq \lambda d_j) + \frac{(\gamma\lambda d_j - \beta_j)_+}{(\gamma - 1)\lambda d_j}I(\beta_j > \lambda d_j) \right\}$ |
+| SCAD               | `scad`             | $\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)$               |
 +--------------------+--------------------+--------------------------+
 | Group Lasso        | `grp.lasso`        | $\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}$ |
 +--------------------+--------------------+--------------------------+
+
+where \[ p_{\lambda, \gamma}^{SCAD}(\beta) =   \left\{
+\begin{array}{ll}
+      \lambda|\beta| & |\beta| \leq \lambda ; \\
+      -\frac{|\beta|^2 - 2\gamma\lambda|\beta| + \lambda^2}{2(\gamma - 1)} & \lambda < |\beta| \leq \gamma\lambda ; \\
+      \frac{(\gamma + 1)\lambda^2}{2} & |\beta| > \gamma\lambda \\
+\end{array} 
+\right. \]
 
 ## Available Model Families
 
