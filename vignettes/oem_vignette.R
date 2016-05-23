@@ -27,7 +27,7 @@ plot(fit1)
 fit2 <- oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
             groups = rep(1:20, each = 5))
 
-## ---- fig.show='hold', fig.width = 7.15, fig.height = 5------------------
+## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 5----
 layout(matrix(1:3, ncol = 3))
 plot(fit2, which.model = 1)
 plot(fit2, which.model = 2)
@@ -67,18 +67,18 @@ cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  groups = rep(1:20, each = 5), 
                  nfolds = 10)
 
-## ---- fig.show='hold', fig.width = 7.15, fig.height = 3.75---------------
+## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
 layout(matrix(1:3, ncol = 3))
 plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
 
 ## ---- message = FALSE, cache=FALSE---------------------------------------
-nobs  <- 1e3
+nobs  <- 2e3
 nvars <- 20
-x <- matrix(runif(nobs * nvars), ncol = nvars)
+x <- matrix(runif(nobs * nvars, max = 2), ncol = nvars)
 
-y <- rbinom(nobs, 1, prob = 1 / (1 + exp(-drop(x %*% c(0.15, -0.25, -0.25, -0.25, rep(0, nvars - 4))))))
+y <- rbinom(nobs, 1, prob = 1 / (1 + exp(-drop(x %*% c(0.25, -1, -1, -0.5, -0.5, -0.25, rep(0, nvars - 6))))))
 
 ## ---- message = FALSE, cache=FALSE---------------------------------------
 cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
@@ -87,7 +87,23 @@ cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  groups = rep(1:10, each = 2), 
                  nfolds = 10)
 
-## ---- fig.show='hold', fig.width = 7.15, fig.height = 3.75---------------
+## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
+layout(matrix(1:3, ncol = 3))
+plot(cvfit2, which.model = 1)
+plot(cvfit2, which.model = 2)
+plot(cvfit2, which.model = 3)
+
+## ------------------------------------------------------------------------
+mean(y)
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
+                 family = "binomial",
+                 type.measure = "auc",
+                 groups = rep(1:10, each = 2), 
+                 nfolds = 10)
+
+## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
 layout(matrix(1:3, ncol = 3))
 plot(cvfit2, which.model = 1)
 plot(cvfit2, which.model = 2)

@@ -228,12 +228,32 @@ plot(cvfit1, which.model = 3)
 
 ## Different Evaluation Metrics
 
-A variety of evaluation metrics can be used for cross validation. Consider a binary outcome setting with logistic regression. 
+A variety of evaluation metrics can be used for cross validation. The available metrics can be found in the table below
+
++-----------------------+------------------------------------+--------------------------+
+| Model                 | Metric                             |  `type.measure=`         |
++=======================+====================================+==========================+
+| **Linear Regression** | Mean squared error                 |     `mse` or `deviance`  |
++-----------------------+------------------------------------+--------------------------+
+|                       | Mean absolute error                |     `mae`                |
++-----------------------+------------------------------------+--------------------------+
+|**Logistic Regression**| Deviance                           |     `deviance`           |
++-----------------------+------------------------------------+--------------------------+
+|                       | Area under the ROC curve           |     `auc`                |
++-----------------------+------------------------------------+--------------------------+
+|                       | Misclassification Rate             |     `class`              |
++-----------------------+------------------------------------+--------------------------+
+|                       | Mean squared error of fitted mean  |     `mse`                |
++-----------------------+------------------------------------+--------------------------+
+|                       | Mean absolute error of fitted mean |     `mae`                |
++-----------------------+------------------------------------+--------------------------+
+
+Consider a binary outcome setting with logistic regression. 
 
 ```{r, message = FALSE, cache=FALSE}
 nobs  <- 2e3
 nvars <- 20
-x <- matrix(runif(nobs * nvars), ncol = nvars)
+x <- matrix(runif(nobs * nvars, max = 2), ncol = nvars)
 
 y <- rbinom(nobs, 1, prob = 1 / (1 + exp(-drop(x %*% c(0.25, -1, -1, -0.5, -0.5, -0.25, rep(0, nvars - 6))))))
 ```
