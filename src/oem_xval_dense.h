@@ -462,6 +462,7 @@ protected:
                     }
                 }
                 grp_idx[g] = idx_tmp;
+                
             }
             // if group weights were not specified,
             // then set the group weight for each
@@ -712,9 +713,6 @@ public:
         // and compute A = dI - XtX (if n > p)
         compute_XtX_d_update_A(add_int_);
         
-        // get indexes of members of each group.
-        // best to do just once in the beginning
-        get_group_indexes();
     }
     
     void update_xtx(int fold_)
@@ -754,6 +752,10 @@ public:
         
         lambda = lambda_;
         penalty = penalty_;
+        
+        // get indexes of members of each group.
+        // best to do just once in the beginning
+        get_group_indexes();
         
     }
     // when computing for the next lambda, we can use the
