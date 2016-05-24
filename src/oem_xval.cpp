@@ -216,7 +216,13 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 //double beta0 = 0.0;
                 //beta(0,i) = beta0;
                 //beta.block(1, i, p, 1) = res;
-                beta.block(0, i, p + intercept, 1) = res;
+                if (intercept)
+                {
+                    beta.block(0, i, p + 1, 1) = res;
+                } else 
+                {
+                    beta.block(1, i, p, 1) = res;
+                }
                 
                 // only compute loss if asked for 
                 // and not for any cross validation folds
