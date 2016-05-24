@@ -135,7 +135,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     }
     
     
-    
     // only compute X'X parts once
     solver->init_xtx(intercept);
     
@@ -167,6 +166,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
 
     for (unsigned int ff = 0; ff < nfolds + 1; ++ff)
     {
+        std::cout << "fold = " << ff << std::endl;
         // ff == 0 will fit the models
         // on the entire dataset
         // ff = 1, ..., nfolds will fit the models
@@ -192,6 +192,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
             }
             
+            std::cout << "pp = " << pp << std::endl;
+            
             VectorXd loss(nlambda);
             loss.fill(1e99);
             
@@ -204,13 +206,17 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 else
                     solver->init_warm(ilambda);
                 
+                std::cout << "lambda initialized" << i << std::endl;
                 niter[i] = solver->solve(maxit);
+                std::cout << "lambda solved" << i << std::endl;
                 VectorXd res = solver->get_beta();
+                
+                std::cout << "solved" << std::endl;
                 
                 //double beta0 = 0.0;
                 //beta(0,i) = beta0;
                 //beta.block(1, i, p, 1) = res;
-                beta.block(0, i, p+1, 1) = res;
+                beta.block(0, i, p + intercept, 1) = res;
                 
                 // only compute loss if asked for 
                 // and not for any cross validation folds

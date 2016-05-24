@@ -78,7 +78,7 @@ variables are in the same units already, you might not wish to standardize.}
 to TRUE will dramatically increase computational time}
 }
 \value{
-An object with S3 class "oemfit"
+An object with S3 class "xval.oem"
 }
 \description{
 Orthogonalizing EM

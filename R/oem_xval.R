@@ -43,7 +43,7 @@
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
 #' to TRUE will dramatically increase computational time
-#' @return An object with S3 class "oemfit" 
+#' @return An object with S3 class "xval.oem" 
 #' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
@@ -330,7 +330,7 @@ xval.oem <- function(x,
     res$nvars   <- p
     res$penalty <- penalty
     res$family  <- family
-    class(res) <- c(class(res), "oemfit_xval")
+    class(res) <- c(class(res), "xval.oem")
     res
 }
 
