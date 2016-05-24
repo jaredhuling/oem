@@ -4,6 +4,8 @@
 #' @param x input matrix or SparseMatrix (sparse not yet implemented. 
 #' Each row is an observation, each column corresponds to a covariate
 #' @param y numeric response vector of length nobs.
+#' @param nfolds integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10
+#' @param foldid an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
@@ -83,33 +85,53 @@
 #' plot(res)
 #' plot(res.gr)
 #' 
-oem <- function(x, 
-                y, 
-                family = c("gaussian", "binomial"),
-                penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
-                weights = numeric(0),
-                lambda = numeric(0),
-                nlambda = 100L,
-                lambda.min.ratio = NULL,
-                alpha = 1,
-                gamma = 3,
-                groups = numeric(0),
-                penalty.factor = NULL,
-                group.weights = NULL,
-                standardize = FALSE,
-                intercept = TRUE,
-                maxit = 500L, 
-                tol = 1e-7,
-                irls.maxit = 100L,
-                irls.tol = 1e-3,
-                compute.loss = FALSE) 
+xval.oem <- function(x, 
+                     y, 
+                     nfolds           = 10L,
+                     foldid           = NULL,
+                     family           = c("gaussian", "binomial"),
+                     penalty          = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
+                     weights          = numeric(0),
+                     lambda           = numeric(0),
+                     nlambda          = 100L,
+                     lambda.min.ratio = NULL,
+                     alpha            = 1,
+                     gamma            = 3,
+                     groups           = numeric(0),
+                     penalty.factor   = NULL,
+                     group.weights    = NULL,
+                     standardize      = FALSE,
+                     intercept        = TRUE,
+                     maxit            = 500L, 
+                     tol              = 1e-7,
+                     irls.maxit       = 100L,
+                     irls.tol         = 1e-3,
+                     compute.loss     = FALSE) 
 {
     family  <- match.arg(family)
     penalty <- match.arg(penalty, several.ok = TRUE)
     
+    if (family == "binomial")
+    {
+        stop("binomial models not yet supported for xval, use cv.oem() instead")
+    }
+    
     dims <- dim(x)
     n <- dims[1]
     p <- dims[2]
+    
+    if (p >= n)
+    {
+        stop("number of observations must be greater than the number of variables
+             for xval, use cv.oem instead.")
+    }
+    
+    if (is.null(foldid)) 
+        foldid = sample(rep(seq(nfolds), length = n))
+    else nfolds = max(foldid)
+    if (nfolds < 3) 
+        stop("nfolds must be bigger than 3; nfolds=10 recommended")
+    
     y <- drop(y)
     y.vals <- unique(y)
     is.sparse <- FALSE
@@ -118,7 +140,7 @@ oem <- function(x,
         is.sparse <- TRUE
         x <- as(x,"CsparseMatrix")
         x <- as(x,"dgCMatrix")
-        stop("sparse matrices not supported yet. coming soon")
+        stop("sparse matrices not supported yet")
     }
     
     if (length(y) != n) {
@@ -232,6 +254,8 @@ oem <- function(x,
     {
         lambda    <- as.double(lambda)
     }
+    foldid        <- as.integer(foldid)
+    nfolds        <- as.integer(nfolds)
     groups        <- as.integer(groups)
     unique.groups <- as.integer(unique.groups)
     nlambda       <- as.integer(nlambda)
@@ -261,75 +285,81 @@ oem <- function(x,
                     irls_tol   = irls.tol)
     
     res <- switch(family,
-                  "gaussian" = oemfit.gaussian(is.sparse,
-                                               x, y, 
-                                               family, 
-                                               penalty, 
-                                               weights,
-                                               groups,
-                                               unique.groups,
-                                               group.weights,
-                                               lambda, 
-                                               nlambda,
-                                               lambda.min.ratio,
-                                               alpha,
-                                               gamma,
-                                               penalty.factor,
-                                               standardize,
-                                               intercept,
-                                               compute.loss,
-                                               options),
-                  "binomial" = oemfit.binomial(is.sparse, 
-                                               x, y, 
-                                               family, 
-                                               penalty, 
-                                               weights,
-                                               groups,
-                                               unique.groups,
-                                               group.weights,
-                                               lambda, 
-                                               nlambda,
-                                               lambda.min.ratio,
-                                               alpha,
-                                               gamma,
-                                               penalty.factor,
-                                               standardize,
-                                               intercept,
-                                               compute.loss,
-                                               options)
+                  "gaussian" = oemfit_xval.gaussian(is.sparse,
+                                                    x, y, 
+                                                    nfolds,
+                                                    foldid,
+                                                    family, 
+                                                    penalty, 
+                                                    weights,
+                                                    groups,
+                                                    unique.groups,
+                                                    group.weights,
+                                                    lambda, 
+                                                    nlambda,
+                                                    lambda.min.ratio,
+                                                    alpha,
+                                                    gamma,
+                                                    penalty.factor,
+                                                    standardize,
+                                                    intercept,
+                                                    compute.loss,
+                                                    options),
+                  "binomial" = oemfit_xval.binomial(is.sparse, 
+                                                    x, y, 
+                                                    nfolds,
+                                                    foldid,
+                                                    family, 
+                                                    penalty, 
+                                                    weights,
+                                                    groups,
+                                                    unique.groups,
+                                                    group.weights,
+                                                    lambda, 
+                                                    nlambda,
+                                                    lambda.min.ratio,
+                                                    alpha,
+                                                    gamma,
+                                                    penalty.factor,
+                                                    standardize,
+                                                    intercept,
+                                                    compute.loss,
+                                                    options)
                   )
     res$nobs    <- n
     res$nvars   <- p
     res$penalty <- penalty
     res$family  <- family
-    class(res) <- c(class(res), "oemfit")
+    class(res) <- c(class(res), "oemfit_xval")
     res
 }
 
 
-oemfit.gaussian <- function(is.sparse, 
-                            x, 
-                            y, 
-                            family, 
-                            penalty, 
-                            weights,
-                            groups,
-                            unique.groups,
-                            group.weights,
-                            lambda, 
-                            nlambda,
-                            lambda.min.ratio,
-                            alpha,
-                            gamma,
-                            penalty.factor,
-                            standardize,
-                            intercept,
-                            compute.loss,
-                            options)
+oemfit_xval.gaussian <- function(is.sparse, 
+                                 x, 
+                                 y, 
+                                 nfolds,
+                                 foldid,
+                                 family, 
+                                 penalty, 
+                                 weights,
+                                 groups,
+                                 unique.groups,
+                                 group.weights,
+                                 lambda, 
+                                 nlambda,
+                                 lambda.min.ratio,
+                                 alpha,
+                                 gamma,
+                                 penalty.factor,
+                                 standardize,
+                                 intercept,
+                                 compute.loss,
+                                 options)
 {
     if (is.sparse)
     {
-        ret <- .Call("oem_fit_sparse", 
+        ret <- .Call("oem_xval_sparse", 
                      x, y, 
                      family, 
                      penalty, 
@@ -345,12 +375,14 @@ oemfit.gaussian <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     nfolds,
+                     foldid,
                      compute.loss,
                      options,
                      PACKAGE = "oem")
     } else 
     {
-        ret <- .Call("oem_fit_dense", 
+        ret <- .Call("oem_xval_dense", 
                      x, y, 
                      family, 
                      penalty, 
@@ -366,38 +398,42 @@ oemfit.gaussian <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     nfolds,
+                     foldid,
                      compute.loss,
                      options,
                      PACKAGE = "oem")
     }
-    class(ret) <- "oemfit_gaussian"
+    class(ret) <- "oemfit_xval_gaussian"
     ret
 }
 
 
-oemfit.binomial <- function(is.sparse, 
-                            x, 
-                            y, 
-                            family, 
-                            penalty, 
-                            weights,
-                            groups,
-                            unique.groups,
-                            group.weights,
-                            lambda, 
-                            nlambda,
-                            lambda.min.ratio,
-                            alpha,
-                            gamma,
-                            penalty.factor,
-                            standardize,
-                            intercept,
-                            compute.loss,
-                            options)
+oemfit_xval.binomial <- function(is.sparse, 
+                                 x, 
+                                 y, 
+                                 nfolds,
+                                 foldid,
+                                 family, 
+                                 penalty, 
+                                 weights,
+                                 groups,
+                                 unique.groups,
+                                 group.weights,
+                                 lambda, 
+                                 nlambda,
+                                 lambda.min.ratio,
+                                 alpha,
+                                 gamma,
+                                 penalty.factor,
+                                 standardize,
+                                 intercept,
+                                 compute.loss,
+                                 options)
 {
     if (is.sparse)
     {
-        ret <- .Call("oem_fit_logistic_sparse", 
+        ret <- .Call("oem_xval_logistic_sparse", 
                      x, y, 
                      family, 
                      penalty,
@@ -413,12 +449,14 @@ oemfit.binomial <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     nfolds,
+                     foldid,
                      compute.loss,
                      options,
                      PACKAGE = "oem")
     } else 
     {
-        ret <- .Call("oem_fit_logistic_dense", 
+        ret <- .Call("oem_xval_logistic_dense", 
                      x, y, 
                      family, 
                      penalty, 
@@ -434,11 +472,13 @@ oemfit.binomial <- function(is.sparse,
                      penalty.factor,
                      standardize,
                      intercept,
+                     nfolds,
+                     foldid,
                      compute.loss,
                      options,
                      PACKAGE = "oem")
     }
-    class(ret) <- "oemfit_binomial"
+    class(ret) <- "oemfit_xval_binomial"
     ret
 }
 

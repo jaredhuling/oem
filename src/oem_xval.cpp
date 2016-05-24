@@ -158,6 +158,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());
+    List out_of_fold_predictions_list(penalty.size());
+    List beta_folds(nfolds);
     
     IntegerVector niter(nlambda);
     int nlambda_store = nlambda;
@@ -175,6 +177,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             // update X'X and X'Y on this fold's 
             // subset of data
             solver->update_xtx(ff);
+            beta_folds[ff-1] = List(penalty.size());
         }
         
         for (unsigned int pp = 0; pp < penalty.size(); pp++)
@@ -182,6 +185,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             if (penalty[pp] == "ols")
             {
                 nlambda = 1L;
+            }
+            
+            if (ff == 0)
+            {
+                out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
             }
             
             VectorXd loss(nlambda);
@@ -215,18 +223,34 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 
             } //end loop over lambda values
             
-            if (penalty[pp] == "ols")
+            if (ff == 0)
             {
-                // reset to old nlambda
-                nlambda = nlambda_store;
-                beta_list(pp) = beta.col(0);
-                iter_list(pp) = niter(0);
-                loss_list(pp) = loss(0);
+                if (penalty[pp] == "ols")
+                {
+                    // reset to old nlambda
+                    nlambda = nlambda_store;
+                    beta_list(pp) = beta.col(0);
+                    iter_list(pp) = niter(0);
+                    loss_list(pp) = loss(0);
+                } else 
+                {
+                    beta_list(pp) = beta;
+                    iter_list(pp) = niter;
+                    loss_list(pp) = loss;
+                }
             } else 
             {
-                beta_list(pp) = beta;
-                iter_list(pp) = niter;
-                loss_list(pp) = loss;
+                if (penalty[pp] == "ols")
+                {
+                    // reset to old nlambda
+                    nlambda = nlambda_store;
+                    //beta_folds[ff-1][pp] = beta.col(0);
+                    //iter_list(pp) = niter(0);
+                } else 
+                {
+                    //beta_folds[ff-1][pp] = beta;
+                    //iter_list(pp) = niter;
+                }
             }
             
             
