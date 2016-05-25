@@ -275,7 +275,7 @@ protected:
                 XX.array() += 1; // adding 1 to all of XX' for the intercept
         }
         
-        
+        // scale by sample size. needed for SCAD/MCP
         XX /= nobs;
         
         Spectra::DenseSymMatProd<double> op(XX);
