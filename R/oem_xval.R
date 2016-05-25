@@ -186,7 +186,7 @@ xval.oem <- function(x,
                 group.weights[zero.idx] <- 0
             } else 
             {
-                if (intercept & family != "gaussian")
+                if (intercept)
                 {
                     ## add group for zero term if it's not here
                     ## and add penalty weight of zero
@@ -205,7 +205,7 @@ xval.oem <- function(x,
             
             if (length(zero.idx) == 0)
             {
-                if (intercept & family != "gaussian")
+                if (intercept)
                 {
                     ## add group for zero term if it's not here
                     unique.groups <- sort(c(0, unique.groups))
@@ -215,7 +215,7 @@ xval.oem <- function(x,
         
         
         
-        if (intercept & family != "gaussian")
+        if (intercept)
         {
             ## add intercept to group with no penalty
             groups <- c(0, groups)
