@@ -138,6 +138,9 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     // only compute X'X parts once
     solver->init_xtx(intercept);
     
+    // get eigenvalue
+    double d = solver->get_d();
+    
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 
@@ -262,9 +265,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             
         } // end loop over penalties
     } // end loop over cross validation folds
-
-    
-    double d = solver->get_d();
 
     delete solver;
 

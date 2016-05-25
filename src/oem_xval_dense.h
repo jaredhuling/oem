@@ -454,7 +454,7 @@ protected:
             {
                 // find all variables in group number g
                 std::vector<int> idx_tmp;
-                for (int v = 0; v < nvars; ++v) 
+                for (int v = 0; v < nvars + intercept; ++v) 
                 {
                     if (groups(v) == unique_groups(g)) 
                     {
@@ -625,6 +625,7 @@ protected:
             res.noalias() = A * beta_prev + XY;
         } else 
         {
+            throw std::invalid_argument("dimension of x larger than number of observations");
             res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
         }
     }
@@ -689,7 +690,7 @@ public:
                              group_weights(group_weights_),
                              penalty_factor_size(penalty_factor_.size()),
                              XXdim( std::min(X_.cols(), X_.rows()) + intercept_ * (X_.rows() > X_.cols())  ),
-                             XY(X_.cols()),      // add extra space if intercept 
+                             XY(X_.cols() + intercept_),      // add extra space if intercept 
                              XX(XXdim, XXdim),   // add extra space if intercept 
                              alpha(alpha_),
                              gamma(gamma_),
@@ -709,6 +710,13 @@ public:
         // compute XtX or XXt (depending on if n > p or not)
         // and compute A = dI - XtX (if n > p)
         compute_XtX_d_update_A(add_int_);
+        
+        if (intercept)
+        {
+            u.resize(nvars + 1);
+            beta.resize(nvars + 1);
+            beta_prev.resize(nvars + 1);
+        }
         
     }
     
