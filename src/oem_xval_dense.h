@@ -30,6 +30,7 @@ protected:
     typedef Map<const Matrix> MapMat;
     typedef Map<const Vector> MapVec;
     typedef Map<const MatrixXd> MapMatd;
+    typedef Map<const MatrixRXd> MapMatRd;
     typedef Map<const VectorXd> MapVecd;
     typedef Map<VectorXi> MapVeci;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
@@ -37,7 +38,7 @@ protected:
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MapMatd X;            // data matrix
+    const MapMatRd X;            // data matrix
     MapVec Y;                   // response vector
     VectorXd weights;
     VectorXi foldid;            // id vector for cv folds
@@ -218,7 +219,7 @@ protected:
                   std::vector<VectorXd > &xty_list_,
                   std::vector<int > &nobs_list_) const {
         
-        MatrixRXd A = X;
+        //MatrixRXd A = X;
         
         for (int k = 1; k < nfolds + 1; ++k)
         {
@@ -242,7 +243,7 @@ protected:
             VectorXd sub_y(numelem);
             for (int r = 0; r < numelem; ++r)
             {
-                sub.row(r) = A.row(idx(r));
+                sub.row(r) = X.row(idx(r));
                 sub_y(r) = Y(idx(r));
             }
             
@@ -268,7 +269,7 @@ protected:
                       std::vector<VectorXd > &xty_list_,
                       std::vector<int > &nobs_list_) const {
         
-        MatrixRXd A = X;
+        //MatrixRXd A = X;
         
         for (int k = 1; k < nfolds + 1; ++k)
         {
@@ -292,7 +293,7 @@ protected:
             VectorXd sub_y(numelem);
             for (int r = 0; r < numelem; ++r)
             {
-                sub.row(r) = A.row(idx(r));
+                sub.row(r) = X.row(idx(r));
                 sub_y(r) = Y(idx(r));
             }
             
@@ -331,7 +332,7 @@ protected:
                    std::vector<VectorXd > &xty_list_,
                    std::vector<int > &nobs_list_) const {
         
-        MatrixRXd A = X;
+        //MatrixRXd A = X;
         
         for (int k = 1; k < nfolds + 1; ++k)
         {
@@ -357,7 +358,7 @@ protected:
             for (int r = 0; r < numelem; ++r)
             {
                 int idx_tmp_val = idx(r);
-                sub.row(r) = A.row(idx_tmp_val);
+                sub.row(r) = X.row(idx_tmp_val);
                 sub_y(r) = Y(idx_tmp_val);
                 sub_weights(r) = weights(idx_tmp_val);
             }
@@ -384,7 +385,7 @@ protected:
                        std::vector<VectorXd > &xty_list_,
                        std::vector<int > &nobs_list_) const {
         
-        MatrixRXd A = X;
+        //MatrixRXd A = X;
         
         for (int k = 1; k < nfolds + 1; ++k)
         {
@@ -410,7 +411,7 @@ protected:
             for (int r = 0; r < numelem; ++r)
             {
                 int idx_tmp_val = idx(r);
-                sub.row(r) = A.row(idx_tmp_val);
+                sub.row(r) = X.row(idx_tmp_val);
                 sub_y(r) = Y(idx_tmp_val);
                 sub_weights(r) = weights(idx_tmp_val);
             }
@@ -616,6 +617,8 @@ protected:
         }
     }
     
+    
+    // define the u update in oem
     void next_u(Vector &res)
     {
         if (nobs > nvars)
@@ -628,6 +631,7 @@ protected:
         }
     }
     
+    // define the beta update in oem
     void next_beta(Vector &res)
     {
         if (penalty == "lasso")
@@ -658,7 +662,7 @@ protected:
     
     
 public:
-    oemXvalDense(const Eigen::Ref<const MatrixXd>  &X_, 
+    oemXvalDense(const Eigen::Ref<const MatrixRXd>  &X_, 
                  ConstGenericVector &Y_,
                  const VectorXd &weights_,
                  const int &nfolds_,

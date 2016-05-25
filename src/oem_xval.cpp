@@ -21,9 +21,11 @@ using Rcpp::CharacterVector;
 
 typedef Map<VectorXd> MapVecd;
 typedef Map<VectorXi> MapVeci;
+typedef Eigen::Map<const MatrixXd> MapMat;
 typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
+typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
 
 
 RcppExport SEXP oem_xval_dense(SEXP x_, 
@@ -49,8 +51,10 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
 {
     BEGIN_RCPP
     
-    Rcpp::NumericMatrix xx(x_);
+    //Rcpp::NumericMatrix xx(x_);
     Rcpp::NumericVector yy(y_);
+    
+    const Eigen::Map<MatrixXd> xx(as<Map<MatrixXd> >(x_));
     
     const int n = xx.rows();
     const int p = xx.cols();
@@ -59,11 +63,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     const VectorXi groups(as<VectorXi>(groups_));
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
     
-    MatrixXd X(n, p);
+    MatrixRXd X = xx;
     VectorXd Y(n);
     
     // Copy data 
-    std::copy(xx.begin(), xx.end(), X.data());
+    //std::copy(xx.begin(), xx.end(), X.data());
     std::copy(yy.begin(), yy.end(), Y.data());
     
 
@@ -160,12 +164,17 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());
-    List out_of_fold_predictions_list(penalty.size());
-    List beta_folds(nfolds);
+    std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
+    std::vector<Eigen::VectorXd> xval_mean(penalty.size());
+    
+    // vector of vectors of MatrixXd's. confusing
+    std::vector<std::vector<Eigen::MatrixXd> > beta_folds(penalty.size(), std::vector<Eigen::MatrixXd>(nfolds));
+    //List beta_folds(nfolds);
     
     IntegerVector niter(nlambda);
     int nlambda_store = nlambda;
     double ilambda = 0.0;
+    
 
     for (unsigned int ff = 0; ff < nfolds + 1; ++ff)
     {
@@ -179,7 +188,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             // update X'X and X'Y on this fold's 
             // subset of data
             solver->update_xtx(ff);
-            beta_folds[ff-1] = List(penalty.size());
+            
         }
         
         for (unsigned int pp = 0; pp < penalty.size(); pp++)
@@ -254,9 +263,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                     // reset to old nlambda
                     nlambda = nlambda_store;
                     //beta_folds[ff-1][pp] = beta.col(0);
+                    beta_folds[pp][ff-1] = beta.col(0);
                     //iter_list(pp) = niter(0);
                 } else 
                 {
+                    beta_folds[pp][ff-1] = beta;
                     //beta_folds[ff-1][pp] = beta;
                     //iter_list(pp) = niter;
                 }
@@ -265,6 +276,36 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             
         } // end loop over penalties
     } // end loop over cross validation folds
+    
+    
+    
+    // compute cross validation scores for each model
+    for (unsigned int pp = 0; pp < penalty.size(); pp++)
+    {
+        if (intercept)
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p);
+            }
+        } else 
+        {
+            for (int i = 0; i < n; ++i)
+            {
+                out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1];
+            }
+        }
+        
+        int nlam = out_of_fold_predictions_list[pp].cols();
+        VectorXd tempres(nlam);
+        for (int l = 0; l < nlam; ++l)
+        {
+            tempres(l) = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square().mean();
+        }
+        xval_mean[pp] = tempres;
+    }
+        
+
 
     delete solver;
 
@@ -272,6 +313,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                         Named("lambda") = lambda,
                         Named("niter")  = iter_list,
                         Named("loss")   = loss_list,
+                        Named("cvm")    = xval_mean,
+                        Named("pred")   = out_of_fold_predictions_list,
                         Named("d")      = d);
     END_RCPP
 }
