@@ -557,8 +557,6 @@ protected:
         XX /= nobs;
         XY /= nobs;
         
-        std::cout << "xtx(5,5)" << XX.topLeftCorner(5,5) << std::endl;
-        std::cout << "xty(5)" << XY.head(5).adjoint() << std::endl;
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
