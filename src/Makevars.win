@@ -1,23 +1,10 @@
 
-## This assume that we can call Rscript to ask Rcpp about its locations
-## Use the R_HOME indirection to support installations of multiple R version
-
-##export PKG_LIBS=`Rscript -e “Rcpp:::LdFlags()”`
-##export PKG_CXXFLAGS=`Rscript -e “Rcpp:::CxxFlags()”`
-
-
-##PKG_LIBS = $(BLAS_LIBS) $(FLIBS) \
-##$(shell "Rscript.exe" -e "Rcpp:::LdFlags()")
-
-##PKG_LIBS = $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" -e "Rcpp:::LdFlags()")
-
 ## OLD
 #PKG_CPPFLAGS = -I${R_HOME}/library/RcppEigen/include \
 #-I${R_HOME}/library/Rcpp/include -I. -DNDEBUG
 
 PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 ## old
-#PKG_LIBS = $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 
 
 PKG_LIBS = $(shell "${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" --vanilla -e "Rcpp:::LdFlags()") $(SHLIB_OPENMP_CXXFLAGS)
