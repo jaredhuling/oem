@@ -91,14 +91,10 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
-    // bool fullbetamat = false;
-    int add = 0;
     if (intercept)
     {
         standardize = false;
         
-        // fullbetamat = true;
-        add = 1;
         // dont penalize the intercept
         VectorXd penalty_factor_tmp(p+1);
         
