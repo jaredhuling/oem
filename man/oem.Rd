@@ -97,6 +97,11 @@ layout(matrix(1:2, ncol = 2))
 plot(fit)
 plot(fit, which.model = 2)
 
+# sparse design matrix
+
+xs <- rsparsematrix(n.obs * 10, n.vars, density = 0.01)
+ys <- rnorm(n.obs, sd = 3) + as.vector(xs \%*\% true.beta)
+
 # logistic
 y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x \%*\% true.beta)))
 

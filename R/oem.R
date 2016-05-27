@@ -65,6 +65,11 @@
 #' plot(fit)
 #' plot(fit, which.model = 2)
 #' 
+#' # sparse design matrix
+#' 
+#' xs <- rsparsematrix(n.obs * 10, n.vars, density = 0.01)
+#' ys <- rnorm(n.obs, sd = 3) + as.vector(xs %*% true.beta)
+#' 
 #' # logistic
 #' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
 #' 
@@ -118,7 +123,6 @@ oem <- function(x,
         is.sparse <- TRUE
         x <- as(x,"CsparseMatrix")
         x <- as(x,"dgCMatrix")
-        stop("sparse matrices not supported yet. coming soon")
     }
     
     if (length(y) != n) {

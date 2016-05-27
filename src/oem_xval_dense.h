@@ -427,7 +427,7 @@ protected:
             
             AtAtmp.block(0,1,1,nvars) = colsums;
             AtAtmp.block(1,0,nvars,1) = colsums.transpose();
-            AtAtmp(0,0) = numelem;
+            AtAtmp(0,0) = sub_weights.sum();
             
             
             // compute X'Y for this fold 
@@ -444,6 +444,7 @@ protected:
             
         }
     }
+    
     
     void get_group_indexes()
     {
@@ -577,7 +578,6 @@ protected:
     void update_XtX_d_update_A(int fold_cur_)
     {
         
-        
         XX.setZero();
         XY.setZero();
         nobs = 0;
@@ -631,6 +631,7 @@ protected:
         }
     }
     
+    
     // define the beta update in oem
     void next_beta(Vector &res)
     {
@@ -662,7 +663,7 @@ protected:
     
     
 public:
-    oemXvalDense(const Eigen::Ref<const MatrixRXd>  &X_, 
+    oemXvalDense(const Eigen::Ref<const MatrixRXd> &X_, 
                  ConstGenericVector &Y_,
                  const VectorXd &weights_,
                  const int &nfolds_,
@@ -691,9 +692,9 @@ public:
                              penalty_factor(penalty_factor_),
                              group_weights(group_weights_),
                              penalty_factor_size(penalty_factor_.size()),
-                             XXdim( std::min(X_.cols(), X_.rows()) + intercept_ * (X_.rows() > X_.cols())  ),
+                             XXdim( std::min(X_.cols(), X_.rows()) + intercept_ * (X_.rows() > X_.cols()) ),
                              XY(X_.cols() + intercept_),      // add extra space if intercept 
-                             XX(XXdim, XXdim),   // add extra space if intercept 
+                             XX(XXdim, XXdim),                // add extra space if intercept 
                              alpha(alpha_),
                              gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
