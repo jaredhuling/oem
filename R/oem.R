@@ -66,6 +66,7 @@
 #' plot(fit, which.model = 2)
 #' 
 #' # sparse design matrix
+#' library(Matrix)
 #' 
 #' xs <- rsparsematrix(n.obs * 10, n.vars, density = 0.01)
 #' ys <- rnorm(n.obs, sd = 3) + as.vector(xs %*% true.beta)

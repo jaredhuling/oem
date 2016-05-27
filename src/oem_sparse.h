@@ -288,7 +288,6 @@ protected:
                     XX.block(0,1,1,nvars) = colsums;
                     XX.block(1,0,nvars,1) = colsums.transpose();
                     XX(0,0) = nobs;
-                    std::cout << "ah" << XX.topLeftCorner(5, 5) << std::endl;
                 } else 
                 {
                     XX = XtX();
@@ -400,6 +399,13 @@ public:
     
     double compute_lambda_zero() 
     { 
+        
+        if (intercept)
+        {
+            u.resize(nvars + 1);
+            beta.resize(nvars + 1);
+            beta_prev.resize(nvars + 1);
+        }
         
         wt_len = weights.size();
         
