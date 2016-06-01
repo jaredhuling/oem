@@ -65,11 +65,25 @@
 #' plot(fit)
 #' plot(fit, which.model = 2)
 #' 
-#' # sparse design matrix
+#' # the oem package has support for
+#' # sparse design matrices
+#' 
 #' library(Matrix)
 #' 
-#' xs <- rsparsematrix(n.obs * 10, n.vars, density = 0.01)
-#' ys <- rnorm(n.obs, sd = 3) + as.vector(xs %*% true.beta)
+#' xs <- rsparsematrix(n.obs * 10, n.vars * 2, density = 0.01)
+#' ys <- rnorm(n.obs, sd = 3) + as.vector(xs %*% c(true.beta, rep(0, n.vars)) )
+#' x.dense <- as.matrix(xs)
+#' 
+#' system.time(fit <- oem(x = x.dense, y = ys, 
+#'                        penalty = c("lasso", "grp.lasso"), 
+#'                        groups = rep(1:40, each = 5), intercept = TRUE))
+#' 
+#' system.time(fits <- oem(x = xs, y = ys, 
+#'                         penalty = c("lasso", "grp.lasso"), 
+#'                         groups = rep(1:40, each = 5), intercept = TRUE, lambda = fit$lambda))
+#'                         
+#' max(abs(fit$beta[[1]] - fits$beta[[1]]))
+#' max(abs(fit$beta[[2]] - fits$beta[[2]]))
 #' 
 #' # logistic
 #' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
