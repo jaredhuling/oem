@@ -53,6 +53,8 @@ protected:
     double alpha;               // alpha = mixing parameter for elastic net
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
+    double xxdiag;
+    double intval;
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
@@ -255,12 +257,15 @@ protected:
                 {
                     // compute X'X with intercept
                     XX.bottomRightCorner(nvars, nvars) = XtWX();
+                    xxdiag = XX.bottomRightCorner(nvars, nvars).diagonal().mean();
+                    intval = sqrt(xxdiag / double(nobs));
                     
-                    Eigen::RowVectorXd colsums = (weights.array().matrix()).asDiagonal() * XX * VectorXd::Ones( XXdim ); 
+                    Eigen::RowVectorXd colsums = (weights.array().matrix()).asDiagonal() * X.adjoint() * VectorXd::Ones( nobs ); 
+                    colsums.array() *= intval;
                     
                     XX.block(0,1,1,nvars) = colsums;
                     XX.block(1,0,nvars,1) = colsums.transpose();
-                    XX(0,0) = weights.sum();
+                    XX(0,0) = weights.sum() / xxdiag;
                 } else
                 {
                     XX = XtWX();
@@ -283,11 +288,21 @@ protected:
                     // compute X'X with intercept
                     XX.bottomRightCorner(nvars, nvars) = XtX();
                     
-                    Eigen::RowVectorXd colsums = X.adjoint() * VectorXd::Ones( nobs ); 
+                    xxdiag = XX.bottomRightCorner(nvars, nvars).diagonal().mean();
+                    intval = sqrt(xxdiag / double(nobs));
+                    
+                    Eigen::RowVectorXd colsums = X.adjoint() * VectorXd::Ones( nobs );
+                    colsums.array() *= intval;
+                    
+                    
                     
                     XX.block(0,1,1,nvars) = colsums;
                     XX.block(1,0,nvars,1) = colsums.transpose();
-                    XX(0,0) = nobs;
+                    XX(0,0) = xxdiag;
+                    
+                    std::cout << "lenXX" << XX.cols() << std::endl;
+                    std::cout << "XX" << XX.topLeftCorner(6, 6) << std::endl;
+                    
                 } else 
                 {
                     XX = XtX();
@@ -409,12 +424,16 @@ public:
         
         wt_len = weights.size();
         
+        // compute XtX or XXt (depending on if n > p or not)
+        // and compute A = dI - XtX (if n > p)
+        compute_XtX_d_update_A();
+        
         if (wt_len)
         {
             if (intercept)
             {
                 XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = (Y.array() * weights.array()).sum();
+                XY(0) = (Y.array() * weights.array()).sum() * intval;
             } else 
             {
                 XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
@@ -424,7 +443,7 @@ public:
             if (intercept)
             {
                 XY.tail(nvars) = X.transpose() * Y;
-                XY(0) = Y.sum();
+                XY(0) = Y.sum() * intval;
             } else 
             {
                 XY.noalias() = X.transpose() * Y;
@@ -433,12 +452,15 @@ public:
         
         XY /= nobs;
         
-        // compute XtX or XXt (depending on if n > p or not)
-        // and compute A = dI - XtX (if n > p)
-        compute_XtX_d_update_A();
         
+        if (intercept)
+        {
+            lambda0 = XY.tail(nvars).cwiseAbs().maxCoeff();
+        } else 
+        {
+            lambda0 = XY.cwiseAbs().maxCoeff();
+        }
         
-        lambda0 = XY.cwiseAbs().maxCoeff();
         return lambda0; 
     }
     double get_d() { return d; }
@@ -466,6 +488,10 @@ public:
     
     VectorXd get_beta() 
     { 
+        if (intercept)
+        {
+            beta(0) *= (intval);
+        }
         return beta;
     }
     

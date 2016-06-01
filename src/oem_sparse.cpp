@@ -131,6 +131,7 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     
     
     MatrixXd beta(p + 1, nlambda);
+    beta.setZero();
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());
