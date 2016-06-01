@@ -220,7 +220,7 @@ protected:
             {
                 // find all variables in group number g
                 std::vector<int> idx_tmp;
-                for (int v = 0; v < nvars; ++v) 
+                for (int v = 0; v < groups.size(); ++v) 
                 {
                     if (groups(v) == unique_groups(g)) 
                     {
@@ -229,6 +229,7 @@ protected:
                 }
                 grp_idx[g] = idx_tmp;
             }
+            
             // if group weights were not specified,
             // then set the group weight for each
             // group to be the sqrt of the size of the

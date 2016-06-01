@@ -169,7 +169,8 @@ oem <- function(x,
                 group.weights[zero.idx] <- 0
             } else 
             {
-                if (intercept & family != "gaussian")
+                if ((intercept & family != "gaussian") |
+                    (intercept & is.sparse))
                 {
                     ## add group for zero term if it's not here
                     ## and add penalty weight of zero
@@ -188,7 +189,8 @@ oem <- function(x,
             
             if (length(zero.idx) == 0)
             {
-                if (intercept & family != "gaussian")
+                if ((intercept & family != "gaussian") |
+                    (intercept & is.sparse))
                 {
                     ## add group for zero term if it's not here
                     unique.groups <- sort(c(0, unique.groups))
@@ -198,11 +200,13 @@ oem <- function(x,
         
         
         
-        if (intercept & family != "gaussian")
+        if ((intercept & family != "gaussian") |
+            (intercept & is.sparse))
         {
             ## add intercept to group with no penalty
             groups <- c(0, groups)
         }
+        
         
     } else {
         unique.groups <- numeric(0)
