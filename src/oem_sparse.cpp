@@ -82,7 +82,6 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     const double gamma     = as<double>(gamma_);
     bool standardize       = as<bool>(standardize_);
     bool intercept         = as<bool>(intercept_);
-    bool intercept_bin     = intercept;
     bool compute_loss      = as<bool>(compute_loss_);
     
     CharacterVector family(as<CharacterVector>(family_));

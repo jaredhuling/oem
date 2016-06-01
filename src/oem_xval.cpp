@@ -98,13 +98,13 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     // don't standardize.
     // fit intercept the dumb way if it is wanted
     // bool fullbetamat = false;
-    int add = 0;
+    //int add = 0;
     standardize = false;
     
     if (intercept)
     {
         // fullbetamat = true;
-        add = 1;
+        //add = 1;
         // dont penalize the intercept
         VectorXd penalty_factor_tmp(p+1);
         
@@ -176,7 +176,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     double ilambda = 0.0;
     
 
-    for (unsigned int ff = 0; ff < nfolds + 1; ++ff)
+    for (int ff = 0; ff < nfolds + 1; ++ff)
     {
         // ff == 0 will fit the models
         // on the entire dataset

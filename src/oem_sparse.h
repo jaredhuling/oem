@@ -289,20 +289,16 @@ protected:
                     // compute X'X with intercept
                     XX.bottomRightCorner(nvars, nvars) = XtX();
                     
-                    xxdiag = XX.bottomRightCorner(nvars, nvars).diagonal().mean();
-                    intval = sqrt(xxdiag / double(nobs));
+                    xxdiag = XX.diagonal().tail(nvars).mean();
+                    intval = sqrt(xxdiag / nobs);
                     
                     Eigen::RowVectorXd colsums = X.adjoint() * VectorXd::Ones( nobs );
                     colsums.array() *= intval;
                     
                     
-                    
                     XX.block(0,1,1,nvars) = colsums;
                     XX.block(1,0,nvars,1) = colsums.transpose();
                     XX(0,0) = xxdiag;
-                    
-                    std::cout << "lenXX" << XX.cols() << std::endl;
-                    std::cout << "XX" << XX.topLeftCorner(6, 6) << std::endl;
                     
                 } else 
                 {
