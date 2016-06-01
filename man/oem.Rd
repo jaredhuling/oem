@@ -102,8 +102,8 @@ plot(fit, which.model = 2)
 
 library(Matrix)
 
-xs <- rsparsematrix(n.obs * 10, n.vars * 2, density = 0.01)
-ys <- rnorm(n.obs, sd = 3) + as.vector(xs \%*\% c(true.beta, rep(0, n.vars)) )
+xs <- rsparsematrix(n.obs * 25, n.vars * 2, density = 0.01)
+ys <- rnorm(n.obs * 25, sd = 3) + as.vector(xs \%*\% c(true.beta, rep(0, n.vars)) )
 x.dense <- as.matrix(xs)
 
 system.time(fit <- oem(x = x.dense, y = ys, 
@@ -134,6 +134,26 @@ system.time(res.gr <- oem(x, y, intercept = FALSE,
 layout(matrix(1:2, ncol = 2))
 plot(res)
 plot(res.gr)
+
+
+# sparse design matrix
+xs <- rsparsematrix(n.obs * 5, n.vars, density = 0.01)
+x.dense <- as.matrix(xs)
+ys <- rbinom(n.obs * 5, 1, prob = 1 / (1 + exp(-x \%*\% true.beta)))
+
+system.time(res.gr <- oem(x.dense, ys, intercept = FALSE, 
+                          penalty = "grp.lasso", 
+                          family = "binomial", 
+                          groups = rep(1:10, each = 10), 
+                          irls.tol = 1e-3, tol = 1e-8))
+                          
+system.time(res.gr.s <- oem(xs, ys, intercept = FALSE, 
+                            penalty = "grp.lasso", 
+                            family = "binomial", 
+                            groups = rep(1:10, each = 10), 
+                            irls.tol = 1e-3, tol = 1e-8))
+                            
+max(abs(res.gr$beta[[1]] - res.gr.s$beta[[1]]))
 
 }
 
