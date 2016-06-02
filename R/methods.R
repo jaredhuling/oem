@@ -96,6 +96,7 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 #' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
 #' @param xvar What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
 #' against the percent deviance explained.
+#' @param labsize size of labels for variable names. If labsize = 0, then no variable names will be plotted
 #' @param xlab label for x-axis
 #' @param ylab label for y-axis
 #' @param ... other graphical parameters for the plot
@@ -120,6 +121,7 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 #' 
 plot.oemfit <- function(x, which.model = 1,
                         xvar = c("norm", "lambda", "loglambda", "dev"),
+                        labsize = 0.6,
                         xlab = iname, ylab = "Coefficients", 
                         ...) 
 {
@@ -134,32 +136,63 @@ plot.oemfit <- function(x, which.model = 1,
     
     xvar <- match.arg(xvar)
     nbeta <- as.matrix(x$beta[[which.model]])
+    remove <- apply(nbeta, 1, function(betas) all(betas == 0) )
     switch(xvar,
            "norm" = {
-               index <- apply(abs(nbeta), 2, sum)
-               iname <- "L1 Norm"
-               xlim <- range(index)
+               index    <- apply(abs(nbeta), 2, sum)
+               iname    <- expression(L[1] * " Norm")
+               xlim     <- range(index)
+               approx.f <- 1
            },
            "lambda" = {
-               index <- x$lambda
-               iname <- "Lambda"
-               xlim <- rev(range(index))
+               index    <- x$lambda
+               iname    <- expression(lambda)
+               xlim     <- rev(range(index))
+               approx.f <- 0
            },
            "loglambda" = {
-               index <- log(x$lambda)
-               iname <- "Log Lambda"
-               xlim <- rev(range(index))
+               index    <- log(x$lambda)
+               iname    <- expression(log(lambda))
+               xlim     <- rev(range(index))
+               approx.f <- 1
            },
            "dev" = {
-               index = x$sumSquare
-               iname = "Sum of Squares"
-               xlim <- range(index)
+               index    <- x$sumSquare
+               iname    <- "Sum of Squares"
+               xlim     <- range(index)
+               approx.f <- 1
            }
     )
-    matplot(index, t(nbeta), lty = 1, xlab = xlab, 
+    if (all(remove)) stop("All beta estimates are zero for all values of lambda. No plot returned.")
+    
+    matplot(index, t(nbeta[!remove,,drop=FALSE]), 
+            lty = 1, xlab = xlab, 
+            col=rainbow(sum(!remove)),
             ylab = ylab, xlim = xlim,
-            main = main.txt,
             type = 'l', ...)
+    
+    atdf <- pretty(index, n = 10L)
+    plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
+    axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0)
+    title(main.txt, line = 2.5)
+    
+    
+    
+    # Adjust the margins to make sure the labels fit
+    labwidth <- ifelse(labsize > 0, max(strwidth(rownames(nbeta[!remove,]), "inches", labsize)), 0)
+    margins <- par("mai")
+    par("mai" = c(margins[1:3], max(margins[4], labwidth*1.4)))
+    if ( labsize > 0 && !is.null(rownames(nbeta)) ) 
+    {
+        take <- which(!remove)
+        for (i in 1:sum(!remove)) {
+            j <- take[i]
+            axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
+                 las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
+                 lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i])
+        }
+    }
+    par("mai"=margins)
 }
 
 
@@ -184,7 +217,7 @@ plot.oemfit <- function(x, which.model = 1,
 #' plot(fit, which.model = 1)
 #' plot(fit, which.model = 2)
 #' 
-plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
+plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
 {
     # modified from glmnet
     object = x
@@ -197,24 +230,24 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda=1, ...)
     
     main.txt <- x$oem.fit$penalty[which.model]
     
-    xlab="log(Lambda)"
+    xlab=expression(log(lambda))
     if(sign.lambda<0)xlab=paste("-",xlab,sep="")
     plot.args=list(x    = sign.lambda * log(object$lambda),
                    y    = object$cvm[[which.model]],
                    ylim = range(object$cvup[[which.model]], object$cvlo[[which.model]]),
                    xlab = xlab,
                    ylab = object$name,
-                   type="n")
+                   type = "n")
     new.args=list(...)
     if(length(new.args))plot.args[names(new.args)]=new.args
     do.call("plot", plot.args)
     error.bars(sign.lambda * log(object$lambda), 
                object$cvup[[which.model]], 
-               object$cvlo[[which.model]], width=0.01, col="darkgrey")
-    points(sign.lambda*log(object$lambda), object$cvm[[which.model]], pch=20, col="red")
+               object$cvlo[[which.model]], width = 0.005)
+    points(sign.lambda*log(object$lambda), object$cvm[[which.model]], pch=20, col="dodgerblue")
     axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0)
-    abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=3)
-    abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=3)
+    abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
+    abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
     title(main.txt, line = 2.5)
     invisible()
 }

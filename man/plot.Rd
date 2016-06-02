@@ -6,7 +6,8 @@
 \title{Plot method for Orthogonalizing EM fitted objects}
 \usage{
 \method{plot}{oemfit}(x, which.model = 1, xvar = c("norm", "lambda",
-  "loglambda", "dev"), xlab = iname, ylab = "Coefficients", ...)
+  "loglambda", "dev"), labsize = 0.6, xlab = iname, ylab = "Coefficients",
+  ...)
 
 \method{plot}{cv.oem}(x, which.model = 1, sign.lambda = 1, ...)
 }
@@ -19,6 +20,8 @@ penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the 
 
 \item{xvar}{What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
 against the percent deviance explained.}
+
+\item{labsize}{size of labels for variable names. If labsize = 0, then no variable names will be plotted}
 
 \item{xlab}{label for x-axis}
 

@@ -139,8 +139,8 @@ error.bars <- function(x, upper, lower, width = 0.02, ...)
 {
     xlim <- range(x)
     barw <- diff(xlim) * width
-    segments(x, upper, x, lower, ...)
-    segments(x - barw, upper, x + barw, upper, ...)
-    segments(x - barw, lower, x + barw, lower, ...)
+    segments(x, upper, x, lower, col = 8, lty = 5, lwd = 0.5, ...)
+    segments(x - barw, upper, x + barw, upper, col = "grey50", lwd = 1, ...)
+    segments(x - barw, lower, x + barw, lower, col = "grey50", lwd = 1, ...)
     range(upper, lower)
 }

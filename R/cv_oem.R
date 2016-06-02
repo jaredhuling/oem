@@ -84,7 +84,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
     #}
     #else 
     nz = lapply(1:length(oem.object$beta), function(m) 
-        sapply(predict(oem.object, type = "nonzero", which.model = m), length)
+        sapply(predict(oem.object, type = "nonzero", which.model = m), length) - 1
         )
     if (is.null(foldid)) 
         foldid = sample(rep(seq(nfolds), length = N))

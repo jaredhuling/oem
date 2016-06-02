@@ -172,6 +172,9 @@ oem <- function(x,
         penalty.factor <- rep(1, p)
     }
     
+    varnames <- colnames(x)
+    if(is.null(varnames)) varnames = paste("V", seq(p), sep="")
+    
     if (length(weights))
     {
         if (length(weights) != n)
@@ -341,11 +344,24 @@ oem <- function(x,
                                                compute.loss,
                                                options)
                   )
-    res$nobs    <- n
-    res$nvars   <- p
-    res$penalty <- penalty
-    res$family  <- family
-    class(res) <- c(class(res), "oemfit")
+    
+    for (i in 1:length(penalty))
+    {
+        rownames(res$beta[[i]]) <- c("(Intercept)", varnames)
+    }
+    
+    nz <- lapply(1:length(res$beta), function(m) 
+        sapply(predict.oemfit(res, type = "nonzero", which.model = m), length) - 1
+    )
+    
+    res$nobs     <- n
+    res$nvars    <- p
+    res$penalty  <- penalty
+    res$family   <- family
+    res$varnames <- varnames
+    res$nzero    <- nz
+    
+    class(res)   <- c(class(res), "oemfit")
     res
 }
 
