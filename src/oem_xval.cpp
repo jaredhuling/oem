@@ -101,7 +101,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     // take all but one
     if (ncores < 1)
     {
-        ncores = std::max(omp_get_num_procs() - 1, 1);
+        ncores = std::max(omp_get_num_threads() - 1, 1);
     }
     
     omp_set_num_threads(ncores);
