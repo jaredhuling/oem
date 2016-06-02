@@ -38,25 +38,6 @@ against the percent deviance explained.}
 
 \item{type}{one of "cv" or "coefficients". type = "cv" will produce a plot of cross validation results like plot.cv.oem. 
 type = "coefficients" will produce a coefficient path plot like plot.oemfit}
-
-\item{x}{fitted "oem" model object}
-
-\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.}
-
-\item{xvar}{What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
-against the percent deviance explained.}
-
-\item{labsize}{size of labels for variable names. If labsize = 0, then no variable names will be plotted}
-
-\item{xlab}{label for x-axis}
-
-\item{ylab}{label for y-axis}
-
-\item{sign.lambda}{Either plot against log(lambda) (default) or its negative if sign.lambda=-1.}
-
-\item{...}{other graphical parameters for the plot}
 }
 \description{
 Plot method for Orthogonalizing EM fitted objects

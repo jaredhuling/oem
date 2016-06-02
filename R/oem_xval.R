@@ -6,6 +6,11 @@
 #' @param y numeric response vector of length nobs.
 #' @param nfolds integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10
 #' @param foldid an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
+#' @param type.measure measure to evaluate for cross-validation. The default is type.measure="deviance", 
+#' which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic
+#' regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
+#' regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
+#' they measure the deviation from the fitted mean to the response.
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
@@ -89,6 +94,7 @@ xval.oem <- function(x,
                      y, 
                      nfolds           = 10L,
                      foldid           = NULL,
+                     type.measure     = c("mse", "deviance", "class", "auc", "mae"),
                      family           = c("gaussian", "binomial"),
                      penalty          = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
                      weights          = numeric(0),
@@ -110,6 +116,10 @@ xval.oem <- function(x,
 {
     family  <- match.arg(family)
     penalty <- match.arg(penalty, several.ok = TRUE)
+    
+    if (missing(type.measure)) 
+        type.measure = "default"
+    else type.measure = match.arg(type.measure)
     
     if (family == "binomial")
     {
@@ -289,6 +299,7 @@ xval.oem <- function(x,
     
     res <- switch(family,
                   "gaussian" = oemfit_xval.gaussian(is.sparse,
+                                                    type.measure,
                                                     x, y, 
                                                     nfolds,
                                                     foldid,
@@ -309,6 +320,7 @@ xval.oem <- function(x,
                                                     compute.loss,
                                                     options),
                   "binomial" = oemfit_xval.binomial(is.sparse, 
+                                                    type.measure,
                                                     x, y, 
                                                     nfolds,
                                                     foldid,
@@ -358,6 +370,7 @@ xval.oem <- function(x,
 
 
 oemfit_xval.gaussian <- function(is.sparse, 
+                                 type.measure,
                                  x, 
                                  y, 
                                  nfolds,
@@ -379,6 +392,17 @@ oemfit_xval.gaussian <- function(is.sparse,
                                  compute.loss,
                                  options)
 {
+    ## code modified from "glmnet" package
+    typenames = c(deviance = "Mean-Squared Error", mse = "Mean-Squared Error", 
+                  mae = "Mean Absolute Error")
+    if (type.measure == "default") 
+        type.measure = "mse"
+    if (type.measure == "deviance") 
+        type.measure = "mse"
+    if (!match(type.measure, c("mse", "mae", "deviance"), FALSE)) {
+        warning("Only 'mse', 'deviance' or 'mae'  available for Gaussian models; 'mse' used")
+        type.measure = "mse"
+    }
     if (is.sparse)
     {
         ret <- .Call("oem_xval_sparse", 
@@ -400,6 +424,7 @@ oemfit_xval.gaussian <- function(is.sparse,
                      nfolds,
                      foldid,
                      compute.loss,
+                     type.measure,
                      options,
                      PACKAGE = "oem")
     } else 
@@ -423,15 +448,18 @@ oemfit_xval.gaussian <- function(is.sparse,
                      nfolds,
                      foldid,
                      compute.loss,
+                     type.measure,
                      options,
                      PACKAGE = "oem")
     }
+    ret$name   <- typenames[type.measure]
     class(ret) <- "oemfit_xval_gaussian"
     ret
 }
 
 
 oemfit_xval.binomial <- function(is.sparse, 
+                                 type.measure,
                                  x, 
                                  y, 
                                  nfolds,
@@ -453,6 +481,19 @@ oemfit_xval.binomial <- function(is.sparse,
                                  compute.loss,
                                  options)
 {
+    
+    ## code modified from "glmnet" package
+    typenames = c(mse = "Mean-Squared Error", mae = "Mean Absolute Error", 
+                  deviance = "Binomial Deviance", auc = "AUC", class = "Misclassification Error")
+    if (type.measure == "default") 
+        type.measure = "deviance"
+    if (!match(type.measure, c("mse", "mae", "deviance", "auc", 
+                               "class"), FALSE)) {
+        warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
+        type.measure = "deviance"
+    }
+    
+    
     if (is.sparse)
     {
         ret <- .Call("oem_xval_logistic_sparse", 
@@ -474,6 +515,7 @@ oemfit_xval.binomial <- function(is.sparse,
                      nfolds,
                      foldid,
                      compute.loss,
+                     type.measure,
                      options,
                      PACKAGE = "oem")
     } else 
@@ -497,9 +539,11 @@ oemfit_xval.binomial <- function(is.sparse,
                      nfolds,
                      foldid,
                      compute.loss,
+                     type.measure,
                      options,
                      PACKAGE = "oem")
     }
+    ret$name   <- typenames[type.measure]
     class(ret) <- "oemfit_xval_binomial"
     ret
 }

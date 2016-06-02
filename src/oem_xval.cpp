@@ -47,6 +47,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                                SEXP nfolds_,
                                SEXP foldid_,
                                SEXP compute_loss_,
+                               SEXP type_measure_,
                                SEXP opts_)
 {
     BEGIN_RCPP
@@ -93,6 +94,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
+        std::vector<std::string> type_measure(as< std::vector<std::string> >(type_measure_));
     VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
     
     // don't standardize.
@@ -302,8 +304,16 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
         VectorXd tempsdres(nlam);
         for (int l = 0; l < nlam; ++l)
         {
-            // compute MSE
-            VectorXd tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square();
+            VectorXd tmpcv;
+            if (type_measure[0] == "mse")
+            {
+                // compute MSE
+                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square();
+            } else if (type_measure[0] == "mae")
+            {
+                // compute MAE
+                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().abs();
+            }
             if (weights.size() > 0)
             {
                 tempres(l) = (weights.array() * tmpcv.array()).mean();

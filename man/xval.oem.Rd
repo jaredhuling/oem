@@ -4,9 +4,10 @@
 \alias{xval.oem}
 \title{Orthogonalizing EM}
 \usage{
-xval.oem(x, y, nfolds = 10L, foldid = NULL, family = c("gaussian",
-  "binomial"), penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
-  "grp.lasso"), weights = numeric(0), lambda = numeric(0), nlambda = 100L,
+xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
+  "deviance", "class", "auc", "mae"), family = c("gaussian", "binomial"),
+  penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
+  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
   lambda.min.ratio = NULL, alpha = 1, gamma = 3, groups = numeric(0),
   penalty.factor = NULL, group.weights = NULL, standardize = FALSE,
   intercept = TRUE, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
@@ -21,6 +22,12 @@ Each row is an observation, each column corresponds to a covariate}
 \item{nfolds}{integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10}
 
 \item{foldid}{an optional vector of values between 1 and nfold specifying which fold each observation belongs to.}
+
+\item{type.measure}{measure to evaluate for cross-validation. The default is type.measure="deviance", 
+which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic
+regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
+regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
+they measure the deviation from the fitted mean to the response.}
 
 \item{family}{"gaussian" for least squares problems, "binomial" for binary response.}
 
