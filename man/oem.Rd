@@ -10,7 +10,8 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
   group.weights = NULL, standardize = FALSE, intercept = TRUE,
   maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  ncores = -1, compute.loss = FALSE)
+  ncores = -1, compute.loss = FALSE, hessian.type = c("full",
+  "upper.bound"))
 }
 \arguments{
 \item{x}{input matrix or SparseMatrix object. 
@@ -74,6 +75,10 @@ variables are in the same units already, you might not wish to standardize.}
 
 \item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
 to TRUE will dramatically increase computational time}
+
+\item{hessian.type}{only for logistic regression. if hessian.type = "full", then the full hessian is used. If
+hessian.type = "upper.bound", then an upper bound of the hessian is used. The upper bound can be dramatically
+faster in certain situations, ie when n >> p}
 }
 \value{
 An object with S3 class "oemfit"

@@ -42,6 +42,9 @@
 #' @param ncores Integer scalar that specifies the number of threads to be used
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
 #' to TRUE will dramatically increase computational time
+#' @param hessian.type only for logistic regression. if hessian.type = "full", then the full hessian is used. If
+#' hessian.type = "upper.bound", then an upper bound of the hessian is used. The upper bound can be dramatically
+#' faster in certain situations, ie when n >> p
 #' @return An object with S3 class "oemfit" 
 #' @useDynLib oem
 #' @import Rcpp
@@ -144,10 +147,12 @@ oem <- function(x,
                 irls.maxit = 100L,
                 irls.tol = 1e-3,
                 ncores = -1,
-                compute.loss = FALSE) 
+                compute.loss = FALSE,
+                hessian.type = c("full", "upper.bound")) 
 {
-    family  <- match.arg(family)
-    penalty <- match.arg(penalty, several.ok = TRUE)
+    family       <- match.arg(family)
+    penalty      <- match.arg(penalty, several.ok = TRUE)
+    hessian.type <- match.arg(hessian.type)
     
     dims <- dim(x)
     n <- dims[1]
@@ -309,11 +314,12 @@ oem <- function(x,
     }
     
     
-    options <- list(maxit      = maxit,
-                    tol        = tol,
-                    irls_maxit = irls.maxit,
-                    irls_tol   = irls.tol,
-                    ncores     = ncores)
+    options <- list(maxit        = maxit,
+                    tol          = tol,
+                    irls_maxit   = irls.maxit,
+                    irls_tol     = irls.tol,
+                    ncores       = ncores,
+                    hessian.type = hessian.type)
     
     res <- switch(family,
                   "gaussian" = oemfit.gaussian(is.sparse,

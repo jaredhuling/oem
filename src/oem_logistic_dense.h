@@ -62,6 +62,7 @@ protected:
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
     int ncores;
+    std::string hessian_type;
     int irls_maxit;
     double irls_tol;
     double dev, dev0;
@@ -424,6 +425,7 @@ public:
                      bool &intercept_,
                      bool &standardize_,
                      int &ncores_,
+                     std::string &hessian_type_,
                      const int &irls_maxit_ = 100,
                      const double &irls_tol_ = 1e-6,
                      const double tol_ = 1e-6) :
@@ -451,6 +453,7 @@ public:
                              gamma(gamma_),
                              default_group_weights( bool(group_weights_.size() < 1) ),  // compute default weights if none given
                              ncores(ncores_),
+                             hessian_type(hessian_type_),
                              irls_maxit(irls_maxit_),
                              irls_tol(irls_tol_),
                              colsums(X_.cols()),
@@ -612,7 +615,8 @@ public:
                 
                 // compute XtX or XXt (depending on if n > p or not)
                 // and compute A = dI - XtX (if n > p)
-                compute_XtX_d_update_A();
+                if ((i == 0 && on_lam_1) || hessian_type == "full")
+                    compute_XtX_d_update_A();
                 
                 
                 // compute X'Wz
