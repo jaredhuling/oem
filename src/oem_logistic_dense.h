@@ -210,7 +210,7 @@ protected:
             MatrixXd XXtmp(nvars, nvars);
             XXtmp.setZero();
             
-            int numrowscur = floor(nobs / ncores);
+            int numrowscurfirst = floor(nobs / ncores);
             
             #pragma omp parallel
             {
@@ -226,23 +226,26 @@ protected:
                     
                     if (ff + 1 == ncores)
                     {
-                        numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        
                         XXtmp_private += MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
                         rankUpdate(X.bottomRows(numrowscur).adjoint() * 
                         (W.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
                     } else 
                     {
                         XXtmp_private += MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
-                        rankUpdate(X.middleRows(ff * numrowscur, numrowscur).adjoint() * 
-                        (W.segment(ff * numrowscur, numrowscur).array().sqrt().matrix()).asDiagonal());
+                        rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint() * 
+                        (W.segment(ff * numrowscurfirst, numrowscurfirst).array().sqrt().matrix()).asDiagonal());
                     }
                 }
                 #pragma omp critical
-                XXtmp += XXtmp_private; 
+                {
+                    XXtmp += XXtmp_private; 
+                }
                 
             }
             return XXtmp;
-                    }
+        }
     }
     
     MatrixXd XWXt() const {
@@ -334,6 +337,7 @@ protected:
             if (intercept)
                 XX.array() += 1; // adding 1 to all of XX' for the intercept
         }
+        
         
         // scale by sample size. needed for SCAD/MCP
         XX /= nobs;
@@ -541,13 +545,47 @@ public:
             
             if (!(i == 0 && !on_lam_1))
             {
-                // calculate mu hat
-                if (intercept)
+                
+                if (ncores <= 1)
                 {
-                    prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
-                } else
+                    // calculate mu hat
+                    if (intercept)
+                    {
+                        prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
+                    } else
+                    {
+                        prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                    }
+                } else 
                 {
-                    prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                    int numrowscur = floor(nobs / ncores);
+                    int numrowscurfirst = numrowscur;
+                    
+                    #pragma omp parallel for schedule(static)
+                    for (int ff = 0; ff < ncores; ++ff)
+                    {
+                        
+                        if (ff + 1 == ncores)
+                        {
+                            numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                            if (intercept)
+                            {
+                                prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
+                            } else
+                            {
+                                prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * beta).array()).exp().array())).matrix();
+                            }
+                        } else 
+                        {
+                            if (intercept)
+                            {
+                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
+                            } else
+                            {
+                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta).array()).exp().array())).matrix();
+                            }
+                        }
+                    }
                 }
                 
                 
