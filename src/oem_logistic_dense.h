@@ -1,11 +1,24 @@
 #ifndef OEM_LOGISTIC_DENSE_H
 #define OEM_LOGISTIC_DENSE_H
 
+#ifdef _OPENMP
+    #define has_openmp 1
+    #include <omp.h>
+#else 
+    #define has_openmp 0
+    #define omp_get_num_threads() 1
+    #define omp_set_num_threads(x) 1
+    #define omp_get_max_threads() 1
+    #define omp_get_num_threads() 1
+    #define omp_get_num_procs() 1
+    #define omp_get_thread_limit() 1
+    #define omp_set_dynamic(x) 1
+    #define omp_get_thread_num() 0
+#endif
+
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
-
-
 
 
 
@@ -48,6 +61,7 @@ protected:
     double alpha;               // alpha = mixing parameter for elastic net
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
+    int ncores;
     int irls_maxit;
     double irls_tol;
     double dev, dev0;
@@ -179,10 +193,56 @@ protected:
         }
     }
     
-    
+    /*
     MatrixXd XtWX() const {
         return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
         rankUpdate(X.adjoint() * (W.array().sqrt().matrix()).asDiagonal() );
+    }*/
+    
+    MatrixXd XtWX() const {
+        
+        if (ncores <= 1)
+        {
+            return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
+            rankUpdate(X.adjoint() * (W.array().sqrt().matrix()).asDiagonal() );
+        } else 
+        {
+            MatrixXd XXtmp(nvars, nvars);
+            XXtmp.setZero();
+            
+            int numrowscur = floor(nobs / ncores);
+            
+            #pragma omp parallel
+            {
+                MatrixXd XXtmp_private(nvars, nvars);
+                XXtmp_private.setZero();
+                
+                // break up computation of X'X into 
+                // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+                
+                #pragma omp for schedule(static) nowait
+                for (int ff = 0; ff < ncores; ++ff)
+                {
+                    
+                    if (ff + 1 == ncores)
+                    {
+                        numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        XXtmp_private += MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
+                        rankUpdate(X.bottomRows(numrowscur).adjoint() * 
+                        (W.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
+                    } else 
+                    {
+                        XXtmp_private += MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
+                        rankUpdate(X.middleRows(ff * numrowscur, numrowscur).adjoint() * 
+                        (W.segment(ff * numrowscur, numrowscur).array().sqrt().matrix()).asDiagonal());
+                    }
+                }
+                #pragma omp critical
+                XXtmp += XXtmp_private; 
+                
+            }
+            return XXtmp;
+                    }
     }
     
     MatrixXd XWXt() const {
@@ -359,6 +419,7 @@ public:
                      const double &gamma_,
                      bool &intercept_,
                      bool &standardize_,
+                     int &ncores_,
                      const int &irls_maxit_ = 100,
                      const double &irls_tol_ = 1e-6,
                      const double tol_ = 1e-6) :
@@ -385,6 +446,7 @@ public:
                              alpha(alpha_),
                              gamma(gamma_),
                              default_group_weights( bool(group_weights_.size() < 1) ),  // compute default weights if none given
+                             ncores(ncores_),
                              irls_maxit(irls_maxit_),
                              irls_tol(irls_tol_),
                              colsums(X_.cols()),

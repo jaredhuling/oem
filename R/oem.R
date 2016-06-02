@@ -39,6 +39,7 @@
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
+#' @param ncores Integer scalar that specifies the number of threads to be used
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
 #' to TRUE will dramatically increase computational time
 #' @return An object with S3 class "oemfit" 
@@ -142,6 +143,7 @@ oem <- function(x,
                 tol = 1e-7,
                 irls.maxit = 100L,
                 irls.tol = 1e-3,
+                ncores = -1,
                 compute.loss = FALSE) 
 {
     family  <- match.arg(family)
@@ -290,6 +292,7 @@ oem <- function(x,
     standardize   <- as.logical(standardize)
     intercept     <- as.logical(intercept)
     compute.loss  <- as.logical(compute.loss)
+    ncores        <- as.integer(ncores[1])
     
     if(maxit <= 0 | irls.maxit <= 0)
     {
@@ -304,7 +307,8 @@ oem <- function(x,
     options <- list(maxit      = maxit,
                     tol        = tol,
                     irls_maxit = irls.maxit,
-                    irls_tol   = irls.tol)
+                    irls_tol   = irls.tol,
+                    ncores     = ncores)
     
     res <- switch(family,
                   "gaussian" = oemfit.gaussian(is.sparse,

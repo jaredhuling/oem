@@ -60,6 +60,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     MatrixXd X(n, p);
     VectorXd Y(n);
     
+    
     // Copy data 
     std::copy(xx.begin(), xx.end(), X.data());
     std::copy(yy.begin(), yy.end(), Y.data());
@@ -77,6 +78,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     
     List opts(opts_);
     const int maxit        = as<int>(opts["maxit"]);
+    int ncores             = as<int>(opts["ncores"]);
     const double tol       = as<double>(opts["tol"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
@@ -88,6 +90,18 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
     VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
+    
+    
+    // take all threads but one
+    if (ncores < 1)
+    {
+        ncores = std::max(omp_get_num_threads() - 1, 1);
+    }
+    
+    omp_set_num_threads(ncores);
+    
+    Eigen::initParallel();
+    Eigen::setNbThreads(1);
     
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
@@ -132,7 +146,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     {
         solver = new oemDense(X, Y, weights, groups, unique_groups, 
                               group_weights, penalty_factor, 
-                              alpha, gamma, intercept, standardize, tol);
+                              alpha, gamma, intercept, standardize, ncores, tol);
     } else if (family(0) == "binomial")
     {
         throw std::invalid_argument("binomial not available for oem_fit_dense, use oem_fit_logistic_dense");

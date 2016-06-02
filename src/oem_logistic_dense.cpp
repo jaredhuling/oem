@@ -76,6 +76,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     
     List opts(opts_);
     const int maxit        = as<int>(opts["maxit"]);
+    int ncores             = as<int>(opts["ncores"]);
     const int irls_maxit   = as<int>(opts["irls_maxit"]);
     const double irls_tol  = as<double>(opts["irls_tol"]);
     const double tol       = as<double>(opts["tol"]);
@@ -89,6 +90,14 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
     VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
+    
+    // take all threads but one
+    if (ncores < 1)
+    {
+        ncores = std::max(omp_get_num_threads() - 1, 1);
+    }
+    
+    omp_set_num_threads(ncores);
     
     // don't standardize if not linear model. 
     // fit intercept the dumb way if it is wanted
@@ -133,9 +142,10 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     //{
     solver = new oemLogisticDense(X, Y, weights, groups, unique_groups, 
                                   group_weights, penalty_factor, 
-                                  alpha, gamma, intercept, standardize, 
+                                  alpha, gamma, intercept, standardize, ncores,
                                   irls_maxit, irls_tol, tol);
     //}
+    
     
     
     double lmax = 0.0;

@@ -107,8 +107,9 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     omp_set_num_threads(ncores);
     
-    Eigen::setNbThreads(1);
     Eigen::initParallel();
+    Eigen::setNbThreads(1);
+    
     
     // don't standardize.
     // fit intercept the dumb way if it is wanted
