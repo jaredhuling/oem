@@ -7,7 +7,8 @@
 cv.oem(x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
   "grp.lasso"), weights = numeric(0), lambda = NULL,
   type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10,
-  foldid = NULL, grouped = TRUE, keep = FALSE, parallel = FALSE, ...)
+  foldid = NULL, grouped = TRUE, keep = FALSE, parallel = FALSE,
+  ncores = -1, ...)
 }
 \arguments{
 \item{x}{input matrix or SparseMatrix (sparse not yet implemented. 
@@ -45,6 +46,8 @@ and each value of lambda for each model. This means these fits are computed with
 fold omitted. The folid vector is also returned. Default is keep=FALSE}
 
 \item{parallel}{If TRUE, use parallel foreach to fit each fold. Must register parallel before hand, such as doMC.}
+
+\item{ncores}{Number of cores to use. If parallel == TRUE, then ncores will be automatically set to 1 to prevent conflicts}
 
 \item{...}{other parameters to be passed to "oem" function}
 }

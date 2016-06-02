@@ -186,6 +186,11 @@ oem <- function(x,
         
     }
     
+    if (n/ncores < 5)
+    {
+        ncores <- max(1, floor(n/ncores))
+    }
+    
     if (length(penalty.factor) != p) {
         stop("penalty.factor must have same length as number of columns in x")
     }

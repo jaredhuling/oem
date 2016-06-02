@@ -28,6 +28,7 @@
 #' and each value of lambda for each model. This means these fits are computed with this observation and the rest of its
 #' fold omitted. The folid vector is also returned. Default is keep=FALSE
 #' @param parallel If TRUE, use parallel foreach to fit each fold. Must register parallel before hand, such as doMC.
+#' @param ncores Number of cores to use. If parallel == TRUE, then ncores will be automatically set to 1 to prevent conflicts
 #' @param ... other parameters to be passed to "oem" function
 #' @return An object with S3 class "cv.oem" 
 #' @export
@@ -51,7 +52,7 @@
 cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
                     weights = numeric(0), lambda = NULL, 
                     type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10, foldid = NULL, 
-                    grouped = TRUE, keep = FALSE, parallel = FALSE, ...) 
+                    grouped = TRUE, keep = FALSE, parallel = FALSE, ncores = -1, ...) 
 {
     ## code modified from "glmnet" package
     penalty <- match.arg(penalty, several.ok = TRUE)
@@ -64,6 +65,12 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
     if (length(weights)) 
         weights = as.double(weights)
     y = drop(y)
+    
+    if (parallel & ncores != 1)
+    {
+        ncores <- 1
+    }
+    
     oem.call = match.call(expand.dots = TRUE)
     which = match(c("type.measure", "nfolds", "foldid", "grouped", 
                     "keep"), names(oem.call), FALSE)
@@ -72,8 +79,10 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
     oem.call[[1]] = as.name("oem")
     oem.object = oem(x, y, penalty = penalty, 
                      weights = weights, 
-                     lambda = lambda, ...)
+                     lambda = lambda, 
+                     ncores = ncores, ...)
     oem.object$call = oem.call
+    
     
     ###Next line is commented out so each call generates its own lambda sequence
     # lambda=oem.object$lambda
@@ -105,12 +114,14 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
                     penalty = penalty, 
                     lambda = lambda, 
                     weights = weights[!which], 
+                    ncores = 1, 
                     ...)
             } else 
             {
                 oem(x[!which, , drop = FALSE], y_sub, 
                     penalty = penalty, 
                     lambda = lambda, 
+                    ncores = 1, 
                     ...)
             }
         }
@@ -126,12 +137,14 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
                 outlist[[i]] = oem(x[!which, , drop = FALSE], 
                                    y_sub, penalty = penalty, 
                                    lambda = lambda, 
-                                   weights = weights[!which], ...)
+                                   weights = weights[!which], 
+                                   ncores = ncores, ...)
             } else 
             {
                 outlist[[i]] = oem(x[!which, , drop = FALSE], 
                                    y_sub, penalty = penalty, 
-                                   lambda = lambda, ...)
+                                   lambda = lambda, 
+                                   ncores = ncores, ...)
             }
         }
     }
