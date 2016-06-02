@@ -342,6 +342,7 @@ xval.oem <- function(x,
                                                     options)
                   )
     
+    classres <- class(res)
     
     for (i in 1:length(penalty))
     {
@@ -364,7 +365,7 @@ xval.oem <- function(x,
     res$varnames <- varnames
     res$nzero    <- nz
     
-    class(res)   <- c(class(res), "xval.oem")
+    class(res)   <- c(classres, "xval.oem")
     res
 }
 

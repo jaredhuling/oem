@@ -289,6 +289,42 @@ predict.oemfit_binomial <- function(object, newx, s=NULL, which.model = 1,
     )
 }  
 
+#' @export 
+predict.oemfit_xval_gaussian <- function(object, newx, s = NULL, which.model = 1,
+                                         type = c("link", 
+                                                  "response",
+                                                  "coefficients",
+                                                  "nonzero"), ...)
+{
+    NextMethod("predict")
+} 
+
+
+#' @export
+predict.oemfit_xval_binomial <- function(object, newx, s=NULL, which.model = 1,
+                                         type=c("link", 
+                                                "response", 
+                                                "coefficients", 
+                                                "class", 
+                                                "nonzero"), ...)
+{
+    type <- match.arg(type)
+    nfit <- NextMethod("predict")
+    switch(type,
+           response={
+               prob=exp(-nfit)
+               1 / (1 + prob)
+           },
+           class={
+               cnum=ifelse(nfit > 0, 2, 1)
+               clet=object$classnames[cnum]
+               if(is.matrix(cnum))clet=array(clet,dim(cnum),dimnames(cnum))
+               clet
+           },
+           nfit
+    )
+}  
+
 
 #' log likelihood function for fitted oem objects
 #'
@@ -446,7 +482,7 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 #' 
 #' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
 predict.cv.oem <- function(object, newx, which.model = "best.model",
-                           s=c("lambda.1se","lambda.min"),...)
+                           s=c("lambda.min", "lambda.1se"), ...)
 {
     if(is.numeric(s))lambda=s
     else 
@@ -476,6 +512,71 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
 
 
 
+#' Prediction function for fitted cross validation oem objects
+#'
+#' @param object fitted "cv.oem" model object
+#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
+#' This argument is not used for type=c("coefficients","nonzero")
+#' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
+#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
+#' predict.cv.oem, can specify
+#' "best.model" to use the best model as estimated by cross-validation
+#' @param ... used to pass the other arguments for predict.oemfit
+#' @return An object depending on the type argument
+#' @method predict xval.oem
+#' @export 
+#' @examples
+#' set.seed(123)
+#' n.obs <- 1e4
+#' n.vars <- 100
+#' n.obs.test <- 1e3
+#' 
+#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+#' 
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#' x.test <- matrix(rnorm(n.obs.test * n.vars), n.obs.test, n.vars)
+#' y.test <- rnorm(n.obs.test, sd = 3) + x.test %*% true.beta
+#' 
+#' fit <- xval.oem(x = x, y = y, 
+#'                 penalty = c("lasso", "grp.lasso"), 
+#'                 groups = rep(1:10, each = 10), 
+#'                 nlambda = 10)
+#' 
+#' preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
+#' 
+#' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
+predict.xval.oem <- function(object, newx, which.model = "best.model",
+                             s = c("lambda.min", "lambda.1se"),...)
+{
+    if(is.numeric(s))lambda=s
+    else 
+        if(is.character(s)){
+            s=match.arg(s)
+            lambda=object[[s]]
+        }
+    else stop("Invalid form for s")
+    if( is.numeric(which.model) )
+    {
+        mod.num <- as.integer(which.model)
+        
+        num.models <- length(object$cvm)
+        if (mod.num > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    }
+    else if(is.character(which.model))
+    {
+        mod.num <- object[["model.min"]]
+    }
+    else stop("Invalid form for which.model")
+    predict.oemfit(object, newx, s=lambda, which.model = mod.num, ...)
+}
 
 
 

@@ -5,17 +5,19 @@ getmin <- function(lambda, cvm, cvsd){
     
     lambda.min.models <- lambda.1se.models <- numeric(length(cvm))
     
+    cv.models <- numeric(length(cvm))
     for (m in 1:length(cvm))
     {
         cvmin <- min(cvm[[m]])
         idmin <- cvm[[m]] <= cvmin
         lambda.min.models[m] <- max(lambda[idmin])
+        cv.models[m] <- min(cvm[[m]][idmin])
         idmin <- match(lambda.min.models[m], lambda)
         semin <- (cvm[[m]] + cvsd[[m]])[idmin]
         idmin <- cvm[[m]] < semin
         lambda.1se.models[m] <- max(lambda[idmin])
     }
-    mmin <- which.min(lambda.min.models)
+    mmin <- which.min(cv.models)
     lambda.min <- lambda.min.models[mmin]
     lambda.1se <- lambda.1se.models[mmin]
     
