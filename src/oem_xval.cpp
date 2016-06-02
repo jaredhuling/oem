@@ -98,7 +98,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
         std::vector<std::string> type_measure(as< std::vector<std::string> >(type_measure_));
     VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
     
-    // take all but one
+    
+    // take all threads but one
     if (ncores < 1)
     {
         ncores = std::max(omp_get_num_threads() - 1, 1);

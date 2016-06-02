@@ -9,6 +9,8 @@
     #define omp_get_num_threads() 1
     #define omp_set_num_threads(x) 1
     #define omp_get_max_threads() 1
+    #define omp_get_num_threads() 1
+    #define omp_get_num_procs() 1
     #define omp_get_thread_limit() 1
     #define omp_set_dynamic(x) 1
     #define omp_get_thread_num() 0
@@ -17,7 +19,6 @@
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
-
 
 
 
@@ -218,6 +219,7 @@ protected:
         return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
         rankUpdate( (weights.array().sqrt().matrix()).asDiagonal() * X );
     }
+    
     
     // computing all the X'X and X'Y pieces
     // for all k folds
