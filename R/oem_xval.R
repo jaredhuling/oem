@@ -340,6 +340,11 @@ xval.oem <- function(x,
         sapply(predict.oemfit(res, type = "nonzero", which.model = m), length) - 1
     )
     
+    lamin        <- getmin(lambda, res$cvm, res$cvsd)
+    res          <- c(res, lamin)
+    
+    res$cvup     <- lapply(1:length(penalty), function(m) res$cvm[[m]] + res$cvsd[[m]])
+    res$cvlo     <- lapply(1:length(penalty), function(m) res$cvm[[m]] - res$cvsd[[m]])
     res$nobs     <- n
     res$nvars    <- p
     res$penalty  <- penalty

@@ -166,6 +166,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     List loss_list(penalty.size());
     std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
     std::vector<Eigen::VectorXd> xval_mean(penalty.size());
+    std::vector<Eigen::VectorXd> xval_sd(penalty.size());
     
     // vector of vectors of MatrixXd's. confusing
     std::vector<std::vector<Eigen::MatrixXd> > beta_folds(penalty.size(), std::vector<Eigen::MatrixXd>(nfolds));
@@ -298,13 +299,26 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
         
         int nlam = out_of_fold_predictions_list[pp].cols();
         VectorXd tempres(nlam);
+        VectorXd tempsdres(nlam);
         for (int l = 0; l < nlam; ++l)
         {
-            tempres(l) = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square().mean();
+            // compute MSE
+            VectorXd tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square();
+            if (weights.size() > 0)
+            {
+                tempres(l) = (weights.array() * tmpcv.array()).mean();
+                tmpcv.array() -= tempres(l);
+                tempsdres(l) = sqrt((tmpcv.array().square().array() * weights.array()).mean() / (nlam - 1));
+            } else 
+            {
+                tempres(l) = tmpcv.mean();
+                tmpcv.array() -= tempres(l);
+                tempsdres(l) = sqrt(tmpcv.array().square().mean() / (n - 1));
+            }
         }
         xval_mean[pp] = tempres;
+        xval_sd[pp] = tempsdres;
     }
-        
 
 
     delete solver;
@@ -314,6 +328,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                         Named("niter")  = iter_list,
                         Named("loss")   = loss_list,
                         Named("cvm")    = xval_mean,
+                        Named("cvsd")   = xval_sd,
                         Named("pred")   = out_of_fold_predictions_list,
                         Named("d")      = d);
     END_RCPP
