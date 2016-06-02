@@ -439,6 +439,56 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 }
 
 
+#' log likelihood function for fitted cross validation oem objects
+#'
+#' @rdname logLik
+#' @method logLik xval.oem
+#' @export 
+#' @examples
+#'
+#' fit <- xval.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+#'
+#' logLik(fit)
+#'
+logLik.xval.oem <- function(object, which.model = 1, ...) {
+    
+    # taken from ncvreg. Thanks to Patrick Breheny.
+    n <- as.numeric(object$nobs)
+    
+    num.models <- length(object$beta)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
+    if (all(object$loss[[which.model]] == 1e99))
+    {
+        stop("oem object needed compute.loss set to TRUE. logLik not returned")
+    }
+    
+    if (object$family == "gaussian")
+    {
+        
+        resid.ss <- object$loss[[which.model]]
+        logL <- -0.5 * n * (log(2 * pi) - log(n) + log(resid.ss)) - 0.5 * n
+    } else if (object$family == "binomial")
+    {
+        logL <- -1 * object$loss[[which.model]]
+    } else if (object$family == "poisson")
+    {
+        stop("poisson not complete yet")
+        #y <- object$y
+        #ind <- y != 0
+        #logL <- -object$loss + sum(y[ind] * log(y[ind])) - sum(y) - sum(lfactorial(y))
+    } else if (object$family == "coxph")
+    {
+        logL <- -1e99
+    }
+    
+    logL
+}
+
 ## the code here is largely based on the code
 ## from the glmnet package (no reason to reinvent the wheel)
 
@@ -715,3 +765,52 @@ plot.xval.oem <- function(x, which.model = 1,
 
 
 
+#' summary method for cross validation Orthogonalizing EM fitted objects
+#'
+#' @param object fitted "cv.oem" object
+#' @param ... not used
+#' @rdname summary
+#' @method summary cv.oem
+#' @export
+summary.cv.oem <- function(object, ...) {
+    ## modified from ncvreg
+    #S <- pmax(object$null.dev - object$cve, 0)
+    #rsq <- S/object$null.dev
+    #snr <- S/object$cve
+    nvars <- lapply(object$oem.fit$beta, function(x) apply(x, 2, function(xx) sum(xx != 0)))
+    model <- switch(object$oem.fit$family, gaussian="linear", binomial="logistic")
+    val <- list(penalty=object$oem.fit$penalty, model=model, n=object$oem.fit$nobs, 
+                p=object$oem.fit$nvars, lambda.min.models=object$lambda.min.models, 
+                lambda=object$lambda, cve=object$cvm, nvars=nvars)
+    if (object$oem.fit$family=="gaussian") val$sigma <- lapply(object$cvm, sqrt)
+    #if (object$oem.fit$family=="binomial") val$pe <- object$pe
+    structure(val, class="summary.cv.oem")
+}
+
+#' print method for summary.cv.oem objects
+#'
+#' @param x a "summary.cv.oem" object
+#' @param digits digits to display
+#' @param ... not used
+#' @rdname print
+#' @method print summary.cv.oem
+#' @export
+print.summary.cv.oem <- function(x, digits, ...) {
+    ## modified from ncvreg
+    digits <- if (missing(digits)) digits <- c(2, 4, 2, 2, 3) else rep(digits, length.out=5)
+    for (m in 1:length(x$penalty))
+    {
+        cat(x$penalty[m], "-penalized ", x$model, " regression with n=", x$n, ", p=", x$p, "\n", sep="")
+        cat("At minimum cross-validation error (lambda=", formatC(x$lambda.min.models[m], digits[2], format="f"), "):\n", sep="")
+        cat("-------------------------------------------------\n")
+        cat("  Nonzero coefficients: ", x$nvars[[m]][ which.min(x$cve[[m]]) ], "\n", sep="")
+        cat("  Cross-validation error (deviance): ", formatC(min(x$cve[[m]]), digits[1], format="f"), "\n", sep="")
+        #cat("  R-squared: ", formatC(max(x$r.squared), digits[3], format="f"), "\n", sep="")
+        #cat("  Signal-to-noise ratio: ", formatC(max(x$snr), digits[4], format="f"), "\n", sep="")
+        #if (x$model == "logistic") cat("  Prediction error: ", formatC(x$pe[x$min], digits[5], format="f"), "\n", sep="")
+        if (x$model == "linear") cat("  Scale estimate (sigma): ", formatC(sqrt(x$cve[[m]][ which.min(x$cve[[m]]) ]), digits[5], format="f"), "\n\n", sep="")
+        
+        if (m < length(x$penalty))
+            cat("<===============================================>\n\n")
+    }
+}

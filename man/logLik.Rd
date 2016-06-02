@@ -3,11 +3,14 @@
 \name{logLik.oemfit}
 \alias{logLik.cv.oem}
 \alias{logLik.oemfit}
+\alias{logLik.xval.oem}
 \title{log likelihood function for fitted oem objects}
 \usage{
 \method{logLik}{oemfit}(object, which.model = 1, ...)
 
 \method{logLik}{cv.oem}(object, which.model = 1, ...)
+
+\method{logLik}{xval.oem}(object, which.model = 1, ...)
 }
 \arguments{
 \item{object}{fitted "oem" model object.}
@@ -20,6 +23,8 @@ penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the 
 }
 \description{
 log likelihood function for fitted oem objects
+
+log likelihood function for fitted cross validation oem objects
 
 log likelihood function for fitted cross validation oem objects
 }
@@ -38,6 +43,11 @@ logLik(fit)
 
 
 fit <- cv.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+
+logLik(fit)
+
+
+fit <- xval.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
 
 logLik(fit)
 
