@@ -2,9 +2,12 @@
 % Please edit documentation in R/methods.R
 \name{summary.cv.oem}
 \alias{summary.cv.oem}
+\alias{summary.xval.oem}
 \title{summary method for cross validation Orthogonalizing EM fitted objects}
 \usage{
 \method{summary}{cv.oem}(object, ...)
+
+\method{summary}{xval.oem}(object, ...)
 }
 \arguments{
 \item{object}{fitted "cv.oem" object}
@@ -12,6 +15,8 @@
 \item{...}{not used}
 }
 \description{
+summary method for cross validation Orthogonalizing EM fitted objects
+
 summary method for cross validation Orthogonalizing EM fitted objects
 }
 

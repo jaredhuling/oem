@@ -787,6 +787,26 @@ summary.cv.oem <- function(object, ...) {
     structure(val, class="summary.cv.oem")
 }
 
+#' summary method for cross validation Orthogonalizing EM fitted objects
+#'
+#' @rdname summary
+#' @method summary xval.oem
+#' @export
+summary.xval.oem <- function(object, ...) {
+    ## modified from ncvreg
+    #S <- pmax(object$null.dev - object$cve, 0)
+    #rsq <- S/object$null.dev
+    #snr <- S/object$cve
+    nvars <- lapply(object$beta, function(x) apply(x, 2, function(xx) sum(xx != 0)))
+    model <- switch(object$family, gaussian="linear", binomial="logistic")
+    val <- list(penalty=object$penalty, model=model, n=object$nobs, 
+                p=object$nvars, lambda.min.models=object$lambda.min.models, 
+                lambda=object$lambda, cve=object$cvm, nvars=nvars, type.measure = object$name)
+    if (object$family=="gaussian") val$sigma <- lapply(object$cvm, sqrt)
+    #if (object$oem.fit$family=="binomial") val$pe <- object$pe
+    structure(val, class="summary.cv.oem")
+}
+
 #' print method for summary.cv.oem objects
 #'
 #' @param x a "summary.cv.oem" object
