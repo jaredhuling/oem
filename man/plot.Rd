@@ -3,6 +3,7 @@
 \name{plot.oemfit}
 \alias{plot.cv.oem}
 \alias{plot.oemfit}
+\alias{plot.xval.oem}
 \title{Plot method for Orthogonalizing EM fitted objects}
 \usage{
 \method{plot}{oemfit}(x, which.model = 1, xvar = c("norm", "lambda",
@@ -10,6 +11,10 @@
   ...)
 
 \method{plot}{cv.oem}(x, which.model = 1, sign.lambda = 1, ...)
+
+\method{plot}{xval.oem}(x, which.model = 1, type = c("cv", "coefficients"),
+  xvar = c("norm", "lambda", "loglambda", "dev"), labsize = 0.6,
+  xlab = iname, ylab = "Coefficients", sign.lambda = 1, ...)
 }
 \arguments{
 \item{x}{fitted "oem" model object}
@@ -30,8 +35,32 @@ against the percent deviance explained.}
 \item{...}{other graphical parameters for the plot}
 
 \item{sign.lambda}{Either plot against log(lambda) (default) or its negative if sign.lambda=-1.}
+
+\item{type}{one of "cv" or "coefficients". type = "cv" will produce a plot of cross validation results like plot.cv.oem. 
+type = "coefficients" will produce a coefficient path plot like plot.oemfit}
+
+\item{x}{fitted "oem" model object}
+
+\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.}
+
+\item{xvar}{What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
+against the percent deviance explained.}
+
+\item{labsize}{size of labels for variable names. If labsize = 0, then no variable names will be plotted}
+
+\item{xlab}{label for x-axis}
+
+\item{ylab}{label for y-axis}
+
+\item{sign.lambda}{Either plot against log(lambda) (default) or its negative if sign.lambda=-1.}
+
+\item{...}{other graphical parameters for the plot}
 }
 \description{
+Plot method for Orthogonalizing EM fitted objects
+
 Plot method for Orthogonalizing EM fitted objects
 }
 \examples{
@@ -66,6 +95,25 @@ fit <- cv.oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10
 layout(matrix(1:2, ncol = 2))
 plot(fit, which.model = 1)
 plot(fit, which.model = 2)
+
+set.seed(123)
+n.obs <- 1e4
+n.vars <- 100
+n.obs.test <- 1e3
+
+true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+
+x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
+
+fit <- xval.oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10, each = 10))
+
+layout(matrix(1:4, ncol = 2))
+plot(fit, which.model = 1)
+plot(fit, which.model = 2)
+
+plot(fit, which.model = 1, type = "coef")
+plot(fit, which.model = 2, type = "coef")
 
 }
 

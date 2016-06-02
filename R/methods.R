@@ -477,3 +477,151 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
 
 
 
+
+
+
+
+
+#' Plot method for Orthogonalizing EM fitted objects
+#'
+#' @param x fitted "oem" model object
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
+#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
+#' @param type one of "cv" or "coefficients". type = "cv" will produce a plot of cross validation results like plot.cv.oem. 
+#' type = "coefficients" will produce a coefficient path plot like plot.oemfit
+#' @param xvar What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
+#' against the percent deviance explained.
+#' @param labsize size of labels for variable names. If labsize = 0, then no variable names will be plotted
+#' @param xlab label for x-axis
+#' @param ylab label for y-axis
+#' @param sign.lambda Either plot against log(lambda) (default) or its negative if sign.lambda=-1.
+#' @param ... other graphical parameters for the plot
+#' @rdname plot
+#' @method plot xval.oem
+#' @export
+#' @examples
+#' set.seed(123)
+#' n.obs <- 1e4
+#' n.vars <- 100
+#' n.obs.test <- 1e3
+#' 
+#' true.beta <- c(runif(15, -0.5, 0.5), rep(0, n.vars - 15))
+#' 
+#' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
+#' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
+#' 
+#' fit <- xval.oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10, each = 10))
+#' 
+#' layout(matrix(1:4, ncol = 2))
+#' plot(fit, which.model = 1)
+#' plot(fit, which.model = 2)
+#' 
+#' plot(fit, which.model = 1, type = "coef")
+#' plot(fit, which.model = 2, type = "coef")
+#' 
+plot.xval.oem <- function(x, which.model = 1,
+                          type = c("cv", "coefficients"),
+                          xvar = c("norm", "lambda", "loglambda", "dev"),
+                          labsize = 0.6,
+                          xlab = iname, ylab = "Coefficients", 
+                          sign.lambda = 1,
+                          ...) 
+{
+    type       <- match.arg(type)
+    num.models <- length(x$beta)
+    if (which.model > num.models)
+    {
+        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+        stop(err.txt)
+    }
+    
+    main.txt <- x$penalty[which.model]
+    
+    if (type == "coefficients")
+    {
+        xvar <- match.arg(xvar)
+        nbeta <- as.matrix(x$beta[[which.model]])
+        remove <- apply(nbeta, 1, function(betas) all(betas == 0) )
+        switch(xvar,
+               "norm" = {
+                   index    <- apply(abs(nbeta), 2, sum)
+                   iname    <- expression(L[1] * " Norm")
+                   xlim     <- range(index)
+                   approx.f <- 1
+               },
+               "lambda" = {
+                   index    <- x$lambda
+                   iname    <- expression(lambda)
+                   xlim     <- rev(range(index))
+                   approx.f <- 0
+               },
+               "loglambda" = {
+                   index    <- log(x$lambda)
+                   iname    <- expression(log(lambda))
+                   xlim     <- rev(range(index))
+                   approx.f <- 1
+               },
+               "dev" = {
+                   index    <- x$sumSquare
+                   iname    <- "Sum of Squares"
+                   xlim     <- range(index)
+                   approx.f <- 1
+               }
+        )
+        if (all(remove)) stop("All beta estimates are zero for all values of lambda. No plot returned.")
+        
+        matplot(index, t(nbeta[!remove,,drop=FALSE]), 
+                lty = 1, xlab = xlab, 
+                col=rainbow(sum(!remove)),
+                ylab = ylab, xlim = xlim,
+                type = 'l', ...)
+        
+        atdf <- pretty(index, n = 10L)
+        plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
+        axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0)
+        title(main.txt, line = 2.5)
+        
+        
+        
+        # Adjust the margins to make sure the labels fit
+        labwidth <- ifelse(labsize > 0, max(strwidth(rownames(nbeta[!remove,]), "inches", labsize)), 0)
+        margins <- par("mai")
+        par("mai" = c(margins[1:3], max(margins[4], labwidth*1.4)))
+        if ( labsize > 0 && !is.null(rownames(nbeta)) ) 
+        {
+            take <- which(!remove)
+            for (i in 1:sum(!remove)) {
+                j <- take[i]
+                axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
+                     las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
+                     lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i])
+            }
+        }
+        par("mai"=margins)
+    } else if (type == "cv")
+    {
+        xlab=expression(log(lambda))
+        if(sign.lambda<0)xlab=paste("-",xlab,sep="")
+        plot.args=list(x    = sign.lambda * log(x$lambda),
+                       y    = x$cvm[[which.model]],
+                       ylim = range(x$cvup[[which.model]], x$cvlo[[which.model]]),
+                       xlab = xlab,
+                       ylab = x$name,
+                       type = "n")
+        new.args=list(...)
+        if(length(new.args))plot.args[names(new.args)]=new.args
+        do.call("plot", plot.args)
+        error.bars(sign.lambda * log(x$lambda), 
+                   x$cvup[[which.model]], 
+                   x$cvlo[[which.model]], width = 0.005)
+        points(sign.lambda*log(x$lambda), x$cvm[[which.model]], pch=20, col="dodgerblue")
+        axis(side=3,at=sign.lambda*log(x$lambda),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0)
+        abline(v = sign.lambda * log(x$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
+        abline(v = sign.lambda * log(x$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
+        title(main.txt, line = 2.5)
+    }
+}
+
+
+
