@@ -203,7 +203,7 @@ protected:
             MatrixXd XXtmp(XXdim, XXdim);
             XXtmp.setZero();
             
-            int numrowscur = floor(nobs / ncores);
+            int numrowscurfirst = floor(nobs / ncores);
             
             #pragma omp parallel
             {
@@ -218,17 +218,20 @@ protected:
                     
                     if (ff + 1 == ncores)
                     {
-                        numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
                                          rankUpdate(X.bottomRows(numrowscur).adjoint());
                     } else 
                     {
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
-                                         rankUpdate(X.middleRows(ff * numrowscur, numrowscur).adjoint());
+                                         rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint());
                     }
                 }
                 #pragma omp critical
-                XXtmp += XXtmp_private; 
+                {
+                    XXtmp += XXtmp_private; 
+                }
+                
                 
             }
             return XXtmp;
@@ -251,7 +254,7 @@ protected:
             MatrixXd XXtmp(XXdim, XXdim);
             XXtmp.setZero();
             
-            int numrowscur = floor(nobs / ncores);
+            int numrowscurfirst = floor(nobs / ncores);
             
             #pragma omp parallel
             {
@@ -267,19 +270,21 @@ protected:
                     
                     if (ff + 1 == ncores)
                     {
-                        numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
                                          rankUpdate(X.bottomRows(numrowscur).adjoint() * 
                                          (weights.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
                     } else 
                     {
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
-                                         rankUpdate(X.middleRows(ff * numrowscur, numrowscur).adjoint() * 
-                                         (weights.segment(ff * numrowscur, numrowscur).array().sqrt().matrix()).asDiagonal());
+                                         rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint() * 
+                                         (weights.segment(ff * numrowscurfirst, numrowscurfirst).array().sqrt().matrix()).asDiagonal());
                     }
                 }
                 #pragma omp critical
-                XXtmp += XXtmp_private; 
+                {
+                    XXtmp += XXtmp_private; 
+                }
                 
             }
             return XXtmp;
