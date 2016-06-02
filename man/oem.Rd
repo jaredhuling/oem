@@ -13,7 +13,7 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   compute.loss = FALSE)
 }
 \arguments{
-\item{x}{input matrix or SparseMatrix (sparse not yet implemented. 
+\item{x}{input matrix or SparseMatrix object. 
 Each row is an observation, each column corresponds to a covariate}
 
 \item{y}{numeric response vector of length nobs.}

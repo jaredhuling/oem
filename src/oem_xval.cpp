@@ -85,6 +85,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     List opts(opts_);
     const int nfolds       = as<int>(nfolds_);
     const int maxit        = as<int>(opts["maxit"]);
+    int ncores             = as<int>(opts["ncores"]);
     const double tol       = as<double>(opts["tol"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
@@ -96,6 +97,17 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
         std::vector<std::string> type_measure(as< std::vector<std::string> >(type_measure_));
     VectorXd penalty_factor(as<VectorXd>(penalty_factor_));
+    
+    // take all but one
+    if (ncores < 1)
+    {
+        ncores = std::max(omp_get_num_procs() - 1, 1);
+    }
+    
+    omp_set_num_threads(ncores);
+    
+    Eigen::setNbThreads(1);
+    Eigen::initParallel();
     
     // don't standardize.
     // fit intercept the dumb way if it is wanted
@@ -178,7 +190,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     int nlambda_store = nlambda;
     double ilambda = 0.0;
     
-
     for (int ff = 0; ff < nfolds + 1; ++ff)
     {
         // ff == 0 will fit the models
@@ -212,7 +223,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             for(int i = 0; i < nlambda; i++)
             {
                 
-                ilambda = lambda[i]; // * n; //     
+                ilambda = lambda[i]; // * n; //  
                 if(i == 0)
                     solver->init(ilambda, penalty[pp]);
                 else
@@ -287,12 +298,14 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     {
         if (intercept)
         {
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i < n; ++i)
             {
                 out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p);
             }
         } else 
         {
+            #pragma omp parallel for schedule(static)
             for (int i = 0; i < n; ++i)
             {
                 out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1];
@@ -302,6 +315,9 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
         int nlam = out_of_fold_predictions_list[pp].cols();
         VectorXd tempres(nlam);
         VectorXd tempsdres(nlam);
+        
+        // static enforces l = i comes before l = i + 1
+        #pragma omp parallel for schedule(static)
         for (int l = 0; l < nlam; ++l)
         {
             VectorXd tmpcv;

@@ -1,7 +1,7 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix or SparseMatrix (sparse not yet implemented. 
+#' @param x input matrix or SparseMatrix object. 
 #' Each row is an observation, each column corresponds to a covariate
 #' @param y numeric response vector of length nobs.
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 

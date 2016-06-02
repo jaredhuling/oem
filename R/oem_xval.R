@@ -11,6 +11,7 @@
 #' regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
 #' regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
 #' they measure the deviation from the fitted mean to the response.
+#' @param ncores Integer scalar that specifies the number of threads to be used
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
@@ -64,9 +65,13 @@
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
-#' fit <- oem(x = x, y = y, 
-#'            penalty = c("lasso", "grp.lasso"), 
-#'            groups = rep(1:20, each = 5))
+#' system.time(fit <- oem(x = x, y = y, 
+#'                        penalty = c("lasso", "grp.lasso"), 
+#'                        groups = rep(1:20, each = 5)))
+#'                        
+#' system.time(xfit <- xval.oem(x = x, y = y, 
+#'                              penalty = c("lasso", "grp.lasso"), 
+#'                              groups = rep(1:20, each = 5)))
 #' 
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
@@ -95,6 +100,7 @@ xval.oem <- function(x,
                      nfolds           = 10L,
                      foldid           = NULL,
                      type.measure     = c("mse", "deviance", "class", "auc", "mae"),
+                     ncores           = -1,
                      family           = c("gaussian", "binomial"),
                      penalty          = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
                      weights          = numeric(0),
@@ -272,8 +278,8 @@ xval.oem <- function(x,
     groups        <- as.integer(groups)
     unique.groups <- as.integer(unique.groups)
     nlambda       <- as.integer(nlambda)
-    alpha         <- as.double(alpha)
-    gamma         <- as.double(gamma)
+    alpha         <- as.double(alpha[1])
+    gamma         <- as.double(gamma[1])
     tol           <- as.double(tol)
     irls.tol      <- as.double(irls.tol)
     irls.maxit    <- as.integer(irls.maxit)
@@ -281,6 +287,7 @@ xval.oem <- function(x,
     standardize   <- as.logical(standardize)
     intercept     <- as.logical(intercept)
     compute.loss  <- as.logical(compute.loss)
+    ncores        <- as.integer(ncores[1])
     
     if(maxit <= 0 | irls.maxit <= 0)
     {
@@ -295,7 +302,8 @@ xval.oem <- function(x,
     options <- list(maxit      = maxit,
                     tol        = tol,
                     irls_maxit = irls.maxit,
-                    irls_tol   = irls.tol)
+                    irls_tol   = irls.tol,
+                    ncores     = ncores)
     
     res <- switch(family,
                   "gaussian" = oemfit_xval.gaussian(is.sparse,

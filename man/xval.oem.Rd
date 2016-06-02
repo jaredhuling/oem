@@ -5,9 +5,9 @@
 \title{Orthogonalizing EM}
 \usage{
 xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
-  "deviance", "class", "auc", "mae"), family = c("gaussian", "binomial"),
-  penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
-  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
+  "deviance", "class", "auc", "mae"), ncores = -1, family = c("gaussian",
+  "binomial"), penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
+  "grp.lasso"), weights = numeric(0), lambda = numeric(0), nlambda = 100L,
   lambda.min.ratio = NULL, alpha = 1, gamma = 3, groups = numeric(0),
   penalty.factor = NULL, group.weights = NULL, standardize = FALSE,
   intercept = TRUE, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
@@ -28,6 +28,8 @@ which uses squared-error for gaussian models (a.k.a type.measure="mse" there), d
 regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
 regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
 they measure the deviation from the fitted mean to the response.}
+
+\item{ncores}{Integer scalar that specifies the number of threads to be used}
 
 \item{family}{"gaussian" for least squares problems, "binomial" for binary response.}
 
@@ -100,9 +102,13 @@ true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
-fit <- oem(x = x, y = y, 
-           penalty = c("lasso", "grp.lasso"), 
-           groups = rep(1:20, each = 5))
+system.time(fit <- oem(x = x, y = y, 
+                       penalty = c("lasso", "grp.lasso"), 
+                       groups = rep(1:20, each = 5)))
+                       
+system.time(xfit <- xval.oem(x = x, y = y, 
+                             penalty = c("lasso", "grp.lasso"), 
+                             groups = rep(1:20, each = 5)))
 
 layout(matrix(1:2, ncol = 2))
 plot(fit)

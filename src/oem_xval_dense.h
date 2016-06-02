@@ -1,24 +1,30 @@
 #ifndef OEM_DENSE_H
 #define OEM_DENSE_H
 
+#ifdef _OPENMP
+    #define has_openmp 1
+    #include <omp.h>
+#else 
+    #define has_openmp 0
+    #define omp_get_num_threads() 1
+    #define omp_set_num_threads(x) 1
+    #define omp_get_max_threads() 1
+    #define omp_get_thread_limit() 1
+    #define omp_set_dynamic(x) 1
+    #define omp_get_thread_num() 0
+#endif
+
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
 
 
 
+
+
+
 // minimize  1/2 * ||y - X * beta||^2 + lambda * ||beta||_1
 //
-// In ADMM form,
-//   minimize f(x) + g(z)
-//   s.t. x - z = 0
-//
-// x => beta
-// z => -X * beta
-// A => X
-// b => y
-// f(x) => 1/2 * ||Ax - b||^2
-// g(z) => lambda * ||z||_1
 class oemXvalDense: public oemBase<Eigen::VectorXd> //Eigen::SparseVector<double>
 {
 protected:
@@ -219,8 +225,11 @@ protected:
                   std::vector<VectorXd > &xty_list_,
                   std::vector<int > &nobs_list_) const {
         
-        //MatrixRXd A = X;
+        // MatrixRXd A = X;
         
+        
+        // static enforces k = i comes before k = i + 1
+        #pragma omp parallel for schedule(static)
         for (int k = 1; k < nfolds + 1; ++k)
         {
             
@@ -271,6 +280,9 @@ protected:
         
         //MatrixRXd A = X;
         
+        
+        // static enforces k = i comes before k = i + 1
+        #pragma omp parallel for schedule(static)
         for (int k = 1; k < nfolds + 1; ++k)
         {
             
@@ -334,6 +346,9 @@ protected:
         
         //MatrixRXd A = X;
         
+        
+        // static enforces k = i comes before k = i + 1
+        #pragma omp parallel for schedule(static)
         for (int k = 1; k < nfolds + 1; ++k)
         {
             
@@ -387,6 +402,9 @@ protected:
         
         //MatrixRXd A = X;
         
+        
+        // static enforces k = i comes before k = i + 1
+        #pragma omp parallel for schedule(static)
         for (int k = 1; k < nfolds + 1; ++k)
         {
             
@@ -581,7 +599,6 @@ protected:
         XX.setZero();
         XY.setZero();
         nobs = 0;
-        
         for (int k = 1; k < nfolds + 1; ++k)
         {
             // compute
