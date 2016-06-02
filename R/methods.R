@@ -781,7 +781,7 @@ summary.cv.oem <- function(object, ...) {
     model <- switch(object$oem.fit$family, gaussian="linear", binomial="logistic")
     val <- list(penalty=object$oem.fit$penalty, model=model, n=object$oem.fit$nobs, 
                 p=object$oem.fit$nvars, lambda.min.models=object$lambda.min.models, 
-                lambda=object$lambda, cve=object$cvm, nvars=nvars)
+                lambda=object$lambda, cve=object$cvm, nvars=nvars, type.measure = object$name)
     if (object$oem.fit$family=="gaussian") val$sigma <- lapply(object$cvm, sqrt)
     #if (object$oem.fit$family=="binomial") val$pe <- object$pe
     structure(val, class="summary.cv.oem")
@@ -804,7 +804,8 @@ print.summary.cv.oem <- function(x, digits, ...) {
         cat("At minimum cross-validation error (lambda=", formatC(x$lambda.min.models[m], digits[2], format="f"), "):\n", sep="")
         cat("-------------------------------------------------\n")
         cat("  Nonzero coefficients: ", x$nvars[[m]][ which.min(x$cve[[m]]) ], "\n", sep="")
-        cat("  Cross-validation error (deviance): ", formatC(min(x$cve[[m]]), digits[1], format="f"), "\n", sep="")
+        cat(paste0("  Cross-validation error (", x$type.measure, "): "), 
+            formatC(min(x$cve[[m]]), digits[1], format="f"), "\n", sep="")
         #cat("  R-squared: ", formatC(max(x$r.squared), digits[3], format="f"), "\n", sep="")
         #cat("  Signal-to-noise ratio: ", formatC(max(x$snr), digits[4], format="f"), "\n", sep="")
         #if (x$model == "logistic") cat("  Prediction error: ", formatC(x$pe[x$min], digits[5], format="f"), "\n", sep="")
