@@ -339,7 +339,6 @@ protected:
                 XX.array() += 1; // adding 1 to all of XX' for the intercept
         }
         
-        
         // scale by sample size. needed for SCAD/MCP
         XX /= nobs;
         
@@ -474,7 +473,7 @@ public:
             if (wt_len)
             {
                 XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = Y.sum();
+                XY(0) = (Y.array() * weights.array()).sum();
             } else 
             {
                 XY.tail(nvars) = X.transpose() * Y;
@@ -497,7 +496,13 @@ public:
         
         XY /= nobs;
         
-        lambda0 = XY.cwiseAbs().maxCoeff();
+        if (intercept)
+        {
+            lambda0 = XY.tail(nvars).cwiseAbs().maxCoeff();
+        } else 
+        {
+            lambda0 = XY.cwiseAbs().maxCoeff();
+        }
         return lambda0; 
     }
     double get_d() { return d; }
@@ -590,7 +595,6 @@ public:
                         }
                     }
                 }
-                
                 
                 // calculate Jacobian (or weight vector)
                 W = prob.array() * (1 - prob.array());

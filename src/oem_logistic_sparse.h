@@ -49,6 +49,8 @@ protected:
     double alpha;               // alpha = mixing parameter for elastic net
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
+    int ncores;
+    std::string hessian_type;
     int irls_maxit;
     double irls_tol;
     double dev, dev0;
@@ -59,6 +61,9 @@ protected:
     
     double lambda;              // L1 penalty
     double lambda0;             // minimum lambda to make coefficients all zero
+    
+    double xxdiag;
+    double intval;
     
     double threshval;
     int wt_len;
@@ -182,9 +187,58 @@ protected:
     
     
     SpMat XtWX() const {
+        
+        if (ncores <= 1)
+        {
+            return SpMat(nvars, nvars).selfadjointView<Lower>().
+            rankUpdate(X.adjoint() * (W.array().sqrt().matrix()).asDiagonal() );
+        } else 
+        {
+            SpMat XXtmp(nvars, nvars);
+            
+            int numrowscurfirst = floor(nobs / ncores);
+            
+            #pragma omp parallel
+            {
+                SpMat XXtmp_private(nvars, nvars);
+                
+                // break up computation of X'X into 
+                // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+                
+                #pragma omp for schedule(static) nowait
+                for (int ff = 0; ff < ncores; ++ff)
+                {
+                    
+                    if (ff + 1 == ncores)
+                    {
+                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        
+                        XXtmp_private += SpMat(nvars, nvars).selfadjointView<Upper>().
+                        rankUpdate(X.bottomRows(numrowscur).adjoint() * 
+                        (W.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
+                    } else 
+                    {
+                        XXtmp_private += SpMat(nvars, nvars).selfadjointView<Upper>().
+                        rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint() * 
+                        (W.segment(ff * numrowscurfirst, numrowscurfirst).array().sqrt().matrix()).asDiagonal());
+                    }
+                }
+                #pragma omp critical
+                {
+                    XXtmp += XXtmp_private; 
+                }
+                
+            }
+            return XXtmp;
+        }
+    }
+    
+    
+    /*
+    SpMat XtWX() const {
         return SpMat(nvars, nvars).selfadjointView<Upper>().
         rankUpdate(X.adjoint() * (W.array().sqrt().matrix()).asDiagonal() );
-    }
+    }*/
     
     SpMat XWXt() const {
         return SpMat(nobs, nobs).selfadjointView<Upper>().
@@ -260,11 +314,19 @@ protected:
         {
             if (intercept)
             {
-                colsums = (W.array().matrix()).asDiagonal() * X.adjoint() * VectorXd::Ones( nobs ); 
+                colsums = X.adjoint() * W; 
                 XX.bottomRightCorner(nvars, nvars) = XtWX();
+                
+                if (xxdiag <= 0)
+                {
+                    xxdiag = XX.diagonal().tail(nvars).mean();
+                    intval = sqrt( (xxdiag / W.array().sum()) / double(nobs));
+                }
+                colsums.array() *= intval;
+                
                 XX.block(0,1,1,nvars) = colsums;
                 XX.block(1,0,nvars,1) = colsums.transpose();
-                XX(0,0) = W.array().sum();
+                XX(0,0) = xxdiag;
             } else 
             {
                 XX = XtWX();
@@ -275,6 +337,7 @@ protected:
             if (intercept)
                 XX.array() += 1; // adding 1 to all of XX' for the intercept
         }
+        
         
         // scale by sample size. needed for SCAD/MCP
         XX /= nobs;
@@ -360,6 +423,8 @@ public:
                       const double &gamma_,
                       bool &intercept_,
                       bool &standardize_,
+                      int &ncores_,
+                      std::string &hessian_type_,
                       const int &irls_maxit_ = 100,
                       const double &irls_tol_ = 1e-6,
                       const double tol_ = 1e-6) :
@@ -386,15 +451,22 @@ public:
                              alpha(alpha_),
                              gamma(gamma_),
                              default_group_weights( bool(group_weights_.size() < 1) ),  // compute default weights if none given
+                             ncores(ncores_),
+                             hessian_type(hessian_type_),
                              irls_maxit(irls_maxit_),
                              irls_tol(irls_tol_),
                              colsums(X_.cols()),
-                             grp_idx(unique_groups_.size())
+                             grp_idx(unique_groups_.size()),
+                             xxdiag(0.0)
     {}
     
     double compute_lambda_zero() 
     { 
         wt_len = weights.size();
+        
+        xxdiag = 0;
+        intval = 0;
+        
         if (intercept)
         {
             // these need to be one element
@@ -406,11 +478,11 @@ public:
             if (wt_len)
             {
                 XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = Y.sum();
+                XY(0) = (Y.array() * weights.array()).sum() * intval;
             } else 
             {
                 XY.tail(nvars) = X.transpose() * Y;
-                XY(0) = Y.sum();
+                XY(0) = Y.sum() * intval;
             }
             
             colsums = X.adjoint() * VectorXd::Ones( nobs );
@@ -429,7 +501,13 @@ public:
         
         XY /= nobs;
         
-        lambda0 = XY.cwiseAbs().maxCoeff();
+        if (intercept)
+        {
+            lambda0 = XY.tail(nvars).cwiseAbs().maxCoeff();
+        } else 
+        {
+            lambda0 = XY.cwiseAbs().maxCoeff();
+        }
         return lambda0; 
     }
     double get_d() { return d; }
@@ -442,8 +520,8 @@ public:
         on_lam_1 = true;
         if (intercept)
         {
-            double ymean = Y.mean();
-            beta(0) = std::log(ymean / (1 - ymean));
+            //double ymean = Y.mean();
+            //beta(0) = std::log(ymean / (1 - ymean));
         }
         
         lambda = lambda_;
@@ -481,12 +559,46 @@ public:
             if (!(i == 0 && !on_lam_1))
             {
                 // calculate mu hat
-                if (intercept)
+                if (ncores <= 1)
                 {
-                    prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0)).array()).exp().array());
-                } else
+                    // calculate mu hat
+                    if (intercept)
+                    {
+                        prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                    } else
+                    {
+                        prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                    }
+                } else 
                 {
-                    prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                    int numrowscur = floor(nobs / ncores);
+                    int numrowscurfirst = numrowscur;
+                    
+                    #pragma omp parallel for schedule(static)
+                    for (int ff = 0; ff < ncores; ++ff)
+                    {
+                        
+                        if (ff + 1 == ncores)
+                        {
+                            numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                            if (intercept)
+                            {
+                                prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                            } else
+                            {
+                                prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * beta).array()).exp().array())).matrix();
+                            }
+                        } else 
+                        {
+                            if (intercept)
+                            {
+                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                            } else
+                            {
+                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta).array()).exp().array())).matrix();
+                            }
+                        }
+                    }
                 }
                 
                 
@@ -509,7 +621,6 @@ public:
                         W(i) = 1e-5;
                     }
                 }
-                
                 
                 // compute XtX or XXt (depending on if n > p or not)
                 // and compute A = dI - XtX (if n > p)
@@ -573,6 +684,10 @@ public:
     
     VectorXd get_beta() 
     { 
+        if (intercept && nobs > nvars)
+        {
+            beta(0) *= intval;
+        }
         return beta;
     }
     

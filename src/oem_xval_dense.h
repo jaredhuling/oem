@@ -767,7 +767,13 @@ public:
          */
         
         
-        lambda0 = XY.cwiseAbs().maxCoeff();
+        if (intercept)
+        {
+            lambda0 = XY.tail(nvars).cwiseAbs().maxCoeff();
+        } else 
+        {
+            lambda0 = XY.cwiseAbs().maxCoeff();
+        }
         return lambda0; 
     }
     double get_d() { return d; }

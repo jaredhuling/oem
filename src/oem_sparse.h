@@ -258,15 +258,15 @@ protected:
                 {
                     // compute X'X with intercept
                     XX.bottomRightCorner(nvars, nvars) = XtWX();
-                    xxdiag = XX.bottomRightCorner(nvars, nvars).diagonal().mean();
+                    xxdiag = XX.diagonal().tail(nvars).mean();
                     intval = sqrt(xxdiag / double(nobs));
                     
-                    Eigen::RowVectorXd colsums = (weights.array().matrix()).asDiagonal() * X.adjoint() * VectorXd::Ones( nobs ); 
+                    Eigen::RowVectorXd colsums = X.adjoint() * weights; 
                     colsums.array() *= intval;
                     
                     XX.block(0,1,1,nvars) = colsums;
                     XX.block(1,0,nvars,1) = colsums.transpose();
-                    XX(0,0) = weights.sum() / xxdiag;
+                    XX(0,0) = weights.sum() * xxdiag;
                 } else
                 {
                     XX = XtWX();
@@ -430,7 +430,13 @@ public:
             if (intercept)
             {
                 XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = (Y.array() * weights.array()).sum() * intval;
+                if (nobs > nvars)
+                {
+                    XY(0) = (Y.array() * weights.array()).sum() * intval;
+                } else 
+                {
+                    XY(0) = (Y.array() * weights.array()).sum();
+                }
             } else 
             {
                 XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
@@ -440,7 +446,14 @@ public:
             if (intercept)
             {
                 XY.tail(nvars) = X.transpose() * Y;
-                XY(0) = Y.sum() * intval;
+                if (nobs > nvars)
+                {
+                    XY(0) = Y.sum() * intval;
+                } else 
+                {
+                    XY(0) = Y.sum();
+                }
+                
             } else 
             {
                 XY.noalias() = X.transpose() * Y;
@@ -485,7 +498,7 @@ public:
     
     VectorXd get_beta() 
     { 
-        if (intercept)
+        if (intercept && nobs > nvars)
         {
             beta(0) *= (intval);
         }
