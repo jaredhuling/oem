@@ -1,6 +1,21 @@
 #ifndef OEM_SPARSE_H
 #define OEM_SPARSE_H
 
+#ifdef _OPENMP
+    #define has_openmp 1
+    #include <omp.h>
+#else 
+    #define has_openmp 0
+    #define omp_get_num_threads() 1
+    #define omp_set_num_threads(x) 1
+    #define omp_get_max_threads() 1
+    #define omp_get_num_threads() 1
+    #define omp_get_num_procs() 1
+    #define omp_get_thread_limit() 1
+    #define omp_set_dynamic(x) 1
+    #define omp_get_thread_num() 0
+#endif
+
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
@@ -53,6 +68,7 @@ protected:
     double alpha;               // alpha = mixing parameter for elastic net
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
+    int ncores;
     double xxdiag;
     double intval;
     
@@ -190,6 +206,7 @@ protected:
     }
     
     
+ 
     SpMat XtX() const {
         return SpMat(XXdim, XXdim).selfadjointView<Upper>().
         rankUpdate(X.adjoint());
@@ -200,10 +217,58 @@ protected:
         rankUpdate(X);
     }
     
+    
     SpMat XtWX() const {
         return SpMat(nvars, nvars).selfadjointView<Upper>().
         rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
     }
+    
+    /*
+    SpMat XtWX() const {
+        
+        if (ncores <= 1)
+        {
+            return SpMat(XXdim, XXdim).selfadjointView<Upper>().
+            rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
+        } else 
+        {
+            SpMat XXtmp(XXdim, XXdim);
+            
+            int numrowscurfirst = floor(nobs / ncores);
+            
+        #pragma omp parallel
+        {
+            SpMat XXtmp_private(XXdim, XXdim);
+            
+            // break up computation of X'X into 
+            // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+            
+            #pragma omp for schedule(static) nowait
+            for (int ff = 0; ff < ncores; ++ff)
+            {
+                
+                if (ff + 1 == ncores)
+                {
+                    int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                    XXtmp_private += SpMat(XXdim, XXdim).selfadjointView<Upper>().
+                    rankUpdate(X.bottomRows(numrowscur).adjoint() * 
+                    (weights.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
+                } else 
+                {
+                    XXtmp_private += SpMat(XXdim, XXdim).selfadjointView<Upper>().
+                    rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint() * 
+                    (weights.segment(ff * numrowscurfirst, numrowscurfirst).array().sqrt().matrix()).asDiagonal());
+                }
+            }
+        #pragma omp critical
+        {
+            XXtmp += XXtmp_private; 
+        }
+            
+        }
+        return XXtmp;
+        }
+    }*/
     
     SpMat XWXt() const {
         return SpMat(nobs, nobs).selfadjointView<Upper>().
@@ -383,6 +448,7 @@ public:
               const double &gamma_,
               bool &intercept_,
               bool &standardize_,
+              int &ncores_,
               const double tol_ = 1e-6) :
     oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
@@ -404,6 +470,7 @@ public:
                              alpha(alpha_),
                              gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
+                             ncores(ncores_),
                              grp_idx(unique_groups_.size())
     
     {}

@@ -1,6 +1,21 @@
 #ifndef OEM_LOGISTIC_SPARSE_H
 #define OEM_LOGISTIC_SPARSE_H
 
+#ifdef _OPENMP
+    #define has_openmp 1
+    #include <omp.h>
+#else 
+    #define has_openmp 0
+    #define omp_get_num_threads() 1
+    #define omp_set_num_threads(x) 1
+    #define omp_get_max_threads() 1
+    #define omp_get_num_threads() 1
+    #define omp_get_num_procs() 1
+    #define omp_get_thread_limit() 1
+    #define omp_set_dynamic(x) 1
+    #define omp_get_thread_num() 0
+#endif
+
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
