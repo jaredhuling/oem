@@ -1,5 +1,5 @@
 
-#include "oem_xval_dense.h"
+#include "oem_xval_sparse.h"
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
@@ -28,27 +28,27 @@ typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
 
 
-RcppExport SEXP oem_xval_dense(SEXP x_, 
-                               SEXP y_, 
-                               SEXP family_,
-                               SEXP penalty_,
-                               SEXP weights_,
-                               SEXP groups_,
-                               SEXP unique_groups_,
-                               SEXP group_weights_,
-                               SEXP lambda_,
-                               SEXP nlambda_, 
-                               SEXP lmin_ratio_,
-                               SEXP alpha_,
-                               SEXP gamma_,
-                               SEXP penalty_factor_,
-                               SEXP standardize_, 
-                               SEXP intercept_,
-                               SEXP nfolds_,
-                               SEXP foldid_,
-                               SEXP compute_loss_,
-                               SEXP type_measure_,
-                               SEXP opts_)
+RcppExport SEXP oem_xval_sparse(SEXP x_, 
+                                SEXP y_, 
+                                SEXP family_,
+                                SEXP penalty_,
+                                SEXP weights_,
+                                SEXP groups_,
+                                SEXP unique_groups_,
+                                SEXP group_weights_,
+                                SEXP lambda_,
+                                SEXP nlambda_, 
+                                SEXP lmin_ratio_,
+                                SEXP alpha_,
+                                SEXP gamma_,
+                                SEXP penalty_factor_,
+                                SEXP standardize_, 
+                                SEXP intercept_,
+                                SEXP nfolds_,
+                                SEXP foldid_,
+                                SEXP compute_loss_,
+                                SEXP type_measure_,
+                                SEXP opts_)
 {
     BEGIN_RCPP
     
@@ -145,10 +145,10 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     if (family(0) == "gaussian")
     {
-        solver = new oemXvalDense(X, Y, weights, nfolds, foldid,
-                                  groups, unique_groups, 
-                                  group_weights, penalty_factor, 
-                                  alpha, gamma, intercept, standardize, tol);
+        solver = new oemXvalSparse(X, Y, weights, nfolds, foldid,
+                                   groups, unique_groups, 
+                                   group_weights, penalty_factor, 
+                                   alpha, gamma, intercept, standardize, tol);
     } else if (family(0) == "binomial")
     {
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);

@@ -206,11 +206,55 @@ protected:
     }
     
     
- 
+    
     SpMat XtX() const {
         return SpMat(XXdim, XXdim).selfadjointView<Upper>().
         rankUpdate(X.adjoint());
     }
+    
+    /*
+    SpMat XtX() const {
+        
+        if (ncores <= 1)
+        {
+            return SpMat(XXdim, XXdim).selfadjointView<Lower>().
+            rankUpdate(X.adjoint()  );
+        } else 
+        {
+            SpMat XXtmp(XXdim, XXdim);
+            
+            int numrowscurfirst = floor(nobs / ncores);
+            
+            #pragma omp parallel
+            {
+                SpMat XXtmp_private(XXdim, XXdim);
+                
+                // break up computation of X'X into 
+                // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+                
+                #pragma omp for schedule(static) nowait
+                for (int ff = 0; ff < ncores; ++ff)
+                {
+                    
+                    if (ff + 1 == ncores)
+                    {
+                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        
+                        XXtmp_private += SpMat(XXdim, XXdim).selfadjointView<Upper>().rankUpdate( X.bottomRows(numrowscur).transpose() );
+                    } else 
+                    {
+                        XXtmp_private += SpMat(XXdim, XXdim).selfadjointView<Upper>().rankUpdate( X.middleRows(ff * numrowscurfirst, numrowscurfirst).transpose() );
+                    }
+                }
+                #pragma omp critical
+                {
+                    XXtmp += XXtmp_private; 
+                }
+                
+            }
+            return XXtmp;
+        }
+    }*/
     
     SpMat XXt() const {
         return SpMat(XXdim, XXdim).selfadjointView<Upper>().

@@ -29,6 +29,7 @@ typedef Eigen::MappedSparseMatrix<double> MSpMat;
 typedef Eigen::SparseMatrix<double> SpMat;
 
 
+
 RcppExport SEXP oem_fit_sparse(SEXP x_, 
                                SEXP y_, 
                                SEXP family_,
@@ -129,7 +130,6 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 
     
-    
     if (nlambda < 1) 
     {
         double lmin = as<double>(lmin_ratio_) * lmax;
@@ -148,7 +148,9 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     IntegerVector niter(nlambda);
     int nlambda_store = nlambda;
     double ilambda = 0.0;
-
+    
+    
+    
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
         if (penalty[pp] == "ols")
