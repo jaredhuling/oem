@@ -57,12 +57,14 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     //const Eigen::Map<MatrixXd> xx(as<Map<MatrixXd> >(x_));
     
+    
     const int n = xx.rows();
     const int p = xx.cols();
     
     const VectorXi foldid(as<VectorXi>(foldid_));
     const VectorXi groups(as<VectorXi>(groups_));
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
+    
     
     MatrixRXd X(n, p);
     MatrixXd XX(n, p);
@@ -119,7 +121,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     // fit intercept the dumb way if it is wanted
     // bool fullbetamat = false;
     //int add = 0;
-    standardize = false;
     
     if (intercept)
     {
@@ -146,7 +147,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     
     // initialize classes
-    
     if (family(0) == "gaussian")
     {
         solver = new oemXvalDense(X, Y, weights, nfolds, foldid,
@@ -181,6 +181,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     
     MatrixXd beta(p + 1, nlambda);
+    beta.setZero();
+    
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());

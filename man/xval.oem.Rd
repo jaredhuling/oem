@@ -9,7 +9,7 @@ xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
   "binomial"), penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
   "grp.lasso"), weights = numeric(0), lambda = numeric(0), nlambda = 100L,
   lambda.min.ratio = NULL, alpha = 1, gamma = 3, groups = numeric(0),
-  penalty.factor = NULL, group.weights = NULL, standardize = FALSE,
+  penalty.factor = NULL, group.weights = NULL, standardize = TRUE,
   intercept = TRUE, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
   irls.tol = 0.001, compute.loss = FALSE)
 }

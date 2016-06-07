@@ -106,7 +106,6 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     // int add = 0;
     if (family(0) != "gaussian")
     {
-        standardize = false;
         
         if (intercept_bin)
         {
@@ -130,23 +129,17 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     }
     
     
+    
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
     
     
     // initialize classes
-    
-    //if (family(0) == "gaussian")
-    //{
-    //
-    //} else if (family(0) == "binomial")
-    //{
     solver = new oemLogisticDense(X, Y, weights, groups, unique_groups, 
                                   group_weights, penalty_factor, 
                                   alpha, gamma, intercept, standardize, ncores,
                                   hessian_type[0],
                                   irls_maxit, irls_tol, tol);
-    //}
     
     
     

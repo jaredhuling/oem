@@ -8,7 +8,7 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   "lasso", "ols", "mcp", "scad", "grp.lasso"), weights = numeric(0),
   lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
-  group.weights = NULL, standardize = FALSE, intercept = TRUE,
+  group.weights = NULL, standardize = TRUE, intercept = TRUE,
   maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
   ncores = -1, compute.loss = FALSE, hessian.type = c("full",
   "upper.bound"))
