@@ -66,7 +66,6 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
     
     
-    
     VectorXd Y(n);
     
     // Copy data 
@@ -188,9 +187,10 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());
-    std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
+    //std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
     std::vector<Eigen::VectorXd> xval_mean(penalty.size());
     std::vector<Eigen::VectorXd> xval_sd(penalty.size());
+    std::vector<int> nlam_list(penalty.size());
     
     // vector of vectors of MatrixXd's. confusing
     std::vector<std::vector<Eigen::MatrixXd> > beta_folds(penalty.size(), std::vector<Eigen::MatrixXd>(nfolds));
@@ -222,9 +222,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 nlambda = 1L;
             }
             
+            
             if (ff == 0)
             {
-                out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
+                //out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
+                nlam_list[pp] = nlambda;
             }
             
             VectorXd loss(nlambda);
@@ -301,11 +303,12 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
         } // end loop over penalties
     } // end loop over cross validation folds
     
-    
+    bool use_weights = bool(weights.size() > 0);
     
     // compute cross validation scores for each model
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
+        /*
         if (intercept)
         {
             #pragma omp parallel for schedule(static)
@@ -320,40 +323,108 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             {
                 out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1];
             }
-        }
+        }*/
         
-        int nlam = out_of_fold_predictions_list[pp].cols();
+        //int nlam = out_of_fold_predictions_list[pp].cols();
+        int nlam = nlam_list[pp];
         VectorXd tempres(nlam);
         VectorXd tempsdres(nlam);
         
         // static enforces l = i comes before l = i + 1
-        #pragma omp parallel for schedule(static)
-        for (int l = 0; l < nlam; ++l)
+        VectorXd tmpcv(nlam);
+        VectorXd tmpss(nlam);
+        tmpcv.setZero();
+        tmpss.setZero();
+        
+        if (intercept)
         {
-            VectorXd tmpcv;
-            if (type_measure[0] == "mse")
+            
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < n; ++i)
             {
-                // compute MSE
-                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square();
-            } else if (type_measure[0] == "mae")
-            {
-                // compute MAE
-                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().abs();
+                VectorXd cur_preds = ((X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p))).array()
+                                        + beta_folds[pp][foldid(i)-1].row(0).array();
+                
+                VectorXd resid = Y(i) - cur_preds.array();
+                VectorXd tmp_cv;
+                
+                if (type_measure[0] == "mse")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().square().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().square();
+                    }
+                } else if (type_measure[0] == "mae")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().abs().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().abs();
+                    }
+                } else 
+                {
+                    std::invalid_argument("type.measure provided not availabe");
+                }
+                //  delta = x - mean_current
+                VectorXd delta = tmp_cv.array() - tmpcv.array();
+                tmpcv.array() += delta.array() / (i + 1);
+                tmpss.array() += delta.array() * (tmp_cv.array() - tmpcv.array()).array();
             }
-            if (weights.size() > 0)
+        } else 
+        {
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < n; ++i)
             {
-                tempres(l) = (weights.array() * tmpcv.array()).mean();
-                tmpcv.array() -= tempres(l);
-                tempsdres(l) = sqrt((tmpcv.array().square().array() * weights.array()).mean() / (nlam - 1));
-            } else 
-            {
-                tempres(l) = tmpcv.mean();
-                tmpcv.array() -= tempres(l);
-                tempsdres(l) = sqrt(tmpcv.array().square().mean() / (n - 1));
+                VectorXd cur_preds = X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p);
+                
+                VectorXd resid = Y(i) - cur_preds.array();
+                VectorXd tmp_cv;
+                
+                if (type_measure[0] == "mse")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().square().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().square();
+                    }
+                } else if (type_measure[0] == "mae")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().abs().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().abs();
+                    }
+                } else 
+                {
+                    std::invalid_argument("type.measure provided not availabe");
+                }
+                //  delta = x - mean_current
+                VectorXd delta = tmp_cv.array() - tmpcv.array();
+                tmpcv.array() += delta.array() / (i + 1);
+                tmpss.array() += delta.array() * (tmp_cv.array() - tmpcv.array()).array();
             }
         }
+        
+        tempres = tmpcv.array();
+        //tmpcv.array() -= tempres.array();
+        
+        //tempsdres = ((tmpss.array() - ((tmpcv.array() - 5.0).array().square().array() / n) ) / (n * (n - 1))).array().sqrt();
+        
+        tempsdres = (tmpss.array() / (double(n - 1))).array().sqrt();
+        
+        //tempsdres = sqrt(tmpcv.array().square().mean() / (n - 1));
+        
         xval_mean[pp] = tempres;
-        xval_sd[pp] = tempsdres;
+        xval_sd[pp] = tempsdres / sqrt(double(n));
     }
 
 
@@ -365,7 +436,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                         Named("loss")   = loss_list,
                         Named("cvm")    = xval_mean,
                         Named("cvsd")   = xval_sd,
-                        Named("pred")   = out_of_fold_predictions_list,
+                        //Named("pred")   = out_of_fold_predictions_list,
                         Named("d")      = d);
     END_RCPP
 }
