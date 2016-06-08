@@ -26,7 +26,7 @@ typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
-
+typedef Map<MatrixRXd> MapMatRd;
 
 RcppExport SEXP oem_xval_dense(SEXP x_, 
                                SEXP y_, 
@@ -66,17 +66,19 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
     
     
-    MatrixRXd X(n, p);
-    MatrixXd XX(n, p);
+    
     VectorXd Y(n);
     
     // Copy data 
-    std::copy(xx.begin(), xx.end(), XX.data());
+    const MapMatd XX(as<MapMatd >(xx));
+    const MatrixRXd X(XX);
+    
+    // std::copy(xx.begin(), xx.end(), XX.data());
     std::copy(yy.begin(), yy.end(), Y.data());
     
-    X = XX;
+    // X = XX;
     
-    XX.resize(0,0);
+    // XX.resize(0,0);
 
     // In glmnet, we minimize
     //   1/(2n) * ||y - X * beta||^2 + lambda * ||beta||_1
