@@ -129,7 +129,6 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     }
     
     
-    
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
     

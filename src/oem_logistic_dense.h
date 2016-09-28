@@ -84,6 +84,7 @@ protected:
                                VectorXd &pen_fact, double &d)
     {
         int v_size = vec.size();
+        
         res.setZero();
         
         const double *ptr = vec.data();
@@ -252,15 +253,15 @@ protected:
     }
     
     MatrixXd XWXt() const {
-        if (standardize)
-        {
-            return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
-            rankUpdate( (W.array().sqrt().matrix()).asDiagonal() * X * colsq_inv.asDiagonal() );
-        } else 
-        {
-            return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
-            rankUpdate( (W.array().sqrt().matrix()).asDiagonal() * X );
-        }
+        //if (standardize)
+        //{
+        //    return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+        //    rankUpdate( (W.array().sqrt().matrix()).asDiagonal() * X * colsq_inv.asDiagonal() );
+        //} else 
+        //{
+        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+        rankUpdate( (W.array().sqrt().matrix()).asDiagonal() * X );
+        //}
     }
     
     // function to be called once in the beginning
@@ -342,7 +343,7 @@ protected:
                 {
                     XX.bottomRightCorner(nvars, nvars) = XtWX();
                 }
-                
+                // colsums should already be standardized if standardize = TRUE
                 XX.block(0,1,1,nvars) = colsums;
                 XX.block(1,0,nvars,1) = colsums.transpose();
                 XX(0,0) = W.array().sum();
@@ -508,8 +509,22 @@ public:
         
         if (standardize)
         {
+            //if (wt_len)
+            //{
+            //    colsq = ((weights.array().matrix()).asDiagonal() * X).array().square().matrix().colwise().sum() / (nobs - 1);
+            //} else 
+            //{
             colsq = X.array().square().matrix().colwise().sum() / (nobs - 1);
+            //}
             colsq_inv = 1 / colsq.array().sqrt();
+        }
+        
+        if (wt_len)
+        {
+            ((weights.array().matrix()).asDiagonal() * X).colwise().sum();
+        } else 
+        {
+            colsums = X.colwise().sum();
         }
         
         if (intercept)
@@ -530,7 +545,6 @@ public:
                 XY(0) = Y.sum();
             }
             
-            colsums = X.colwise().sum();
             
             if (standardize)
             {
@@ -549,14 +563,13 @@ public:
                 XY.noalias() = X.transpose() * Y;
             }
             
+            
             if (standardize)
             {
                 XY.array() *= colsq_inv.array();
+                colsums.array() *= colsq_inv.array();
             } 
-            
-            
         }
-        
         
         XY /= nobs;
         
@@ -758,7 +771,7 @@ public:
                 }
             }
             
-            
+            // oem iterations
             for(j = 0; j < maxit; ++j)
             {
                 
@@ -791,7 +804,15 @@ public:
     { 
         if (standardize)
         {
-            return (beta.array() * colsq_inv.array()).matrix();
+            if (intercept)
+            {
+                VectorXd beta_ret = beta;
+                beta_ret.tail(nvars).array() *= colsq_inv.array();
+                return(beta_ret);
+            } else 
+            {
+                return (beta.array() * colsq_inv.array()).matrix();
+            }
         } else 
         {
             return beta;
