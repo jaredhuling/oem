@@ -392,24 +392,27 @@ protected:
             for (int r = 0; r < numelem; ++r)
             {
                 int idx_tmp_val = idx(r);
-                sub.row(r) = X.row(idx_tmp_val);
-                sub_y(r) = Y(idx_tmp_val);
-                sub_weights(r) = weights(idx_tmp_val);
+                sub.row(r)      = X.row(idx_tmp_val);
+                sub_y(r)        = Y(idx_tmp_val);
+                sub_weights(r)  = weights(idx_tmp_val);
             }
             
             MatrixXd AtWAtmp(MatrixXd(nvars, nvars).setZero().
                                 selfadjointView<Lower>().rankUpdate( ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).adjoint() ));
             
             VectorXd AtWBtmp = sub.adjoint() * (sub_y.array() * sub_weights.array()).matrix();
-            VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
+            
+            // this commented code is wrong! we do not standardize with respect to weights
+            //VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
+            VectorXd colsqtmp = sub.array().square().colwise().sum();
             
             sub.resize(0,0);
             
             // store the X'X and X'Y of the subset
             // of data for fold k
-            xtx_list_[k-1] = AtWAtmp;
-            xty_list_[k-1] = AtWBtmp;
-            nobs_list_[k-1] = numelem;
+            xtx_list_[k-1]   = AtWAtmp;
+            xty_list_[k-1]   = AtWBtmp;
+            nobs_list_[k-1]  = numelem;
             colsq_list_[k-1] = colsqtmp;
             
         }
@@ -453,9 +456,9 @@ protected:
             for (int r = 0; r < numelem; ++r)
             {
                 int idx_tmp_val = idx(r);
-                sub.row(r) = X.row(idx_tmp_val);
-                sub_y(r) = Y(idx_tmp_val);
-                sub_weights(r) = weights(idx_tmp_val);
+                sub.row(r)      = X.row(idx_tmp_val);
+                sub_y(r)        = Y(idx_tmp_val);
+                sub_weights(r)  = weights(idx_tmp_val);
             }
             
             MatrixXd AtAtmp(MatrixXd(nvars+1, nvars+1).setZero());
@@ -478,15 +481,16 @@ protected:
             AtBtmp.tail(nvars) = sub.adjoint() * sub_y;
             AtBtmp(0) = sub_y.sum();
             
-            VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
+            //VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
+            VectorXd colsqtmp = sub.array().square().colwise().sum();
             
             sub.resize(0,0);
             
             // store the X'X and X'Y of the subset
             // of data for fold k
-            xtx_list_[k-1] = AtAtmp;
-            xty_list_[k-1] = AtBtmp;
-            nobs_list_[k-1] = numelem;
+            xtx_list_[k-1]   = AtAtmp;
+            xty_list_[k-1]   = AtBtmp;
+            nobs_list_[k-1]  = numelem;
             colsq_list_[k-1] = colsqtmp;
             
         }
@@ -614,6 +618,10 @@ protected:
             if (intercept)
             {
                 XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XX.bottomRightCorner(nvars, nvars) * colsq_inv.asDiagonal();
+                XX.row(0).tail(nvars).array() *= colsq_inv.array();
+                XX.col(0).tail(nvars).array() *= colsq_inv.array();
+                //XX.topRightCorner(1, nvars).array()   *= colsq_inv.array();
+                //XX.bottomLeftCorner(nvars, 1).array() *= colsq_inv.array();
                 XY.tail(nvars).array() *= colsq_inv.array();
             } else 
             {
@@ -673,6 +681,8 @@ protected:
             if (intercept)
             {
                 XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XX.bottomRightCorner(nvars, nvars) * colsq_inv.asDiagonal();
+                XX.row(0).tail(nvars).array() *= colsq_inv.array();
+                XX.col(0).tail(nvars).array() *= colsq_inv.array();
                 XY.tail(nvars).array() *= colsq_inv.array();
             } else 
             {
