@@ -24,15 +24,19 @@ protected:
     typedef Map<VectorXi> MapVeci;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
+    typedef Eigen::Ref<Vector> GenericVector;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MapMatd XX;           // data matrix
-    MapVec XY;                  // response vector
+    const MapMatd XX;           // X'X matrix
+    MapVec XY_init;             // X'Y vector
+    VectorXd XY;                // X'Y vector
     VectorXi groups;            // vector of group membersihp indexes 
     VectorXi unique_groups;     // vector of all unique groups
     VectorXd penalty_factor;    // penalty multiplication factors 
     VectorXd group_weights;     // group lasso penalty multiplication factors 
+    VectorXd scale_factor;      // scaling factor for columns of X
+    VectorXd scale_factor_inv;  // inverse of scaling factor for columns of X
     int penalty_factor_size;    // size of penalty_factor vector
     
     MatrixXd A;                 // A = d * I - X'X
@@ -49,6 +53,7 @@ protected:
     double lambda0;            // minimum lambda to make coefficients all zero
     
     double threshval;
+    int scale_len;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -209,8 +214,15 @@ protected:
     
     void compute_XtX_d_update_A()
     {
-        
-        Spectra::DenseSymMatProd<double> op(XX);
+        MatrixXd XXmat(XX.rows(), XX.cols());
+        if (scale_len)
+        {
+            XXmat = scale_factor_inv.asDiagonal() * XX * scale_factor_inv.asDiagonal();
+        } else 
+        {
+            XXmat = XX;
+        }
+        Spectra::DenseSymMatProd<double> op(XXmat);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
         
         eigs.init();
@@ -218,7 +230,9 @@ protected:
         Vector eigenvals = eigs.eigenvalues();
         d = eigenvals[0] * 1.005; // multiply by an increasing factor to be safe
         
-        A = -XX;
+        A = -XXmat;
+        
+        
         A.diagonal().array() += d;
         
     }
@@ -264,6 +278,7 @@ protected:
                const VectorXi &unique_groups_,
                VectorXd &group_weights_,
                VectorXd &penalty_factor_,
+               const VectorXd &scale_factor_,
                const double &alpha_,
                const double &gamma_,
                const double tol_ = 1e-6) :
@@ -274,11 +289,14 @@ protected:
                                  false,
                                  tol_),
                                  XX(XX_.data(), XX_.rows(), XX_.cols()),
-                                 XY(XY_.data(), XY_.size()),
+                                 XY_init(XY_.data(), XY_.size()),
+                                 XY(XY_.size()),
                                  groups(groups_),
                                  unique_groups(unique_groups_),
                                  penalty_factor(penalty_factor_),
                                  group_weights(group_weights_),
+                                 scale_factor(scale_factor_),
+                                 scale_factor_inv(XX_.cols()),
                                  penalty_factor_size(penalty_factor_.size()),
                                  alpha(alpha_),
                                  gamma(gamma_),
@@ -290,11 +308,20 @@ protected:
         
         double compute_lambda_zero() 
         { 
+            scale_len = scale_factor.size();
+            
+            if (scale_len)
+            {
+                scale_factor_inv = 1 / scale_factor.array();
+                XY = XY_init.array() * scale_factor_inv.array();
+            } else 
+            {
+                XY = XY_init;
+            }
             
             // compute XtX or XXt (depending on if n > p or not)
             // and compute A = dI - XtX (if n > p)
             compute_XtX_d_update_A();
-            
             
             lambda0 = XY.cwiseAbs().maxCoeff();
             return lambda0; 
@@ -324,6 +351,8 @@ protected:
         
         VectorXd get_beta() 
         { 
+            if (scale_len)
+                beta.array() *= scale_factor_inv.array();
             return beta;
         }
         

@@ -7,9 +7,9 @@
 oem.xtx(xtx, xty, family = c("gaussian", "binomial"),
   penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
   lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
-  alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
-  group.weights = NULL, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
-  irls.tol = 0.001)
+  alpha = 1, gamma = 3, groups = numeric(0), scale.factor = numeric(0),
+  penalty.factor = NULL, group.weights = NULL, maxit = 500L,
+  tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001)
 }
 \arguments{
 \item{xtx}{input matrix equal to X'X / nobs
@@ -43,6 +43,10 @@ when nobs < nvars.}
 
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}
+
+\item{scale.factor}{of length nvars = ncol(xtx) = length(xty) for scaling columns of X. The standard deviation
+for each column is a common choice for scale.factor. Coefficients will be returned on original scale. Default is 
+no scaling.}
 
 \item{penalty.factor}{Separate penalty factors can be applied to each coefficient. 
 This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 

@@ -38,6 +38,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
                         SEXP lmin_ratio_,
                         SEXP alpha_,
                         SEXP gamma_,
+                        SEXP scale_factor_,
                         SEXP penalty_factor_,
                         SEXP opts_)
 {
@@ -48,6 +49,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
     
     const int p = xtx.cols();
     
+    const VectorXd scale_factor(as<VectorXd>(scale_factor_));
     const VectorXi groups(as<VectorXi>(groups_));
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
     
@@ -82,6 +84,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
     {
         solver = new oemXTX(xtx, xty, groups, unique_groups, 
                             group_weights, penalty_factor, 
+                            scale_factor,
                             alpha, gamma, tol);
     } else if (family(0) == "binomial")
     {

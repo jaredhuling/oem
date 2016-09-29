@@ -596,7 +596,7 @@ public:
         on_lam_1 = true;
         if (intercept)
         {
-            double ymean = Y.mean();
+            //double ymean = Y.mean();
             //beta(0) = std::log(ymean / (1 - ymean));
         }
         
