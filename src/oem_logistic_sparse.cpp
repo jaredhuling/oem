@@ -106,7 +106,6 @@ RcppExport SEXP oem_fit_logistic_sparse(SEXP x_,
     // int add = 0;
     if (family(0) != "gaussian")
     {
-        standardize = false;
         
         if (intercept_bin)
         {

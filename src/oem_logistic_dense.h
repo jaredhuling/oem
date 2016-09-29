@@ -397,7 +397,7 @@ protected:
                     // need to handle differently with intercept
                     VectorXd resid  = Y - X * (beta_prev.tail(nvars).array() * colsq_inv.array()).matrix();
                     resid.array() -= beta_prev(0);
-                    resid.array() *= W.array();
+                    //resid.array() *= W.array();
                     
                     resid /=  double(nobs);
                     res.tail(nvars) = (colsq_inv.asDiagonal() * X.adjoint()) * (resid) + d * beta_prev.tail(nvars);
@@ -407,7 +407,7 @@ protected:
                     // need to handle differently with intercept
                     VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
                     resid.array() -= beta_prev(0);
-                    resid.array() *= W.array();
+                    //resid.array() *= W.array();
                     
                     resid /=  double(nobs);
                     res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);

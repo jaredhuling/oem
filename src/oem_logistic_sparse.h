@@ -44,6 +44,7 @@ protected:
     typedef Eigen::MappedSparseMatrix<double> MSpMat;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
+    typedef MSpMat::InnerIterator InIterMat;
     
     const MSpMat X;             // sparse data matrix
     MapVec Y;                   // response vector
@@ -83,6 +84,8 @@ protected:
     double threshval;
     int wt_len;
     bool on_lam_1;
+    
+    VectorXd colsq_inv;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -323,6 +326,7 @@ protected:
     void compute_XtX_d_update_A()
     {
         
+        
         // compute X'X or XX'
         // must handle differently if p > n
         if (nobs > nvars + int(intercept)) 
@@ -330,7 +334,15 @@ protected:
             if (intercept)
             {
                 colsums = X.adjoint() * W; 
-                XX.bottomRightCorner(nvars, nvars) = XtWX();
+                
+                if (standardize)
+                {
+                    colsums.array() *= colsq_inv.array();
+                    XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
+                } else 
+                {
+                    XX.bottomRightCorner(nvars, nvars) = XtWX();
+                }
                 
                 if (xxdiag <= 0)
                 {
@@ -344,7 +356,13 @@ protected:
                 XX(0,0) = xxdiag;
             } else 
             {
-                XX = XtWX();
+                if (standardize)
+                {
+                    XX = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
+                } else 
+                {
+                    XX = XtWX();
+                }
             }
         } else 
         {
@@ -382,15 +400,36 @@ protected:
         {
             if (intercept)
             {
-                // need to handle differently with intercept
-                VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
-                resid.array() -= beta_prev(0);
-                resid /=  double(nobs);
-                res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
-                res(0) = resid.sum() + d * beta_prev(0);
+                if (standardize)
+                {
+                    // need to handle differently with intercept
+                    VectorXd resid  = Y - X * (beta_prev.tail(nvars).array() * colsq_inv.array()).matrix();
+                    resid.array() -= beta_prev(0);
+                    //resid.array() *= W.array();
+                    
+                    resid /=  double(nobs);
+                    res.tail(nvars) = (colsq_inv.asDiagonal() * X.adjoint()) * (resid) + d * beta_prev.tail(nvars);
+                    res(0) = resid.sum() + d * beta_prev(0);
+                } else 
+                {
+                    // need to handle differently with intercept
+                    VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
+                    resid.array() -= beta_prev(0);
+                    //resid.array() *= W.array();
+                    
+                    resid /=  double(nobs);
+                    res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
+                    res(0) = resid.sum() + d * beta_prev(0);
+                }
             } else 
             {
-                res.noalias() = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix();
+                if (standardize)
+                {
+                    res.noalias() = (colsq_inv.array() * (X.adjoint() * ((W.array() * (Y - X * ( beta_prev.array() * colsq_inv.array() ).matrix() ).array() ) / double(nobs)).matrix()).array()).matrix();
+                } else 
+                {
+                    res.noalias() = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix();
+                }
                 res += d * beta_prev;
             }
             
@@ -472,7 +511,8 @@ public:
                              irls_tol(irls_tol_),
                              colsums(X_.cols()),
                              grp_idx(unique_groups_.size()),
-                             xxdiag(0.0)
+                             xxdiag(0.0),
+                             colsq_inv(X_.cols())
     {}
     
     double compute_lambda_zero() 
@@ -481,6 +521,22 @@ public:
         
         xxdiag = 0;
         intval = 0;
+        
+        if (standardize)
+        {
+            VectorXd colsq(nvars);
+            colsq.setZero();
+            
+            for (int j = 0; j < nvars; ++j)
+            {
+                for (InIterMat i_(X, j); i_; ++i_)
+                {
+                    colsq(j) += std::pow(i_.value(), 2);
+                }
+            }
+            colsq /= (nobs - 1);
+            colsq_inv = 1 / colsq.array().sqrt();
+        }
         
         if (intercept)
         {
@@ -501,6 +557,13 @@ public:
             }
             
             colsums = X.adjoint() * VectorXd::Ones( nobs );
+            
+            if (standardize)
+            {
+                XY.tail(nvars).array() *= colsq_inv.array();
+                colsums.array() *= colsq_inv.array();
+            } 
+            
         } else 
         {
             if (wt_len)
@@ -511,8 +574,13 @@ public:
                 XY.noalias() = X.transpose() * Y;
             }
             
+            if (standardize)
+            {
+                XY.array() *= colsq_inv.array();
+                colsums.array() *= colsq_inv.array();
+            } 
+            
         }
-        
         
         XY /= nobs;
         
@@ -579,10 +647,23 @@ public:
                     // calculate mu hat
                     if (intercept)
                     {
-                        prob = 1 / (1 + (-1 * ((X * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                        if (standardize)
+                        {
+                            prob = 1 / (1 + (-1 * ((X * ( beta.tail(nvars).array() * colsq_inv.array() ).matrix()   ).array() + 
+                                beta(0)).array()).exp().array());
+                        } else 
+                        {
+                            prob = 1 / (1 + (-1 * ((X * (beta.tail(nvars).array() * colsq_inv.array()).matrix() ).array() + beta(0) * intval).array()).exp().array());
+                        }
+                            
                     } else
                     {
-                        prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                        if (standardize){
+                            prob.noalias() = (1 / (1 + (-1 * (X * ( beta.array() * colsq_inv.array() ).matrix()  ).array()).exp().array())).matrix();
+                        } else 
+                        {
+                            prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
+                        }
                     }
                 } else 
                 {
@@ -598,19 +679,45 @@ public:
                             numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
                             if (intercept)
                             {
-                                prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                                if (standardize)
+                                {
+                                    prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * (beta.tail(nvars).array() * colsq_inv.array()).matrix() ).array() + beta(0) * intval).array()).exp().array());
+                                } else 
+                                {
+                                    prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                                }
+                                    
                             } else
                             {
-                                prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * beta).array()).exp().array())).matrix();
+                                if (standardize)
+                                {
+                                    prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * (beta.array() * colsq_inv.array()).matrix()   ).array()).exp().array())).matrix();
+                                } else 
+                                {
+                                    prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * beta).array()).exp().array())).matrix();
+                                }
                             }
                         } else 
                         {
                             if (intercept)
                             {
-                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                                if (standardize)
+                                {
+                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * (beta.tail(nvars).array() * colsq_inv.array()).matrix()  ).array() + beta(0) * intval).array()).exp().array());
+                                } else 
+                                {
+                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
+                                }
+                                    
                             } else
                             {
-                                prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta).array()).exp().array())).matrix();
+                                if (standardize)
+                                {
+                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * (beta.array() * colsq_inv.array()).matrix()).array()).exp().array())).matrix();
+                                } else 
+                                {
+                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta).array()).exp().array())).matrix();
+                                }
                             }
                         }
                     }
@@ -653,10 +760,19 @@ public:
                         grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
                         grad(0) = presid.sum() / double(nobs);
                         
+                        if (standardize)
+                        {
+                            grad.tail(nvars).array() *= colsq_inv.array();
+                        }
+                        
                     } else 
                     {
                         grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
                         
+                        if (standardize)
+                        {
+                            grad.array() *= colsq_inv.array();
+                        }
                     }
                     
                     
@@ -702,6 +818,21 @@ public:
         if (intercept && nobs > nvars)
         {
             beta(0) *= intval;
+        }
+        if (standardize)
+        {
+            if (intercept)
+            {
+                VectorXd beta_ret = beta;
+                beta_ret.tail(nvars).array() *= colsq_inv.array();
+                return(beta_ret);
+            } else 
+            {
+                return (beta.array() * colsq_inv.array()).matrix();
+            }
+        } else 
+        {
+            return beta;
         }
         return beta;
     }
