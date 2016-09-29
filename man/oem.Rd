@@ -24,7 +24,7 @@ Each row is an observation, each column corresponds to a covariate}
 \item{penalty}{Specification of penalty type in lowercase letters. Choices include "lasso", 
 "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"}
 
-\item{weights}{observation weights. defaults to 1 for each observation (setting weight vector to 
+\item{weights}{observation weights. Not implemented yet. Defaults to 1 for each observation (setting weight vector to 
 length 0 will default all weights to 1)}
 
 \item{lambda}{A user supplied lambda sequence. By default, the program computes
