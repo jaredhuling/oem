@@ -100,7 +100,7 @@ public:
             case 1:
                 if (wt_len)
                 {
-                    scaleY = sd_n( (Y.array() * wts.array()).matrix() );
+                    scaleY = sd_n( (Y.array() * wts.array().sqrt()).matrix() );
                 } else 
                 {
                     scaleY = sd_n(Y);
@@ -108,12 +108,23 @@ public:
                 Y.array() /= scaleY;
                 break;
             case 2:
+                if (wt_len)
+                {
+                    meanY = (Y.array() * wts.array().sqrt()).matrix().mean();
+                    //Y.array() -= meanY;
+                    //scaleY = (Y.array() * wts.array()).matrix().norm() * n_invsqrt;
+                } else
+                {
+                    meanY = Y.mean();
+                    //Y.array() -= meanY;
+                    //scaleY = Y.norm() * n_invsqrt;
+                }
             case 3:
                 if (wt_len)
                 {
-                    meanY = (Y.array() * wts.array()).matrix().mean();
+                    meanY = (Y.array() * wts.array().sqrt()).matrix().mean();
                     Y.array() -= meanY;
-                    scaleY = (Y.array() * wts.array()).matrix().norm() * n_invsqrt;
+                    scaleY = (Y.array() * wts.array().sqrt()).matrix().norm() * n_invsqrt;
                 } else
                 {
                     meanY = Y.mean();
@@ -135,14 +146,14 @@ public:
             case 1:
                 for(int i = 0; i < p; i++)
                 {
-                    scaleX[i] = sd_n((X.col(i).array() * wts.array()).matrix() );
+                    scaleX[i] = sd_n((X.col(i).array() * wts.array().sqrt()).matrix() );
                     X.col(i).array() *= (1.0 / scaleX[i]);
                 }
                 break;
             case 2:
                 for(int i = 0; i < p; i++)
                 {
-                    meanX[i] = (X.col(i).array() * wts.array()).matrix().mean();
+                    meanX[i] = (X.col(i).array() * wts.array().sqrt()).matrix().mean();
                     X.col(i).array() -= meanX[i];
                 }
                 break;

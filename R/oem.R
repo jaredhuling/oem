@@ -7,7 +7,7 @@
 #' @param family "gaussian" for least squares problems, "binomial" for binary response. 
 #' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
 #' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
-#' @param weights observation weights. defaults to 1 for each observation (setting weight vector to 
+#' @param weights observation weights. Not implemented yet. Defaults to 1 for each observation (setting weight vector to 
 #' length 0 will default all weights to 1)
 #' @param lambda A user supplied lambda sequence. By default, the program computes
 #' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
@@ -166,6 +166,8 @@ oem <- function(x,
         x <- as(x,"CsparseMatrix")
         x <- as(x,"dgCMatrix")
     }
+    
+    if (length(weights) > 0) stop("weights not implemented yet.")
     
     if (length(y) != n) {
         stop("x and y lengths do not match")

@@ -397,6 +397,8 @@ protected:
                     // need to handle differently with intercept
                     VectorXd resid  = Y - X * (beta_prev.tail(nvars).array() * colsq_inv.array()).matrix();
                     resid.array() -= beta_prev(0);
+                    resid.array() *= W.array();
+                    
                     resid /=  double(nobs);
                     res.tail(nvars) = (colsq_inv.asDiagonal() * X.adjoint()) * (resid) + d * beta_prev.tail(nvars);
                     res(0) = resid.sum() + d * beta_prev(0);
@@ -405,6 +407,8 @@ protected:
                     // need to handle differently with intercept
                     VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
                     resid.array() -= beta_prev(0);
+                    resid.array() *= W.array();
+                    
                     resid /=  double(nobs);
                     res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
                     res(0) = resid.sum() + d * beta_prev(0);
@@ -519,13 +523,13 @@ public:
             colsq_inv = 1 / colsq.array().sqrt();
         }
         
-        if (wt_len)
-        {
-            ((weights.array().matrix()).asDiagonal() * X).colwise().sum();
-        } else 
-        {
-            colsums = X.colwise().sum();
-        }
+        //if (wt_len)
+        //{
+        //    ((weights.array().matrix()).asDiagonal() * X).colwise().sum();
+        //} else 
+        //{
+        colsums = X.colwise().sum();
+        //}
         
         if (intercept)
         {
@@ -535,15 +539,15 @@ public:
             beta.resize(nvars + 1);
             beta_prev.resize(nvars + 1);
             
-            if (wt_len)
-            {
-                XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = (Y.array() * weights.array()).sum();
-            } else 
-            {
-                XY.tail(nvars) = X.transpose() * Y;
-                XY(0) = Y.sum();
-            }
+            //if (wt_len)
+            //{
+            //    XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
+            //    XY(0) = (Y.array() * weights.array()).sum();
+            //} else 
+            //{
+            XY.tail(nvars) = X.transpose() * Y;
+            XY(0) = Y.sum();
+            //}
             
             
             if (standardize)
@@ -555,13 +559,13 @@ public:
             
         } else 
         {
-            if (wt_len)
-            {
-                XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
-            } else
-            {
-                XY.noalias() = X.transpose() * Y;
-            }
+            //if (wt_len)
+            //{
+            //    XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
+            //} else
+            //{
+            XY.noalias() = X.transpose() * Y;
+            //}
             
             
             if (standardize)
@@ -707,11 +711,10 @@ public:
                             }
                         }
                     }
-                }
+                } 
                 
                 // calculate Jacobian (or weight vector)
                 W = prob.array() * (1 - prob.array());
-                
                 
                 // if observation weights specified, use them
                 if (wt_len)
@@ -754,7 +757,7 @@ public:
                         
                     } else 
                     {
-                        grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
+                        grad.noalias() = X.adjoint() * (Y.array() - prob.array() ).matrix() / double(nobs);
                         
                         if (standardize)
                         {
@@ -769,7 +772,13 @@ public:
                     //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
                     XY.noalias() = XX * beta + grad;
                 }
-            }
+            } //else 
+            //{
+            //    W.fill(0.25);
+            //    if (wt_len) W.array() *= weights.array();
+            //    XY.array() -= 0.5 / nobs;
+            //    prob.fill(0.5);
+            //}
             
             // oem iterations
             for(j = 0; j < maxit; ++j)

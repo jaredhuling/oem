@@ -379,7 +379,13 @@ protected:
             res.noalias() = A * beta_prev + XY;
         } else 
         {
-            res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+            if (wt_len)
+            {
+                res.noalias() = X.adjoint() * ((Y - X * beta_prev).array() * weights.array().square()).matrix() / double(nobs) + d * beta_prev;
+            } else
+            {
+                res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+            }
         }
     }
     
@@ -506,7 +512,13 @@ public:
     virtual double get_loss()
     {
         double loss;
-        loss = (Y - X * beta).array().square().sum();
+        if (wt_len)
+        {
+            loss = ((Y - X * beta).array().square() * weights.array()).sum();
+        } else 
+        {
+            loss = (Y - X * beta).array().square().sum();
+        }
         return loss;
     }
 };
