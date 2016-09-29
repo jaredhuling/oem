@@ -1,8 +1,19 @@
 .Rproj.user
 .Rhistory
+.Rapp.history
 .RData
 oem.Rproj
 src/*.o
 src/*.so
 src/*.dll
 inst/doc
+
+*.bk
+*.desc
+
+# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
+.httr-oauth
+.Rproj.user
+
+# Example code in package build process
+*-Ex.R

@@ -11,3 +11,5 @@ README_files
 ^CONTRIBUTING\.md$
 ^NEWS$
 ^appveyor\.yml$
+^.*\.*.bk$
+^.*\.*.desc$

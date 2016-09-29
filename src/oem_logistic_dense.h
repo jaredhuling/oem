@@ -491,7 +491,7 @@ public:
                              penalty_factor(penalty_factor_),
                              group_weights(group_weights_),
                              penalty_factor_size(penalty_factor_.size()),
-                             XXdim( std::min(X_.cols(), X_.rows()) + int(intercept_) ),
+                             XXdim( std::min(X_.cols() + int(intercept_) , X_.rows())),
                              XY(X_.cols() + int(intercept)), // add extra space if intercept but no standardize
                              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
                              alpha(alpha_),

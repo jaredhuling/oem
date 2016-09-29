@@ -8,9 +8,11 @@ Maintainer: <jaredhuling@gmail.com>
 Description: Solves least squares problems using the orthogonalizing EM algorithm.
 License: GPL (>= 2)
 LazyData: TRUE
+Depends:
+    bigmemory
 Imports: 
     Rcpp (>= 0.11.0), Matrix, foreach, methods
-LinkingTo: Rcpp, RcppEigen, BH
+LinkingTo: Rcpp, RcppEigen, BH, bigmemory
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown
