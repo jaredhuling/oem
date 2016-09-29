@@ -63,12 +63,12 @@
 #'                    penalty = c("lasso", "grp.lasso"), 
 #'                    groups = rep(1:20, each = 5))    
 #'                    
-#' max(abs(fit$beta[[1]][-1,] - fitx$beta[[1]]))
-#' max(abs(fit$beta[[2]][-1,] - fitx$beta[[2]]))       
+#' max(abs(fit$beta[[1]][-1,] - fit.xtx$beta[[1]]))
+#' max(abs(fit$beta[[2]][-1,] - fit.xtx$beta[[2]]))       
 #' 
 #' layout(matrix(1:2, ncol = 2))
-#' plot(fitx)
-#' plot(fitx, which.model = 2)
+#' plot(fit.xtx)
+#' plot(fit.xtx, which.model = 2)
 #' 
 oem.xtx <- function(xtx, 
                     xty, 
