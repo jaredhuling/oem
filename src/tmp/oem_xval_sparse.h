@@ -1,5 +1,5 @@
-#ifndef OEM_SPARSE_H
-#define OEM_SPARSE_H
+#ifndef OEM_DENSE_H
+#define OEM_DENSE_H
 
 #ifdef _OPENMP
     #define has_openmp 1
@@ -42,10 +42,13 @@ protected:
     typedef Map<VectorXi> MapVeci;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
+    typedef Eigen::MappedSparseMatrix<double> MSpMat;
+    typedef Eigen::MappedSparseMatrix<double, Eigen::RowMajor> MSpMatR;
     typedef Eigen::SparseMatrix<double> SpMat;
+    typedef Eigen::SparseMatrix<double, Eigen::RowMajor> SpMatR;
     typedef Eigen::SparseVector<double> SparseVector;
     
-    const MapMatRd X;            // data matrix
+    const MSpMatR X;            // data matrix
     MapVec Y;                   // response vector
     VectorXd weights;
     VectorXi foldid;            // id vector for cv folds
@@ -66,6 +69,10 @@ protected:
     std::vector<MatrixXd > xtx_list;
     std::vector<VectorXd > xty_list;
     std::vector<int > nobs_list;
+    std::vector<VectorXd > colsq_list;
+    VectorXd colsq_inv;
+    VectorXd colsq;
+    
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
     std::string penalty;       // penalty specified
@@ -200,23 +207,42 @@ protected:
     }
     
     
-    MatrixXd XtX() const {
-        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+    // Calculate square of all elements of smat
+    static SpMat square(const SpMat &smat)
+    {
+        const int n1 = smat.nonZeros();
+        
+        SpMatR retmat(smat.rows(), smat.cols());
+        retmat.reserve(n1);
+        
+        for (int kk = 0; kk < smat.outerSize(); ++kk){
+            for (Eigen::SparseMatrix<double>::InnerIterator it(retmat, kk); it; ++it){
+                // square all nonzero elements
+                it.valueRef() = pow(it.value(), 2);
+            }
+        }
+        
+        return retmat;
+    }
+    
+    
+    SpMat XtX() const {
+        return SpMat(XXdim, XXdim).selfadjointView<Lower>().
         rankUpdate(X.adjoint());
     }
     
-    MatrixXd XXt() const {
-        return MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
+    SpMat XXt() const {
+        return SpMat(XXdim, XXdim).selfadjointView<Lower>().
         rankUpdate(X);
     }
     
-    MatrixXd XtWX() const {
-        return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
+    SpMat XtWX() const {
+        return SpMat(nvars, nvars).selfadjointView<Lower>().
         rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
     }
     
-    MatrixXd XWXt() const {
-        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+    SpMat XWXt() const {
+        return SpMat(nobs, nobs).selfadjointView<Lower>().
         rankUpdate( (weights.array().sqrt().matrix()).asDiagonal() * X );
     }
     
@@ -225,7 +251,8 @@ protected:
     // for all k folds
     void XtX_xval(std::vector<MatrixXd > &xtx_list_, 
                   std::vector<VectorXd > &xty_list_,
-                  std::vector<int > &nobs_list_) const {
+                  std::vector<int > &nobs_list_, 
+                  std::vector<VectorXd > &colsq_list_) const {
         
         // MatrixRXd A = X;
         
@@ -250,7 +277,7 @@ protected:
             }
             
             // store subset of matrix X and response Y for this fold
-            MatrixXd sub(numelem, nvars);
+            SpMatR sub(numelem, nvars);
             VectorXd sub_y(numelem);
             for (int r = 0; r < numelem; ++r)
             {
@@ -258,16 +285,20 @@ protected:
                 sub_y(r) = Y(idx(r));
             }
             
-            MatrixXd AtAtmp(MatrixXd(nvars, nvars).setZero().
+            SpMat AtAtmp(SpMat(nvars, nvars).
                             selfadjointView<Lower>().rankUpdate(sub.adjoint() ));
             
             VectorXd AtBtmp = sub.adjoint() * sub_y;
+            
+            VectorXd colsqtmp = square(sub).adjoint() * VectorXd::Ones( numelem );
+            
             
             // store the X'X and X'Y of the subset
             // of data for fold k
             xtx_list_[k-1] = AtAtmp;
             xty_list_[k-1] = AtBtmp;
             nobs_list_[k-1] = numelem;
+            colsq_list_[k-1] = colsqtmp;
             
         }
     }
@@ -278,7 +309,8 @@ protected:
     // when an intercept is needed
     void XtX_xval_int(std::vector<MatrixXd > &xtx_list_, 
                       std::vector<VectorXd > &xty_list_,
-                      std::vector<int > &nobs_list_) const {
+                      std::vector<int > &nobs_list_, 
+                      std::vector<VectorXd > &colsq_list_) const {
         
         //MatrixRXd A = X;
         
@@ -303,7 +335,7 @@ protected:
             }
             
             // store subset of matrix X and response Y for this fold
-            MatrixXd sub(numelem, nvars);
+            SpMat sub(numelem, nvars);
             VectorXd sub_y(numelem);
             for (int r = 0; r < numelem; ++r)
             {
@@ -311,14 +343,16 @@ protected:
                 sub_y(r) = Y(idx(r));
             }
             
-            MatrixXd AtAtmp(MatrixXd(nvars+1, nvars+1).setZero());
+            SpMat AtAtmp2(SpMat(nvars+1, nvars+1));
             
             // compute X'X for this fold 
             // with intercept 
-            AtAtmp.bottomRightCorner(nvars, nvars) = MatrixXd(nvars, nvars).setZero()
+            AtAtmp2.bottomRightCorner(nvars, nvars) = SpMat(nvars, nvars)
                 .selfadjointView<Lower>().rankUpdate(sub.adjoint() );
             
-            Eigen::RowVectorXd colsums = sub.colwise().sum();
+            MatrixXd AtAtmp = AtAtmp2; 
+            
+            Eigen::RowVectorXd colsums = sub.adjoint() * VectorXd::Ones( numelem );
             AtAtmp.block(0,1,1,nvars) = colsums;
             AtAtmp.block(1,0,nvars,1) = colsums.transpose();
             AtAtmp(0,0) = numelem;
@@ -330,11 +364,14 @@ protected:
             AtBtmp.tail(nvars) = sub.adjoint() * sub_y;
             AtBtmp(0) = sub_y.sum();
             
+            VectorXd colsqtmp = square(sub).adjoint() * VectorXd::Ones( numelem );
+            
             // store the X'X and X'Y of the subset
             // of data for fold k
             xtx_list_[k-1] = AtAtmp;
             xty_list_[k-1] = AtBtmp;
             nobs_list_[k-1] = numelem;
+            colsq_list_[k-1] = colsqtmp;
             
         }
     }
@@ -344,7 +381,8 @@ protected:
     // when observation weights are used
     void XtWX_xval(std::vector<MatrixXd > &xtx_list_, 
                    std::vector<VectorXd > &xty_list_,
-                   std::vector<int > &nobs_list_) const {
+                   std::vector<int > &nobs_list_, 
+                   std::vector<VectorXd > &colsq_list_) const {
         
         //MatrixRXd A = X;
         
@@ -369,7 +407,7 @@ protected:
             }
             
             // store subset of matrix X and response Y for this fold
-            MatrixXd sub(numelem, nvars);
+            SpMat sub(numelem, nvars);
             VectorXd sub_y(numelem);
             VectorXd sub_weights(numelem);
             for (int r = 0; r < numelem; ++r)
@@ -380,16 +418,19 @@ protected:
                 sub_weights(r) = weights(idx_tmp_val);
             }
             
-            MatrixXd AtWAtmp(MatrixXd(nvars, nvars).setZero().
-                                selfadjointView<Lower>().rankUpdate((sub_weights.array().sqrt().matrix()).asDiagonal() * sub.adjoint() ));
+            SpMat AtWAtmp(SpMat(nvars, nvars).
+                                selfadjointView<Lower>().rankUpdate( ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).adjoint() ));
             
             VectorXd AtWBtmp = sub.adjoint() * (sub_y.array() * sub_weights.array()).matrix();
+
+            VectorXd colsqtmp = square((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).adjoint() * VectorXd::Ones( numelem );
             
             // store the X'X and X'Y of the subset
             // of data for fold k
             xtx_list_[k-1] = AtWAtmp;
             xty_list_[k-1] = AtWBtmp;
             nobs_list_[k-1] = numelem;
+            colsq_list_[k-1] = colsqtmp;
             
         }
     }
@@ -400,7 +441,8 @@ protected:
     // when an intercept is needed and weights are used
     void XtWX_xval_int(std::vector<MatrixXd > &xtx_list_, 
                        std::vector<VectorXd > &xty_list_,
-                       std::vector<int > &nobs_list_) const {
+                       std::vector<int > &nobs_list_, 
+                       std::vector<VectorXd > &colsq_list_) const {
         
         //MatrixRXd A = X;
         
@@ -425,7 +467,7 @@ protected:
             }
             
             // store subset of matrix X and response Y for this fold
-            MatrixXd sub(numelem, nvars);
+            SpMat sub(numelem, nvars);
             VectorXd sub_y(numelem);
             VectorXd sub_weights(numelem);
             for (int r = 0; r < numelem; ++r)
@@ -436,14 +478,17 @@ protected:
                 sub_weights(r) = weights(idx_tmp_val);
             }
             
-            MatrixXd AtAtmp(MatrixXd(nvars+1, nvars+1).setZero());
+            SpMat AtAtmp2(SpMat(nvars+1, nvars+1));
             
             // compute X'X for this fold 
             // with intercept and weights
-            AtAtmp.bottomRightCorner(nvars, nvars) = MatrixXd(nvars, nvars).setZero()
-                  .selfadjointView<Lower>().rankUpdate((sub_weights.array().sqrt().matrix()).asDiagonal() * sub.adjoint() );
+            AtAtmp2.bottomRightCorner(nvars, nvars) = SpMat(nvars, nvars)
+                  .selfadjointView<Upper>().rankUpdate( (sub_weights.array().sqrt().matrix()).asDiagonal() * sub.adjoint() );
             
-            Eigen::RowVectorXd colsums = (((sub_weights.array().matrix()).asDiagonal() * sub).colwise().sum()).matrix(); 
+            MatrixXd AtAtmp = AtAtmp2;
+            
+            Eigen::RowVectorXd colsums = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).adjoint() * VectorXd::Ones( numelem );
+            
             
             AtAtmp.block(0,1,1,nvars) = colsums;
             AtAtmp.block(1,0,nvars,1) = colsums.transpose();
@@ -456,11 +501,14 @@ protected:
             AtBtmp.tail(nvars) = sub.adjoint() * sub_y;
             AtBtmp(0) = sub_y.sum();
             
+            VectorXd colsqtmp = square(((sub_weights.array().sqrt().matrix()).asDiagonal() * sub)).adjoint() * VectorXd::Ones( numelem );
+            
             // store the X'X and X'Y of the subset
             // of data for fold k
             xtx_list_[k-1] = AtAtmp;
             xty_list_[k-1] = AtBtmp;
             nobs_list_[k-1] = numelem;
+            colsq_list_[k-1] = colsqtmp;
             
         }
     }
@@ -521,7 +569,7 @@ protected:
                 {
                     // this computes all the X'X and X'Y
                     // pieces for each fold
-                    XtWX_xval_int(xtx_list, xty_list, nobs_list);
+                    XtWX_xval_int(xtx_list, xty_list, nobs_list, colsq_list);
                 } else 
                 {
                     throw std::invalid_argument("dimension of x larger than number of observations");
@@ -532,7 +580,7 @@ protected:
                 {
                     // this computes all the X'X and X'Y
                     // pieces for each fold
-                    XtX_xval_int(xtx_list, xty_list, nobs_list);
+                    XtX_xval_int(xtx_list, xty_list, nobs_list, colsq_list);
                 } else 
                 {
                     throw std::invalid_argument("dimension of x larger than number of observations");
@@ -546,7 +594,7 @@ protected:
                 {
                     // this computes all the X'X and X'Y
                     // pieces for each fold
-                    XtWX_xval(xtx_list, xty_list, nobs_list);
+                    XtWX_xval(xtx_list, xty_list, nobs_list, colsq_list);
                 } else 
                 {
                     throw std::invalid_argument("dimension of x larger than number of observations");
@@ -557,7 +605,7 @@ protected:
                 {
                     // this computes all the X'X and X'Y
                     // pieces for each fold
-                    XtX_xval(xtx_list, xty_list, nobs_list);
+                    XtX_xval(xtx_list, xty_list, nobs_list, colsq_list);
                 } else 
                 {
                     throw std::invalid_argument("dimension of x larger than number of observations");
@@ -566,6 +614,7 @@ protected:
         }
         
         nobs = 0;
+        colsq.setZero();
         for (int k = 0; k < nfolds; ++k)
         {
             // compute
@@ -574,6 +623,24 @@ protected:
             XX += xtx_list[k];
             XY += xty_list[k];
             nobs += nobs_list[k];
+            colsq.array() += colsq_list[k].array();
+        }
+        
+        colsq /= (nobs - 1);
+        colsq_inv = 1 / colsq.array().sqrt();
+        
+        
+        if (standardize)
+        {
+            if (intercept)
+            {
+                XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XX.bottomRightCorner(nvars, nvars) * colsq_inv.asDiagonal();
+                XY.tail(nvars).array() *= colsq_inv.array();
+            } else 
+            {
+                XX = colsq_inv.asDiagonal() * XX * colsq_inv.asDiagonal();
+                XY.array() *= colsq_inv.array();
+            }
         }
         
         XX /= nobs;
@@ -601,6 +668,9 @@ protected:
         XX.setZero();
         XY.setZero();
         nobs = 0;
+        
+        colsq.setZero();
+        
         for (int k = 1; k < nfolds + 1; ++k)
         {
             // compute
@@ -611,9 +681,26 @@ protected:
                 XX += xtx_list[k-1];
                 XY += xty_list[k-1];
                 nobs += nobs_list[k-1];
+                colsq.array() += colsq_list[k-1].array();
             }
         }
         
+        colsq /= (nobs - 1);
+        colsq_inv = 1 / colsq.array().sqrt();
+        
+        
+        if (standardize)
+        {
+            if (intercept)
+            {
+                XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XX.bottomRightCorner(nvars, nvars) * colsq_inv.asDiagonal();
+                XY.tail(nvars).array() *= colsq_inv.array();
+            } else 
+            {
+                XX = colsq_inv.asDiagonal() * XX * colsq_inv.asDiagonal();
+                XY.array() *= colsq_inv.array();
+            }
+        }
         
         XX /= nobs;
         XY /= nobs;
@@ -646,10 +733,9 @@ protected:
         } else 
         {
             throw std::invalid_argument("dimension of x larger than number of observations");
-            res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+            // res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
         }
     }
-    
     
     // define the beta update in oem
     void next_beta(Vector &res)
@@ -682,7 +768,7 @@ protected:
     
     
 public:
-    oemXvalSparse(const Eigen::Ref<const MatrixRXd> &X_, 
+    oemXvalSparse(const SpMatR &X_, 
                   ConstGenericVector &Y_,
                   const VectorXd &weights_,
                   const int &nfolds_,
@@ -702,7 +788,7 @@ public:
                              intercept_, 
                              standardize_,
                              tol_),
-                             X(X_.data(), X_.rows(), X_.cols()),
+                             X(X_),
                              Y(Y_.data(), Y_.size()),
                              weights(weights_),
                              foldid(foldid_),
@@ -721,6 +807,9 @@ public:
                              xtx_list(nfolds_),
                              xty_list(nfolds_),
                              nobs_list(nfolds_),
+                             colsq_list(nfolds_),
+                             colsq_inv(X_.cols()),
+                             colsq(X_.cols()),
                              grp_idx(unique_groups_.size())
     
     {}
@@ -731,6 +820,7 @@ public:
         
         // compute XtX or XXt (depending on if n > p or not)
         // and compute A = dI - XtX (if n > p)
+        
         compute_XtX_d_update_A(add_int_);
         
         if (intercept)
@@ -744,9 +834,7 @@ public:
     
     void update_xtx(int fold_)
     {
-        
         update_XtX_d_update_A(fold_);
-        
     }
     
     double compute_lambda_zero() 
@@ -796,18 +884,50 @@ public:
     void init_warm(double lambda_)
     {
         lambda = lambda_;
-        
     }
     
     VectorXd get_beta() 
     { 
-        return beta;
+        
+        if (standardize)
+        {
+            if (intercept)
+            {
+                VectorXd beta_tmp = beta;
+                beta_tmp.tail(nvars).array() *= colsq_inv.array();
+                return beta_tmp;
+            } else 
+            {
+                return (beta.array() * colsq_inv.array()).matrix();
+            }
+        } else 
+        {
+            return beta;
+        }
     }
     
     virtual double get_loss()
     {
         double loss;
-        loss = (Y - X * beta).array().square().sum();
+        if (intercept)
+        {
+            if (standardize)
+            {
+                loss = ((Y - X * (beta.tail(nvars).array() * colsq_inv.array()).matrix()  ).array() - beta(0)).array().square().sum();
+            } else 
+            {
+                loss = ((Y - X * beta.tail(nvars)).array() - beta(0)).array().square().sum();
+            }
+        } else 
+        {
+            if (standardize)
+            {
+                loss = (Y - X * (beta.array() * colsq_inv.array()).matrix() ).array().square().sum();
+            } else 
+            {
+                loss = (Y - X * beta).array().square().sum();
+            }
+        }
         return loss;
     }
 };

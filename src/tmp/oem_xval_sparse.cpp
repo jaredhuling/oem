@@ -25,52 +25,61 @@ typedef Eigen::Map<const MatrixXd> MapMat;
 typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
+typedef Eigen::MappedSparseMatrix<double> MSpMat;
+typedef Eigen::MappedSparseMatrix<double, Eigen::RowMajor> MSpMatR;
+typedef Eigen::SparseMatrix<double, Eigen::RowMajor> SpMatR;
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> MatrixRXd;
+typedef Map<MatrixRXd> MapMatRd;
 
-
-RcppExport SEXP oem_xval_sparse(SEXP x_, 
-                                SEXP y_, 
-                                SEXP family_,
-                                SEXP penalty_,
-                                SEXP weights_,
-                                SEXP groups_,
-                                SEXP unique_groups_,
-                                SEXP group_weights_,
-                                SEXP lambda_,
-                                SEXP nlambda_, 
-                                SEXP lmin_ratio_,
-                                SEXP alpha_,
-                                SEXP gamma_,
-                                SEXP penalty_factor_,
-                                SEXP standardize_, 
-                                SEXP intercept_,
-                                SEXP nfolds_,
-                                SEXP foldid_,
-                                SEXP compute_loss_,
-                                SEXP type_measure_,
-                                SEXP opts_)
+RcppExport SEXP oem_xval_dense(SEXP x_, 
+                               SEXP y_, 
+                               SEXP family_,
+                               SEXP penalty_,
+                               SEXP weights_,
+                               SEXP groups_,
+                               SEXP unique_groups_,
+                               SEXP group_weights_,
+                               SEXP lambda_,
+                               SEXP nlambda_, 
+                               SEXP lmin_ratio_,
+                               SEXP alpha_,
+                               SEXP gamma_,
+                               SEXP penalty_factor_,
+                               SEXP standardize_, 
+                               SEXP intercept_,
+                               SEXP nfolds_,
+                               SEXP foldid_,
+                               SEXP compute_loss_,
+                               SEXP type_measure_,
+                               SEXP opts_)
 {
     BEGIN_RCPP
     
-    //Rcpp::NumericMatrix xx(x_);
+    const MSpMat XX(as<MSpMat>(x_));
     Rcpp::NumericVector yy(y_);
     
-    const Eigen::Map<MatrixXd> xx(as<Map<MatrixXd> >(x_));
+    const SpMatR X = XX;
     
-    const int n = xx.rows();
-    const int p = xx.cols();
+    
+    //const Eigen::Map<MatrixXd> xx(as<Map<MatrixXd> >(x_));
+    
+    
+    const int n = X.rows();
+    const int p = X.cols();
     
     const VectorXi foldid(as<VectorXi>(foldid_));
     const VectorXi groups(as<VectorXi>(groups_));
     const VectorXi unique_groups(as<VectorXi>(unique_groups_));
     
-    MatrixRXd X = xx;
+    
     VectorXd Y(n);
     
-    // Copy data 
-    //std::copy(xx.begin(), xx.end(), X.data());
+    // std::copy(xx.begin(), xx.end(), XX.data());
     std::copy(yy.begin(), yy.end(), Y.data());
     
+    // X = XX;
+    
+    // XX.resize(0,0);
 
     // In glmnet, we minimize
     //   1/(2n) * ||y - X * beta||^2 + lambda * ||beta||_1
@@ -111,11 +120,11 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
     Eigen::setNbThreads(1);
     
     
+    
     // don't standardize.
     // fit intercept the dumb way if it is wanted
     // bool fullbetamat = false;
     //int add = 0;
-    standardize = false;
     
     if (intercept)
     {
@@ -141,8 +150,8 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
     
     
-    // initialize classes
     
+    // initialize classes
     if (family(0) == "gaussian")
     {
         solver = new oemXvalSparse(X, Y, weights, nfolds, foldid,
@@ -151,7 +160,7 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
                                    alpha, gamma, intercept, standardize, tol);
     } else if (family(0) == "binomial")
     {
-        //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
+        throw std::invalid_argument("only gaussian available for this function");
     }
     
     
@@ -177,12 +186,15 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
     
     
     MatrixXd beta(p + 1, nlambda);
+    beta.setZero();
+    
     List beta_list(penalty.size());
     List iter_list(penalty.size());
     List loss_list(penalty.size());
-    std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
+    //std::vector<Eigen::MatrixXd> out_of_fold_predictions_list(penalty.size());
     std::vector<Eigen::VectorXd> xval_mean(penalty.size());
     std::vector<Eigen::VectorXd> xval_sd(penalty.size());
+    std::vector<int> nlam_list(penalty.size());
     
     // vector of vectors of MatrixXd's. confusing
     std::vector<std::vector<Eigen::MatrixXd> > beta_folds(penalty.size(), std::vector<Eigen::MatrixXd>(nfolds));
@@ -214,9 +226,11 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
                 nlambda = 1L;
             }
             
+            
             if (ff == 0)
             {
-                out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
+                //out_of_fold_predictions_list[pp] = MatrixXd(n, nlambda);
+                nlam_list[pp] = nlambda;
             }
             
             VectorXd loss(nlambda);
@@ -293,11 +307,12 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
         } // end loop over penalties
     } // end loop over cross validation folds
     
-    
+    bool use_weights = bool(weights.size() > 0);
     
     // compute cross validation scores for each model
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
+        /*
         if (intercept)
         {
             #pragma omp parallel for schedule(static)
@@ -312,40 +327,108 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
             {
                 out_of_fold_predictions_list[pp].row(i) = X.row(i) * beta_folds[pp][foldid(i)-1];
             }
-        }
+        }*/
         
-        int nlam = out_of_fold_predictions_list[pp].cols();
+        //int nlam = out_of_fold_predictions_list[pp].cols();
+        int nlam = nlam_list[pp];
         VectorXd tempres(nlam);
         VectorXd tempsdres(nlam);
         
         // static enforces l = i comes before l = i + 1
-        #pragma omp parallel for schedule(static)
-        for (int l = 0; l < nlam; ++l)
+        VectorXd tmpcv(nlam);
+        VectorXd tmpss(nlam);
+        tmpcv.setZero();
+        tmpss.setZero();
+        
+        if (intercept)
         {
-            VectorXd tmpcv;
-            if (type_measure[0] == "mse")
+            
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < n; ++i)
             {
-                // compute MSE
-                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().square();
-            } else if (type_measure[0] == "mae")
-            {
-                // compute MAE
-                tmpcv = (Y.array() - out_of_fold_predictions_list[pp].col(l).array()).array().abs();
+                VectorXd cur_preds = ((X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p))).array()
+                                        + beta_folds[pp][foldid(i)-1].row(0).array();
+                
+                VectorXd resid = Y(i) - cur_preds.array();
+                VectorXd tmp_cv;
+                
+                if (type_measure[0] == "mse")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().square().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().square();
+                    }
+                } else if (type_measure[0] == "mae")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().abs().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().abs();
+                    }
+                } else 
+                {
+                    std::invalid_argument("type.measure provided not availabe");
+                }
+                //  delta = x - mean_current
+                VectorXd delta = tmp_cv.array() - tmpcv.array();
+                tmpcv.array() += delta.array() / (i + 1);
+                tmpss.array() += delta.array() * (tmp_cv.array() - tmpcv.array()).array();
             }
-            if (weights.size() > 0)
+        } else 
+        {
+            #pragma omp parallel for schedule(static)
+            for (int i = 0; i < n; ++i)
             {
-                tempres(l) = (weights.array() * tmpcv.array()).mean();
-                tmpcv.array() -= tempres(l);
-                tempsdres(l) = sqrt((tmpcv.array().square().array() * weights.array()).mean() / (nlam - 1));
-            } else 
-            {
-                tempres(l) = tmpcv.mean();
-                tmpcv.array() -= tempres(l);
-                tempsdres(l) = sqrt(tmpcv.array().square().mean() / (n - 1));
+                VectorXd cur_preds = X.row(i) * beta_folds[pp][foldid(i)-1].bottomRows(p);
+                
+                VectorXd resid = Y(i) - cur_preds.array();
+                VectorXd tmp_cv;
+                
+                if (type_measure[0] == "mse")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().square().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().square();
+                    }
+                } else if (type_measure[0] == "mae")
+                {
+                    if (use_weights)
+                    {
+                        tmp_cv = resid.array().abs().array() * weights(i);
+                    } else 
+                    {
+                        tmp_cv = resid.array().abs();
+                    }
+                } else 
+                {
+                    std::invalid_argument("type.measure provided not availabe");
+                }
+                //  delta = x - mean_current
+                VectorXd delta = tmp_cv.array() - tmpcv.array();
+                tmpcv.array() += delta.array() / (i + 1);
+                tmpss.array() += delta.array() * (tmp_cv.array() - tmpcv.array()).array();
             }
         }
+        
+        tempres = tmpcv.array();
+        //tmpcv.array() -= tempres.array();
+        
+        //tempsdres = ((tmpss.array() - ((tmpcv.array() - 5.0).array().square().array() / n) ) / (n * (n - 1))).array().sqrt();
+        
+        tempsdres = (tmpss.array() / (double(n - 1))).array().sqrt();
+        
+        //tempsdres = sqrt(tmpcv.array().square().mean() / (n - 1));
+        
         xval_mean[pp] = tempres;
-        xval_sd[pp] = tempsdres;
+        xval_sd[pp] = tempsdres / sqrt(double(n));
     }
 
 
@@ -357,7 +440,7 @@ RcppExport SEXP oem_xval_sparse(SEXP x_,
                         Named("loss")   = loss_list,
                         Named("cvm")    = xval_mean,
                         Named("cvsd")   = xval_sd,
-                        Named("pred")   = out_of_fold_predictions_list,
+                        //Named("pred")   = out_of_fold_predictions_list,
                         Named("d")      = d);
     END_RCPP
 }

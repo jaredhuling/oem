@@ -59,7 +59,9 @@ groups.}
 
 \item{standardize}{Logical flag for x variable standardization, prior to fitting the models. 
 The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
-variables are in the same units already, you might not wish to standardize.}
+variables are in the same units already, you might not wish to standardize. Keep in mind that 
+standardization is done differently for sparse matrices, so results (when standardized) may be
+slightly different for a sparse matrix object and a dense matrix object}
 
 \item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)}
 

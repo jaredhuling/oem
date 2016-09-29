@@ -51,6 +51,7 @@ protected:
     typedef Eigen::MappedSparseMatrix<double> MSpMat;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
+    typedef MSpMat::InnerIterator InIterMat;
     
     const MSpMat X;             // sparse data matrix
     MapVec Y;                   // response vector
@@ -81,6 +82,8 @@ protected:
     
     double threshval;
     int wt_len;
+    
+    VectorXd colsq_inv;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -357,6 +360,22 @@ protected:
     void compute_XtX_d_update_A()
     {
         
+        if (standardize)
+        {
+            VectorXd colsq(nvars);
+            colsq.setZero();
+            
+            for (int j = 0; j < nvars; ++j)
+            {
+                for (InIterMat i_(X, j); i_; ++i_)
+                {
+                    colsq(j) += std::pow(i_.value(), 2);
+                }
+            }
+            colsq /= (nobs - 1);
+            colsq_inv = 1 / colsq.array().sqrt();
+        }
+        
         // compute X'X
         // if weights specified, compute X'WX instead
         if (wt_len)
@@ -366,19 +385,39 @@ protected:
                 if (intercept)
                 {
                     // compute X'X with intercept
-                    XX.bottomRightCorner(nvars, nvars) = XtWX();
+                    if (standardize)
+                    {
+                        XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
+                    } else
+                    {
+                        XX.bottomRightCorner(nvars, nvars) = XtWX();
+                    }
+                        
                     xxdiag = XX.diagonal().tail(nvars).mean();
                     intval = sqrt(xxdiag / double(nobs));
                     
                     Eigen::RowVectorXd colsums = X.adjoint() * weights; 
                     colsums.array() *= intval;
                     
-                    XX.block(0,1,1,nvars) = colsums;
-                    XX.block(1,0,nvars,1) = colsums.transpose();
+                    if (standardize)
+                    {
+                        XX.block(0,1,1,nvars) = colsums.array() * colsq_inv.array();
+                        XX.block(1,0,nvars,1) = (colsums.array() * colsq_inv.array()).transpose();
+                    } else 
+                    {
+                        XX.block(0,1,1,nvars) = colsums;
+                        XX.block(1,0,nvars,1) = colsums.transpose();
+                    }
                     XX(0,0) = weights.sum() * xxdiag;
                 } else
                 {
-                    XX = XtWX();
+                    if (standardize)
+                    {
+                        XX = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
+                    } else
+                    {
+                        XX = XtWX();
+                    }
                 }
             } else 
             {
@@ -396,7 +435,13 @@ protected:
                 if (intercept)
                 {
                     // compute X'X with intercept
-                    XX.bottomRightCorner(nvars, nvars) = XtX();
+                    if (standardize)
+                    {
+                        XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XtX() * colsq_inv.asDiagonal();
+                    } else
+                    {
+                        XX.bottomRightCorner(nvars, nvars) = XtX();
+                    }
                     
                     xxdiag = XX.diagonal().tail(nvars).mean();
                     intval = sqrt(xxdiag / nobs);
@@ -405,13 +450,26 @@ protected:
                     colsums.array() *= intval;
                     
                     
-                    XX.block(0,1,1,nvars) = colsums;
-                    XX.block(1,0,nvars,1) = colsums.transpose();
+                    if (standardize)
+                    {
+                        XX.block(0,1,1,nvars) = colsums.array() * colsq_inv.array();
+                        XX.block(1,0,nvars,1) = (colsums.array() * colsq_inv.array()).transpose();
+                    } else 
+                    {
+                        XX.block(0,1,1,nvars) = colsums;
+                        XX.block(1,0,nvars,1) = colsums.transpose();
+                    }
                     XX(0,0) = xxdiag;
                     
                 } else 
                 {
-                    XX = XtX();
+                    if (standardize)
+                    {
+                        XX = colsq_inv.asDiagonal() * XtX() * colsq_inv.asDiagonal();
+                    } else
+                    {
+                        XX = XtX();
+                    }
                 }
             } else 
             {
@@ -515,7 +573,8 @@ public:
                              gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
                              ncores(ncores_),
-                             grp_idx(unique_groups_.size())
+                             grp_idx(unique_groups_.size()),
+                             colsq_inv(X_.cols())
     
     {}
     
@@ -548,9 +607,11 @@ public:
                 {
                     XY(0) = (Y.array() * weights.array()).sum();
                 }
+                if (standardize) XY.tail(nvars).array() *= colsq_inv.array();
             } else 
             {
                 XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
+                if (standardize) XY.array() *= colsq_inv.array();
             }
         } else
         {
@@ -564,10 +625,11 @@ public:
                 {
                     XY(0) = Y.sum();
                 }
-                
+                if (standardize) XY.tail(nvars).array() *= colsq_inv.array();
             } else 
             {
                 XY.noalias() = X.transpose() * Y;
+                if (standardize) XY.array() *= colsq_inv.array();
             }
         }
         
@@ -613,13 +675,45 @@ public:
         {
             beta(0) *= (intval);
         }
-        return beta;
+        if (standardize)
+        {
+            if (intercept)
+            {
+                VectorXd beta_tmp = beta;
+                beta_tmp.tail(nvars).array() *= colsq_inv.array();
+                return beta_tmp;
+            } else 
+            {
+                return (beta.array() * colsq_inv.array()).matrix();
+            }
+        } else 
+        {
+            return beta;
+        }
     }
     
     virtual double get_loss()
     {
         double loss;
-        loss = (Y - X * beta).array().square().sum();
+        if (intercept)
+        {
+            if (standardize)
+            {
+                loss = ((Y - X * (beta.tail(nvars).array() * colsq_inv.array()).matrix()  ).array() - beta(0)).array().square().sum();
+            } else 
+            {
+                loss = ((Y - X * beta.tail(nvars)).array() - beta(0)).array().square().sum();
+            }
+        } else 
+        {
+            if (standardize)
+            {
+                loss = (Y - X * (beta.array() * colsq_inv.array()).matrix() ).array().square().sum();
+            } else 
+            {
+                loss = (Y - X * beta).array().square().sum();
+            }
+        }
         return loss;
     }
 };

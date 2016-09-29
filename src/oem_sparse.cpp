@@ -98,12 +98,9 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     
     omp_set_num_threads(ncores);
     
-    // don't standardize if not linear model. 
-    // fit intercept the dumb way if it is wanted
+    
     if (intercept)
     {
-        standardize = false;
-        
         // dont penalize the intercept
         VectorXd penalty_factor_tmp(p+1);
         
@@ -113,7 +110,6 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     
     // initialize pointers 
     oemBase<Eigen::VectorXd> *solver = NULL; // solver doesn't point to anything yet
-    
     
     // initialize class
     if (family(0) == "gaussian")
