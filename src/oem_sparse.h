@@ -450,15 +450,15 @@ protected:
                     colsums.array() *= intval;
                     
                     
+                    XX.block(0,1,1,nvars) = colsums;
+                    XX.block(1,0,nvars,1) = colsums.transpose();
+                    
                     if (standardize)
                     {
-                        XX.block(0,1,1,nvars) = colsums.array() * colsq_inv.array();
-                        XX.block(1,0,nvars,1) = (colsums.array() * colsq_inv.array()).transpose();
-                    } else 
-                    {
-                        XX.block(0,1,1,nvars) = colsums;
-                        XX.block(1,0,nvars,1) = colsums.transpose();
+                        XX.row(0).tail(nvars).array() *= colsq_inv.array();
+                        XX.col(0).tail(nvars).array() *= colsq_inv.array();
                     }
+                    
                     XX(0,0) = xxdiag;
                     
                 } else 
@@ -594,6 +594,7 @@ public:
         // compute XtX or XXt (depending on if n > p or not)
         // and compute A = dI - XtX (if n > p)
         compute_XtX_d_update_A();
+        
         
         if (wt_len)
         {
