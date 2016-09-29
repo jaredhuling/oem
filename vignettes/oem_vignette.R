@@ -63,15 +63,37 @@ system.time(fit2b <- oem(x = x2, y = y2, penalty = c("grp.lasso", "lasso", "mcp"
 
 
 ## ---- message = FALSE, cache=FALSE---------------------------------------
-cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
-                 groups = rep(1:20, each = 5), 
-                 nfolds = 10)
+system.time(cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
+                             groups = rep(1:20, each = 5), 
+                             nfolds = 10))
 
 ## ---- fig.show='hold', fig.width = 7.15, fig.height = 3.75---------------
 layout(matrix(1:3, ncol = 3))
 plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+
+nobsc  <- 1e5
+nvarsc <- 100
+xc <- matrix(rnorm(nobsc * nvarsc), ncol = nvarsc)
+yc <- drop(xc %*% c(0.5, 0.5, -0.5, -0.5, 1, rep(0, nvarsc - 5))) + rnorm(nobsc, sd = 4)
+
+system.time(cvalfit1 <- cv.oem(x = xc, y = yc, penalty = "lasso", 
+                               groups = rep(1:20, each = 5), 
+                               nfolds = 10))
+
+system.time(xvalfit1 <- xval.oem(x = xc, y = yc, penalty = "lasso",
+                                 groups = rep(1:20, each = 5), 
+                                 nfolds = 10))
+
+system.time(xvalfit2 <- xval.oem(x = xc, y = yc, penalty = "lasso",
+                                 groups = rep(1:20, each = 5), 
+                                 nfolds = 10, ncores = 2))
+
+system.time(ofit1 <- oem(x = xc, y = yc, penalty = "lasso",
+                         groups = rep(1:20, each = 5)))
 
 ## ---- message = FALSE, cache=FALSE---------------------------------------
 nobs  <- 2e3
@@ -85,13 +107,14 @@ cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  family = "binomial",
                  type.measure = "class",
                  groups = rep(1:10, each = 2), 
-                 nfolds = 10)
+                 nfolds = 10, standardize = FALSE)
 
 ## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
+yrng <- range(c(unlist(cvfit2$cvup), unlist(cvfit2$cvlo)))
 layout(matrix(1:3, ncol = 3))
-plot(cvfit2, which.model = 1)
-plot(cvfit2, which.model = 2)
-plot(cvfit2, which.model = 3)
+plot(cvfit2, which.model = 1, ylim = yrng)
+plot(cvfit2, which.model = 2, ylim = yrng)
+plot(cvfit2, which.model = 3, ylim = yrng)
 
 ## ------------------------------------------------------------------------
 mean(y)
@@ -101,13 +124,88 @@ cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  family = "binomial",
                  type.measure = "auc",
                  groups = rep(1:10, each = 2), 
-                 nfolds = 10)
+                 nfolds = 10, standardize = FALSE)
 
 ## ---- echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75----
+yrng <- range(c(unlist(cvfit2$cvup), unlist(cvfit2$cvlo)))
 layout(matrix(1:3, ncol = 3))
-plot(cvfit2, which.model = 1)
-plot(cvfit2, which.model = 2)
-plot(cvfit2, which.model = 3)
+plot(cvfit2, which.model = 1, ylim = yrng)
+plot(cvfit2, which.model = 2, ylim = yrng)
+plot(cvfit2, which.model = 3, ylim = yrng)
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+xtx <- crossprod(xc) / nrow(xc)
+xty <- crossprod(xc, yc) / nrow(xc)
+
+
+system.time(fit <- oem(x = xc, y = yc, 
+                       penalty = c("lasso", "grp.lasso"), 
+                       standardize = FALSE, intercept = FALSE,
+                       groups = rep(1:20, each = 5)))
+
+system.time(fit.xtx <- oem.xtx(xtx = xtx, xty = xty, 
+                               penalty = c("lasso", "grp.lasso"), 
+                               groups = rep(1:20, each = 5))  )  
+                   
+max(abs(fit$beta[[1]][-1,] - fit.xtx$beta[[1]]))
+max(abs(fit$beta[[2]][-1,] - fit.xtx$beta[[2]])) 
+
+col.std <- apply(xc, 2, sd)
+fit.xtx.s <- oem.xtx(xtx = xtx, xty = xty, 
+                     scale.factor = col.std,
+                     penalty = c("lasso", "grp.lasso"), 
+                     groups = rep(1:20, each = 5))  
+
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+set.seed(123)
+nrows <- 50000
+ncols <- 100
+bkFile <- "bigmat.bk"
+descFile <- "bigmatk.desc"
+bigmat <- filebacked.big.matrix(nrow=nrows, ncol=ncols, type="double",
+                                backingfile=bkFile, backingpath=".",
+                                descriptorfile=descFile,
+                                dimnames=c(NULL,NULL))
+
+# Each column value with be the column number multiplied by
+# samples from a standard normal distribution.
+set.seed(123)
+for (i in 1:ncols) bigmat[,i] = rnorm(nrows)*i
+
+yb <- rnorm(nrows) + bigmat[,1] - bigmat[,2]
+
+## out-of-memory computation
+fit <- big.oem(x = bigmat, y = yb, 
+               penalty = c("lasso", "grp.lasso"), 
+               groups = rep(1:20, each = 5))
+
+## fitting with in-memory computation
+fit2 <- oem(x = bigmat[,], y = yb, 
+            penalty = c("lasso", "grp.lasso"), 
+            groups = rep(1:20, each = 5))   
+           
+max(abs(fit$beta[[1]] - fit2$beta[[1]]))            
+
+
+## ---- message = FALSE, cache=FALSE---------------------------------------
+
+nobsc  <- 1e5
+nvarsc <- 500
+xc <- matrix(rnorm(nobsc * nvarsc), ncol = nvarsc)
+yc <- drop(xc %*% c(0.5, 0.5, -0.5, -0.5, 1, rep(0, nvarsc - 5))) + rnorm(nobsc, sd = 4)
+
+
+system.time(fit <- oem(x = xc, y = yc, 
+                       penalty = c("lasso", "grp.lasso"), 
+                       standardize = FALSE, intercept = FALSE,
+                       groups = rep(1:20, each = 25)))
+
+system.time(fitp <- oem(x = xc, y = yc, 
+                        penalty = c("lasso", "grp.lasso"), 
+                        standardize = FALSE, intercept = FALSE,
+                        groups = rep(1:20, each = 25), ncores = 2))
+
 
 ## ---- message = FALSE, cache=FALSE---------------------------------------
 

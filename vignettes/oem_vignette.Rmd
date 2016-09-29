@@ -67,7 +67,7 @@ First load `oem`
 library(oem)
 ```
 
-Simulate some data
+Simulate data
 
 ```{r, message = FALSE, cache=FALSE}
 nobs  <- 1e4
@@ -220,9 +220,9 @@ system.time(fit2b <- oem(x = x2, y = y2, penalty = c("grp.lasso", "lasso", "mcp"
 Here we use the `nfolds` argument to specify the number of folds for $k$-fold cross validation
 
 ```{r, message = FALSE, cache=FALSE}
-cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
-                 groups = rep(1:20, each = 5), 
-                 nfolds = 10)
+system.time(cvfit1 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"), 
+                             groups = rep(1:20, each = 5), 
+                             nfolds = 10))
 ```
 
 Plot the cross validation mean squared error results for each model
@@ -233,6 +233,34 @@ plot(cvfit1, which.model = 1)
 plot(cvfit1, which.model = 2)
 plot(cvfit1, which.model = 3)
 ```
+
+## Extremely Fast Cross Validation for Linear Models
+
+The function `xval.oem` offers accelerated cross validation for penalized linear models. In many cases is is orders of magnitude faster than cv.oem. It is only recommended for scenarios where the number of observations is larger than the number of variables. In addition to the computational gains in single-core usage, it also benefits from parallelizaton using OpenMP (instead of using foreach, as used by cv.oem). For large enough problems, it has on a similar order of computation time as just fitting one OEM model. 
+
+```{r, message = FALSE, cache=FALSE}
+
+nobsc  <- 1e5
+nvarsc <- 100
+xc <- matrix(rnorm(nobsc * nvarsc), ncol = nvarsc)
+yc <- drop(xc %*% c(0.5, 0.5, -0.5, -0.5, 1, rep(0, nvarsc - 5))) + rnorm(nobsc, sd = 4)
+
+system.time(cvalfit1 <- cv.oem(x = xc, y = yc, penalty = "lasso", 
+                               groups = rep(1:20, each = 5), 
+                               nfolds = 10))
+
+system.time(xvalfit1 <- xval.oem(x = xc, y = yc, penalty = "lasso",
+                                 groups = rep(1:20, each = 5), 
+                                 nfolds = 10))
+
+system.time(xvalfit2 <- xval.oem(x = xc, y = yc, penalty = "lasso",
+                                 groups = rep(1:20, each = 5), 
+                                 nfolds = 10, ncores = 2))
+
+system.time(ofit1 <- oem(x = xc, y = yc, penalty = "lasso",
+                         groups = rep(1:20, each = 5)))
+```
+
 
 ## Evaluation Metrics
 
@@ -273,14 +301,15 @@ cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  family = "binomial",
                  type.measure = "class",
                  groups = rep(1:10, each = 2), 
-                 nfolds = 10)
+                 nfolds = 10, standardize = FALSE)
 ```
 
 ```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+yrng <- range(c(unlist(cvfit2$cvup), unlist(cvfit2$cvlo)))
 layout(matrix(1:3, ncol = 3))
-plot(cvfit2, which.model = 1)
-plot(cvfit2, which.model = 2)
-plot(cvfit2, which.model = 3)
+plot(cvfit2, which.model = 1, ylim = yrng)
+plot(cvfit2, which.model = 2, ylim = yrng)
+plot(cvfit2, which.model = 3, ylim = yrng)
 ```
 
 In this case, misclassification rate is not the best indicator of performance. The classes here are imbalanced:
@@ -298,17 +327,113 @@ cvfit2 <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp", "grp.lasso"),
                  family = "binomial",
                  type.measure = "auc",
                  groups = rep(1:10, each = 2), 
-                 nfolds = 10)
+                 nfolds = 10, standardize = FALSE)
 ```
 
 ```{r, echo = FALSE, fig.show='hold', fig.width = 7.15, fig.height = 3.75}
+yrng <- range(c(unlist(cvfit2$cvup), unlist(cvfit2$cvlo)))
 layout(matrix(1:3, ncol = 3))
-plot(cvfit2, which.model = 1)
-plot(cvfit2, which.model = 2)
-plot(cvfit2, which.model = 3)
+plot(cvfit2, which.model = 1, ylim = yrng)
+plot(cvfit2, which.model = 2, ylim = yrng)
+plot(cvfit2, which.model = 3, ylim = yrng)
+```
+
+# Methods for Very Large Scale Problems
+
+## OEM with Precomputed $X^TX$, $X^TY$ for Linear Models
+
+With a very large dataset and computing cluster, the total size of a dataset may be very large, but if the number of variables is only moderately large (on the order of a few thousands) $X^TX$ and $X^TY$ may not be large and may already be available from other computations or can be computed trivially in parallel. The function `oem.xtx` computes penalized linear regression models using the OEM algorithm only using $X^TX$ and $X^TY$. Standardization can be achieved by providing a vector of scaling factors (usually the standard deviations of the columns of x). The function is used like the following:
+
+
+
+```{r, message = FALSE, cache=FALSE}
+xtx <- crossprod(xc) / nrow(xc)
+xty <- crossprod(xc, yc) / nrow(xc)
+
+
+system.time(fit <- oem(x = xc, y = yc, 
+                       penalty = c("lasso", "grp.lasso"), 
+                       standardize = FALSE, intercept = FALSE,
+                       groups = rep(1:20, each = 5)))
+
+system.time(fit.xtx <- oem.xtx(xtx = xtx, xty = xty, 
+                               penalty = c("lasso", "grp.lasso"), 
+                               groups = rep(1:20, each = 5))  )  
+                   
+max(abs(fit$beta[[1]][-1,] - fit.xtx$beta[[1]]))
+max(abs(fit$beta[[2]][-1,] - fit.xtx$beta[[2]])) 
+
+col.std <- apply(xc, 2, sd)
+fit.xtx.s <- oem.xtx(xtx = xtx, xty = xty, 
+                     scale.factor = col.std,
+                     penalty = c("lasso", "grp.lasso"), 
+                     groups = rep(1:20, each = 5))  
+
+```
+
+
+
+## Out-of-memory Computation
+
+The OEM package also provides functionality for on-disk computation with the `big.oem` function, allowing for fitting penalized regression models on datasets too large to fit in memory. The `big.oem` function uses the tools provided by the `bigmemory` package, so a big.matrix object must be used for the design matrix. 
+
+```{r, message = FALSE, cache=FALSE}
+set.seed(123)
+nrows <- 50000
+ncols <- 100
+bkFile <- "bigmat.bk"
+descFile <- "bigmatk.desc"
+bigmat <- filebacked.big.matrix(nrow=nrows, ncol=ncols, type="double",
+                                backingfile=bkFile, backingpath=".",
+                                descriptorfile=descFile,
+                                dimnames=c(NULL,NULL))
+
+# Each column value with be the column number multiplied by
+# samples from a standard normal distribution.
+set.seed(123)
+for (i in 1:ncols) bigmat[,i] = rnorm(nrows)*i
+
+yb <- rnorm(nrows) + bigmat[,1] - bigmat[,2]
+
+## out-of-memory computation
+fit <- big.oem(x = bigmat, y = yb, 
+               penalty = c("lasso", "grp.lasso"), 
+               groups = rep(1:20, each = 5))
+
+## fitting with in-memory computation
+fit2 <- oem(x = bigmat[,], y = yb, 
+            penalty = c("lasso", "grp.lasso"), 
+            groups = rep(1:20, each = 5))   
+           
+max(abs(fit$beta[[1]] - fit2$beta[[1]]))            
+
 ```
 
 # Other Features
+
+## Parallelization via OpenMP
+
+Computational time can be reduced a little via OpenMP parallelization of the key computational steps of the OEM algorithm. Simply use the `ncores` argument to access parallelization. There is no need for the foreach package.
+
+```{r, message = FALSE, cache=FALSE}
+
+nobsc  <- 1e5
+nvarsc <- 500
+xc <- matrix(rnorm(nobsc * nvarsc), ncol = nvarsc)
+yc <- drop(xc %*% c(0.5, 0.5, -0.5, -0.5, 1, rep(0, nvarsc - 5))) + rnorm(nobsc, sd = 4)
+
+
+system.time(fit <- oem(x = xc, y = yc, 
+                       penalty = c("lasso", "grp.lasso"), 
+                       standardize = FALSE, intercept = FALSE,
+                       groups = rep(1:20, each = 25)))
+
+system.time(fitp <- oem(x = xc, y = yc, 
+                        penalty = c("lasso", "grp.lasso"), 
+                        standardize = FALSE, intercept = FALSE,
+                        groups = rep(1:20, each = 25), ncores = 2))
+
+```
 
 ## Penalty Adjustment
 If some variables should not be penalized, this can be specified through the use of the `penalty.factor` argument for all penalties other than the group lasso. For the group lasso, the group-specific weights can be modified by the `group.weights` argument. `penalty.factor` should be a vector of length equal to the number of columns in `x`. Each element in `penalty.factor` will be multiplied to the applied tuning parameter for each corresponding variable. For example, for a problem with 5 variables (`ncol(x) = 5`), setting `penalty.factor = c(1, 1, 1, 0, 0)` will effectively only allow penalization for the first three variables. The `group.weights` argument should be a vector with length equal to the number of groups. Similarly to `penalty.factor`, these weights will be multiplied to the penalty applied to each group. `penalty.factor` and `group.weights` can also be used to fit the adaptive lasso and adaptive group lasso, respectively.  
