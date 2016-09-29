@@ -478,8 +478,10 @@ protected:
             // compute X'Y for this fold 
             // with intercept 
             VectorXd AtBtmp(nvars + 1);
-            AtBtmp.tail(nvars) = sub.adjoint() * sub_y;
-            AtBtmp(0) = sub_y.sum();
+            VectorXd yw(numelem);
+            yw = (sub_y.array() * sub_weights.array());
+            AtBtmp.tail(nvars) = sub.adjoint() * yw;
+            AtBtmp(0) = yw.sum();
             
             //VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
             VectorXd colsqtmp = sub.array().square().colwise().sum();

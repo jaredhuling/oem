@@ -366,6 +366,7 @@ oem <- function(x,
     
     for (i in 1:length(penalty))
     {
+        if (penalty[i] == "ols") res$beta[[i]] <- matrix(res$beta[[i]], ncol = 1)
         rownames(res$beta[[i]]) <- c("(Intercept)", varnames)
     }
     
