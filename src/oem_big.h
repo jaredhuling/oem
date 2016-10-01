@@ -377,7 +377,7 @@ protected:
     
     
     public:
-        oemBig(const Eigen::Ref<const MatrixXd>  &X_, 
+        oemBig(const Map<MatrixXd> &X_, 
                ConstGenericVector &Y_,
                const VectorXd &weights_,
                const VectorXi &groups_,

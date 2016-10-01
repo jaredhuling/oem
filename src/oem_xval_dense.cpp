@@ -52,6 +52,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
 {
     BEGIN_RCPP
     
+    
     Rcpp::NumericMatrix xx(x_);
     Rcpp::NumericVector yy(y_);
     
@@ -75,8 +76,8 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     // std::copy(xx.begin(), xx.end(), XX.data());
     std::copy(yy.begin(), yy.end(), Y.data());
     
-    // X = XX;
     
+    // X = XX;
     // XX.resize(0,0);
 
     // In glmnet, we minimize
@@ -125,22 +126,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     if (intercept)
     {
-        // fullbetamat = true;
-        //add = 1;
         // dont penalize the intercept
         VectorXd penalty_factor_tmp(p+1);
         
         penalty_factor_tmp << 0, penalty_factor;
         penalty_factor.swap(penalty_factor_tmp);
-        
-        //VectorXd v(n);
-        //v.fill(1);
-        //MatrixXd X_tmp(n, p+1);
-        
-        //X_tmp << v, X;
-        //X.swap(X_tmp);
-        
-        //X_tmp.resize(0,0);
     }
     
     // initialize pointers 
@@ -156,6 +146,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                                   alpha, gamma, intercept, standardize, tol);
     } else if (family(0) == "binomial")
     {
+        throw std::invalid_argument("binomial not available for oem_xval_dense, use oem_xval_logistic_dense");
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
     }
     
