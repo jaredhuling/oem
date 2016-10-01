@@ -245,10 +245,10 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
                object$cvup[[which.model]], 
                object$cvlo[[which.model]], width = 0.005)
     points(sign.lambda*log(object$lambda), object$cvm[[which.model]], pch=20, col="dodgerblue")
-    axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0)
+    axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0, ...)
     abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
     abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
-    title(main.txt, line = 2.5)
+    title(main.txt, line = 2.5, ...)
     invisible()
 }
 
@@ -719,8 +719,8 @@ plot.xval.oem <- function(x, which.model = 1,
         
         atdf <- pretty(index, n = 10L)
         plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
-        axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0)
-        title(main.txt, line = 2.5)
+        axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0, ...)
+        title(main.txt, line = 2.5, ...)
         
         
         
@@ -735,7 +735,7 @@ plot.xval.oem <- function(x, which.model = 1,
                 j <- take[i]
                 axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
                      las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
-                     lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i])
+                     lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i], ...)
             }
         }
         par("mai"=margins)
@@ -756,10 +756,10 @@ plot.xval.oem <- function(x, which.model = 1,
                    x$cvup[[which.model]], 
                    x$cvlo[[which.model]], width = 0.005)
         points(sign.lambda*log(x$lambda), x$cvm[[which.model]], pch=20, col="dodgerblue")
-        axis(side=3,at=sign.lambda*log(x$lambda),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0)
+        axis(side=3,at=sign.lambda*log(x$lambda),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0, ...)
         abline(v = sign.lambda * log(x$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
         abline(v = sign.lambda * log(x$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
-        title(main.txt, line = 2.5)
+        title(main.txt, line = 2.5, ...)
     }
 }
 
