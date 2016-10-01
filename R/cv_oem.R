@@ -188,6 +188,8 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
     lamin=if(cvname=="AUC")getmin(lambda, lapply(cvm, function(ccvvmm) -ccvvmm), cvsd)
     else getmin(lambda, cvm, cvsd)
     obj = c(out, as.list(lamin))
+    obj$best.model <- penalty[obj$model.min]
+    obj$penalty <- penalty
     class(obj) = "cv.oem"
     obj
 }

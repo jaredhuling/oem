@@ -373,6 +373,9 @@ xval.oem <- function(x,
     res$varnames <- varnames
     res$nzero    <- nz
     
+    res$best.model <- penalty[res$model.min]
+    res$penalty    <- penalty
+    
     class(res)   <- c(classres, "xval.oem")
     res
 }

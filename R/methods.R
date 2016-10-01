@@ -173,8 +173,8 @@ plot.oemfit <- function(x, which.model = 1,
     
     atdf <- pretty(index, n = 10L)
     plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
-    axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0)
-    title(main.txt, line = 2.5)
+    axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0, ...)
+    title(main.txt, line = 2.5, ...)
     
     
     
@@ -189,7 +189,7 @@ plot.oemfit <- function(x, which.model = 1,
             j <- take[i]
             axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
                  las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
-                 lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i])
+                 lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i], ...)
         }
     }
     par("mai"=margins)
