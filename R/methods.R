@@ -136,7 +136,7 @@ plot.oem <- function(x, which.model = 1,
     main.txt <- x$penalty[which.model]
     
     xvar <- match.arg(xvar)
-    nbeta <- as.matrix(x$beta[[which.model]])
+    nbeta <- as.matrix(x$beta[[which.model]][-1,]) ## remove intercept
     remove <- apply(nbeta, 1, function(betas) all(betas == 0) )
     switch(xvar,
            "norm" = {
