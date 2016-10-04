@@ -1,25 +1,25 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix or SparseMatrix object. 
+#' @param x input matrix or \code{CsparseMatrix} object of the \pkg{Matrix} package. 
 #' Each row is an observation, each column corresponds to a covariate
-#' @param y numeric response vector of length nobs.
-#' @param family "gaussian" for least squares problems, "binomial" for binary response. 
-#' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
-#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
+#' @param y numeric response vector of length \code{nobs}.
+#' @param family \code{"gaussian"} for least squares problems, \code{"binomial"} for binary response. 
+#' @param penalty Specification of penalty type. Choices include \code{"lasso"}, 
+#' \code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}
 #' @param weights observation weights. Not implemented yet. Defaults to 1 for each observation (setting weight vector to 
 #' length 0 will default all weights to 1)
 #' @param lambda A user supplied lambda sequence. By default, the program computes
-#' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
+#' its own lambda sequence based on \code{nlambda} and \code{lambda.min.ratio}. Supplying
 #' a value of lambda overrides this.
-#' @param nlambda The number of lambda values - default is 100.
-#' @param lambda.min.ratio Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
+#' @param nlambda The number of lambda values. The default is 100.
+#' @param lambda.min.ratio Smallest value for lambda, as a fraction of \code{lambda.max}, the (data derived) entry
 #' value (i.e. the smallest value for which all coefficients are zero). The default
 #' depends on the sample size nobs relative to the number of variables nvars. If
-#' nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
-#' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
-#' when nobs < nvars.
-#' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
+#' \code{nobs > nvars}, the default is 0.0001, close to zero. If \code{nobs < nvars}, the default
+#' is 0.01. A very small value of \code{lambda.min.ratio} will lead to a saturated fit
+#' when \code{nobs < nvars}.
+#' @param alpha mixing value for \code{elastic.net}. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 #' should be put in group 0
@@ -27,27 +27,29 @@
 #' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 #' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
 #' variables. 
-#' @param group.weights penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+#' @param group.weights penalty factors applied to each group for the group lasso. Similar to \code{penalty.factor}, 
 #' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
 #' @param standardize Logical flag for x variable standardization, prior to fitting the models. 
-#' The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
+#' The coefficients are always returned on the original scale. Default is \code{standardize = TRUE}. If 
 #' variables are in the same units already, you might not wish to standardize. Keep in mind that 
 #' standardization is done differently for sparse matrices, so results (when standardized) may be
 #' slightly different for a sparse matrix object and a dense matrix object
-#' @param intercept Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
+#' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
-#' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
+#' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
 #' @param ncores Integer scalar that specifies the number of threads to be used
-#' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
-#' to TRUE will dramatically increase computational time
-#' @param hessian.type only for logistic regression. if hessian.type = "full", then the full hessian is used. If
-#' hessian.type = "upper.bound", then an upper bound of the hessian is used. The upper bound can be dramatically
+#' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
+#' to \code{TRUE} will dramatically increase computational time
+#' @param hessian.type only for logistic regression. if \code{hessian.type = "full"}, then the full hessian is used. If
+#' \code{hessian.type = "upper.bound"}, then an upper bound of the hessian is used. The upper bound can be dramatically
 #' faster in certain situations, ie when n >> p
-#' @return An object with S3 class "oemfit" 
+#' @return An object with S3 class "oem" 
+#' @references Shifeng Xiong, Bin Dai, Jared Huling, and Peter Z. G. Qian. Orthogonalizing
+#' EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
 #' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
@@ -371,7 +373,7 @@ oem <- function(x,
     }
     
     nz <- lapply(1:length(res$beta), function(m) 
-        sapply(predict.oemfit(res, type = "nonzero", which.model = m), length) - 1
+        sapply(predict.oem(res, type = "nonzero", which.model = m), length) - 1
     )
     
     res$nobs     <- n
@@ -381,7 +383,7 @@ oem <- function(x,
     res$varnames <- varnames
     res$nzero    <- nz
     
-    class(res)   <- c(class(res), "oemfit")
+    class(res)   <- c(class(res), "oem")
     res
 }
 

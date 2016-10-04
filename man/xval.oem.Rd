@@ -14,43 +14,41 @@ xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
   irls.tol = 0.001, compute.loss = FALSE)
 }
 \arguments{
-\item{x}{input matrix or SparseMatrix (sparse not yet implemented. 
+\item{x}{input matrix (sparse matrices not yet implemented). 
 Each row is an observation, each column corresponds to a covariate}
 
-\item{y}{numeric response vector of length nobs.}
+\item{y}{numeric response vector of length \code{nobs = nrow(x)}.}
 
 \item{nfolds}{integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10}
 
-\item{foldid}{an optional vector of values between 1 and nfold specifying which fold each observation belongs to.}
+\item{foldid}{an optional vector of values between 1 and \code{nfold} specifying which fold each observation belongs to.}
 
-\item{type.measure}{measure to evaluate for cross-validation. The default is type.measure="deviance", 
-which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic
-regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
-regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
+\item{type.measure}{measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
+which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
+regression. \code{type.measure = "class"} applies to \code{binomial} only. \code{type.measure = "auc"} is for two-class logistic 
+regression only. \code{type.measure="mse"} or \code{type.measure="mae"} (mean absolute error) can be used by all models;
 they measure the deviation from the fitted mean to the response.}
 
 \item{ncores}{Integer scalar that specifies the number of threads to be used}
 
-\item{family}{"gaussian" for least squares problems, "binomial" for binary response.}
+\item{family}{\code{"gaussian"} for least squares problems, \code{"binomial"} for binary response (not implemented yet).}
 
-\item{penalty}{Specification of penalty type in lowercase letters. Choices include "lasso", 
-"ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"}
+\item{penalty}{Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
+\code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}}
 
 \item{weights}{observation weights. defaults to 1 for each observation (setting weight vector to 
 length 0 will default all weights to 1)}
 
 \item{lambda}{A user supplied lambda sequence. By default, the program computes
-its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
+its own lambda sequence based on \code{nlambda} and \code{lambda.min.ratio}. Supplying
 a value of lambda overrides this.}
 
 \item{nlambda}{The number of lambda values - default is 100.}
 
-\item{lambda.min.ratio}{Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
+\item{lambda.min.ratio}{Smallest value for lambda, as a fraction of \code{lambda.max}, the (data derived) entry
 value (i.e. the smallest value for which all coefficients are zero). The default
 depends on the sample size nobs relative to the number of variables nvars. If
-nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
-is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
-when nobs < nvars.}
+\code{nobs > nvars}, the default is 0.0001, close to zero.}
 
 \item{alpha}{mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)}
 
@@ -64,16 +62,16 @@ This is a number that multiplies lambda to allow differential shrinkage. Can be 
 which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
 variables.}
 
-\item{group.weights}{penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+\item{group.weights}{penalty factors applied to each group for the group lasso. Similar to \code{penalty.factor}, 
 this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 groups.}
 
-\item{standardize}{Logical flag for x variable standardization, prior to fitting the models. 
-The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
+\item{standardize}{Logical flag for \code{x} variable standardization, prior to fitting the models. 
+The coefficients are always returned on the original scale. Default is \code{standardize = TRUE}. If 
 variables are in the same units already, you might not wish to standardize.}
 
-\item{intercept}{Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)}
+\item{intercept}{Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})}
 
 \item{maxit}{integer. Maximum number of OEM iterations}
 
@@ -81,13 +79,13 @@ variables are in the same units already, you might not wish to standardize.}
 
 \item{irls.maxit}{integer. Maximum number of IRLS iterations}
 
-\item{irls.tol}{convergence tolerance for IRLS iterations. Only used if family != "gaussian"}
+\item{irls.tol}{convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}}
 
-\item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
-to TRUE will dramatically increase computational time}
+\item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
+to \code{TRUE} will dramatically increase computational time}
 }
 \value{
-An object with S3 class "xval.oem"
+An object with S3 class \code{"xval.oem"}
 }
 \description{
 Orthogonalizing EM

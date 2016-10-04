@@ -1,44 +1,43 @@
 
 #' Orthogonalizing EM
 #'
-#' @param xtx input matrix equal to X'X / nobs  
-#' (it is highly recommended to scale by the number of rows in X).
-#' If xtx is scaled, xty must also be scaled!
-#' @param xty numeric vector of length nvars. Equal to X'Y / nobs. 
-#' (it is highly recommended to scale by the number of rows in X)
-#' @param family "gaussian" for least squares problems, "binomial" for binary response. (only gaussian implemented)
-#' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
-#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
+#' @param xtx input matrix equal to \code{crossprod(x) / nrow(x)}. 
+#' where \code{x} is the design matrix.
+#' It is highly recommended to scale by the number of rows in \code{x}.
+#' If \code{xtx} is scaled, \code{xty} must also be scaled or else results may be meaningless!
+#' @param xty numeric vector of length \code{nvars}. Equal to \code{crosprod(x, y) / nobs}. 
+#' It is highly recommended to scale by the number of rows in \code{x}.
+#' @param family \code{"gaussian"} for least squares problems, \code{"binomial"} for binary response. 
+#' (only \code{gaussian} implemented currently)
+#' @param penalty Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
+#' \code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}
 #' @param lambda A user supplied lambda sequence. By default, the program computes
-#' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
+#' its own lambda sequence based on \code{nlambda} and \code{lambda.min.ratio}. Supplying
 #' a value of lambda overrides this.
 #' @param nlambda The number of lambda values - default is 100.
-#' @param lambda.min.ratio Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
+#' @param lambda.min.ratio Smallest value for lambda, as a fraction of \code{lambda.max}, the (data derived) entry
 #' value (i.e. the smallest value for which all coefficients are zero). The default
-#' depends on the sample size nobs relative to the number of variables nvars. If
-#' nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
-#' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
-#' when nobs < nvars.
+#' depends on the sample size nobs relative to the number of variables nvars. The default is 0.0001
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 #' should be put in group 0
-#' @param scale.factor of length nvars = ncol(xtx) = length(xty) for scaling columns of X. The standard deviation
-#' for each column is a common choice for scale.factor. Coefficients will be returned on original scale. Default is 
+#' @param scale.factor of length \code{nvars === ncol(xtx) == length(xty)} for scaling columns of \code{x}. The standard deviation
+#' for each column of \code{x} is a common choice for \code{scale.factor}. Coefficients will be returned on original scale. Default is 
 #' no scaling.
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
 #' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 #' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
 #' variables. 
-#' @param group.weights penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+#' @param group.weights penalty factors applied to each group for the group lasso. Similar to \code{penalty.factor}, 
 #' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
-#' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
-#' @return An object with S3 class "oemfit" 
+#' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
+#' @return An object with S3 class \code{"oem"}
 #' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
@@ -159,7 +158,7 @@ oem.xtx <- function(xtx,
     
     
     if (is.null(lambda.min.ratio)) {
-        lambda.min.ratio <- ifelse(nrow(x) < ncol(x), 0.01, 0.0001)
+        lambda.min.ratio <- 0.0001
     } else {
         lambda.min.ratio <- as.numeric(lambda.min.ratio)
     }
@@ -254,7 +253,7 @@ oem.xtx <- function(xtx,
     }
     
     nz <- lapply(1:length(res$beta), function(m) 
-        sapply(predict.oemfit(res, type = "nonzero", which.model = m), length) - 1
+        sapply(predict.oem(res, type = "nonzero", which.model = m), length) - 1
     )
     
     res$nvars    <- p
@@ -263,7 +262,7 @@ oem.xtx <- function(xtx,
     res$varnames <- varnames
     res$nzero    <- nz
     
-    class(res)   <- c(class(res), "oemfit")
+    class(res)   <- c(class(res), "oem")
     res
 }
 

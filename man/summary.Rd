@@ -10,7 +10,7 @@
 \method{summary}{xval.oem}(object, ...)
 }
 \arguments{
-\item{object}{fitted "cv.oem" object}
+\item{object}{fitted \code{"cv.oem"} object}
 
 \item{...}{not used}
 }

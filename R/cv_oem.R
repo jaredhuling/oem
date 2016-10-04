@@ -3,34 +3,34 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix or SparseMatrix (sparse not yet implemented. 
+#' @param x input matrix or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
 #' Each row is an observation, each column corresponds to a covariate
 #' @param y numeric response vector of length nobs.
-#' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
-#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
+#' @param penalty Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
+#' \code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}
 #' @param weights observation weights. defaults to 1 for each observation (setting weight vector to 
 #' length 0 will default all weights to 1)
 #' @param lambda A user supplied lambda sequence. By default, the program computes
 #' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
 #' a value of lambda overrides this.
-#' @param type.measure measure to evaluate for cross-validation. The default is type.measure="deviance", 
-#' which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic
-#' regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
-#' regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
+#' @param type.measure measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
+#' which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
+#' regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} is for two-class logistic 
+#' regression only. \code{type.measure = "mse"} or \code{type.measure = "mae"} (mean absolute error) can be used by all models;
 #' they measure the deviation from the fitted mean to the response.
 #' @param nfolds number of folds for cross-validation. default is 10. 3 is smallest value allowed. 
 #' @param foldid an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
-#' @param grouped Like in glmnet, this is an experimental argument, with default TRUE, and can be ignored by most users. 
+#' @param grouped Like in \pkg{glmnet}, this is an experimental argument, with default \code{TRUE}, and can be ignored by most users. 
 #' For all models, this refers to computing nfolds separate statistics, and then using their mean and estimated standard 
-#' error to describe the CV curve. If grouped=FALSE, an error matrix is built up at the observation level from the 
-#' predictions from the nfold fits, and then summarized (does not apply to type.measure="auc"). 
-#' @param keep If keep=TRUE, a prevalidated list of arrasy is returned containing fitted values for each observation 
+#' error to describe the CV curve. If \code{grouped = FALSE}, an error matrix is built up at the observation level from the 
+#' predictions from the \code{nfold} fits, and then summarized (does not apply to \code{type.measure = "auc"}). 
+#' @param keep If \code{keep = TRUE}, a prevalidated list of arrasy is returned containing fitted values for each observation 
 #' and each value of lambda for each model. This means these fits are computed with this observation and the rest of its
-#' fold omitted. The folid vector is also returned. Default is keep=FALSE
-#' @param parallel If TRUE, use parallel foreach to fit each fold. Must register parallel before hand, such as doMC.
-#' @param ncores Number of cores to use. If parallel == TRUE, then ncores will be automatically set to 1 to prevent conflicts
-#' @param ... other parameters to be passed to "oem" function
-#' @return An object with S3 class "cv.oem" 
+#' fold omitted. The folid vector is also returned. Default is \code{keep = FALSE}
+#' @param parallel If TRUE, use parallel foreach to fit each fold. Must register parallel before hand, such as \pkg{doMC}.
+#' @param ncores Number of cores to use. If \code{parallel = TRUE}, then ncores will be automatically set to 1 to prevent conflicts
+#' @param ... other parameters to be passed to \code{"oem"} function
+#' @return An object with S3 class \code{"cv.oem"} 
 #' @export
 #' @examples
 #' set.seed(123)

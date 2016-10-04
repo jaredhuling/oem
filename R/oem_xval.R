@@ -1,32 +1,30 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix or SparseMatrix (sparse not yet implemented. 
+#' @param x input matrix (sparse matrices not yet implemented). 
 #' Each row is an observation, each column corresponds to a covariate
-#' @param y numeric response vector of length nobs.
+#' @param y numeric response vector of length \code{nobs = nrow(x)}.
 #' @param nfolds integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10
-#' @param foldid an optional vector of values between 1 and nfold specifying which fold each observation belongs to.
-#' @param type.measure measure to evaluate for cross-validation. The default is type.measure="deviance", 
-#' which uses squared-error for gaussian models (a.k.a type.measure="mse" there), deviance for logistic
-#' regression. type.measure="class" applies to binomial only. type.measure="auc" is for two-class logistic 
-#' regression only. type.measure="mse" or type.measure="mae" (mean absolute error) can be used by all models;
+#' @param foldid an optional vector of values between 1 and \code{nfold} specifying which fold each observation belongs to.
+#' @param type.measure measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
+#' which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
+#' regression. \code{type.measure = "class"} applies to \code{binomial} only. \code{type.measure = "auc"} is for two-class logistic 
+#' regression only. \code{type.measure="mse"} or \code{type.measure="mae"} (mean absolute error) can be used by all models;
 #' they measure the deviation from the fitted mean to the response.
 #' @param ncores Integer scalar that specifies the number of threads to be used
-#' @param family "gaussian" for least squares problems, "binomial" for binary response. 
-#' @param penalty Specification of penalty type in lowercase letters. Choices include "lasso", 
-#' "ols" (Ordinary least squares, no penaly), "elastic.net", "scad", "mcp", "grp.lasso"
+#' @param family \code{"gaussian"} for least squares problems, \code{"binomial"} for binary response (not implemented yet). 
+#' @param penalty Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
+#' \code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}
 #' @param weights observation weights. defaults to 1 for each observation (setting weight vector to 
 #' length 0 will default all weights to 1)
 #' @param lambda A user supplied lambda sequence. By default, the program computes
-#' its own lambda sequence based on nlambda and lambda.min.ratio. Supplying
+#' its own lambda sequence based on \code{nlambda} and \code{lambda.min.ratio}. Supplying
 #' a value of lambda overrides this.
 #' @param nlambda The number of lambda values - default is 100.
-#' @param lambda.min.ratio Smallest value for lambda, as a fraction of lambda.max, the (data derived) entry
+#' @param lambda.min.ratio Smallest value for lambda, as a fraction of \code{lambda.max}, the (data derived) entry
 #' value (i.e. the smallest value for which all coefficients are zero). The default
 #' depends on the sample size nobs relative to the number of variables nvars. If
-#' nobs > nvars, the default is 0.0001, close to zero. If nobs < nvars, the default
-#' is 0.01. A very small value of lambda.min.ratio will lead to a saturated fit
-#' when nobs < nvars.
+#' \code{nobs > nvars}, the default is 0.0001, close to zero. 
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
@@ -35,21 +33,21 @@
 #' This is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some variables, 
 #' which implies no shrinkage, and that variable is always included in the model. Default is 1 for all 
 #' variables. 
-#' @param group.weights penalty factors applied to each group for the group lasso. Similar to penalty.factor, 
+#' @param group.weights penalty factors applied to each group for the group lasso. Similar to \code{penalty.factor}, 
 #' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
-#' @param standardize Logical flag for x variable standardization, prior to fitting the models. 
-#' The coefficients are always returned on the original scale. Default is standardize=FALSE. If 
+#' @param standardize Logical flag for \code{x} variable standardization, prior to fitting the models. 
+#' The coefficients are always returned on the original scale. Default is \code{standardize = TRUE}. If 
 #' variables are in the same units already, you might not wish to standardize. 
-#' @param intercept Should intercept(s) be fitted (default=TRUE) or set to zero (FALSE)
+#' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
-#' @param irls.tol convergence tolerance for IRLS iterations. Only used if family != "gaussian"
-#' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to FALSE. Setting
-#' to TRUE will dramatically increase computational time
-#' @return An object with S3 class "xval.oem" 
+#' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
+#' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
+#' to \code{TRUE} will dramatically increase computational time
+#' @return An object with S3 class \code{"xval.oem"} 
 #' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
@@ -358,7 +356,7 @@ xval.oem <- function(x,
     }
     
     nz <- lapply(1:length(res$beta), function(m) 
-        sapply(predict.oemfit(res, type = "nonzero", which.model = m), length) - 1
+        sapply(predict.oem(res, type = "nonzero", which.model = m), length) - 1
     )
     
     lamin        <- getmin(res$lambda, res$cvm, res$cvsd)

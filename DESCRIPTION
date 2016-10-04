@@ -1,18 +1,18 @@
 Package: oem
 Type: Package
 Title: Orthogonalizing EM
-Version: 0.1
+Version: 2.0.0
 Date: 2016-05-19
 Author: Jared Huling
 Maintainer: <jaredhuling@gmail.com>
-Description: Solves least squares problems using the orthogonalizing EM algorithm.
+Description: Solving least squares problems using the orthogonalizing EM algorithm.
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
     bigmemory
 Imports: 
     Rcpp (>= 0.11.0), Matrix, foreach, methods
-LinkingTo: Rcpp, RcppEigen, BH, bigmemory
+LinkingTo: Rcpp, RcppEigen, BH, bigmemory, RcppArmadillo
 RoxygenNote: 5.0.1
 Suggests: knitr,
     rmarkdown

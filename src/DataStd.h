@@ -1,3 +1,5 @@
+// Code modified from Yixuan Qiu
+//
 #ifndef DATASTD_H
 #define DATASTD_H
 

@@ -13,3 +13,6 @@ README_files
 ^appveyor\.yml$
 ^.*\.*.bk$
 ^.*\.*.desc$
+^revdep$
+src/old
+src/tmp

@@ -10,19 +10,20 @@
 \arguments{
 \item{object}{fitted "cv.oem" model object}
 
-\item{newx}{Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
+\item{newx}{Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in the 
+\code{CsparseMatrix} objects of the \pkg{Matrix} package
 This argument is not used for type=c("coefficients","nonzero")}
 
-\item{which.model}{If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+\item{which.model}{If multiple penalties are fit and returned in the same \code{oem} object, the \code{which.model} argument is used to 
 specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
-predict.cv.oem, can specify
-"best.model" to use the best model as estimated by cross-validation}
+\code{penalty = c("lasso", "grp.lasso")}, then \code{which.model = 2} provides predictions for the group lasso model. For 
+\code{predict.cv.oem()}, can specify
+\code{"best.model"} to use the best model as estimated by cross-validation}
 
-\item{s}{Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation}
+\item{s}{Value(s) of the penalty parameter \code{lambda} at which predictions are required. Default is the entire sequence used to create 
+the model. For predict.cv.oem, can also specify \code{"lambda.1se"} or \code{"lambda.min"} for best lambdas estimated by cross validation}
 
-\item{...}{used to pass the other arguments for predict.oemfit}
+\item{...}{used to pass the other arguments for \code{predict.oem()}}
 }
 \value{
 An object depending on the type argument

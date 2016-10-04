@@ -4,16 +4,17 @@
 #' Prediction method for Orthogonalizing EM fitted objects
 #'
 #' @param object fitted "oem" model object
-#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
-#' This argument is not used for type=c("coefficients","nonzero")
+#' @param newx Matrix of new values for \code{x} at which predictions are to be made. Must be a matrix; can be sparse as in the 
+#' \code{CsparseMatrix} objects of the \pkg{Matrix} package. 
+#' This argument is not used for \code{type=c("coefficients","nonzero")}
 #' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
 #' the model.
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model.
-#' @param type Type of prediction required. Type == "link" gives the linear predictors for the "binomial" model; for "gaussian" models it gives the fitted values. 
-#' Type == "response" gives the fitted probabilities for "binomial". Type "coefficients" computes the coefficients at the requested values for s.
-#' Type "class" applies only to "binomial" and produces the class label corresponding to the maximum probability.
+#' @param which.model If multiple penalties are fit and returned in the same oem object, the \code{which.model} argument is used to 
+#' specify which model to make predictions for. For example, if the oem object \code{oemobj} was fit with argument 
+#' \code{penalty = c("lasso", "grp.lasso")}, then which.model = 2 provides predictions for the group lasso model.
+#' @param type Type of prediction required. \code{type = "link"} gives the linear predictors for the \code{"binomial"} model; for \code{"gaussian"} models it gives the fitted values. 
+#' \code{type = "response"} gives the fitted probabilities for \code{"binomial"}. \code{type = "coefficients"} computes the coefficients at the requested values for \code{s}.
+#' \code{type = "class"} applies only to \code{"binomial"} and produces the class label corresponding to the maximum probability.
 #' @param ... not used 
 #' @importFrom graphics abline abline axis matplot points segments
 #' @importFrom methods as
@@ -44,12 +45,12 @@
 #' apply(preds.lasso,     2, function(x) mean((y.test - x) ^ 2))
 #' apply(preds.grp.lasso, 2, function(x) mean((y.test - x) ^ 2))
 #' 
-predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
-                           type = c("link",
-                                    "response",
-                                    "coefficients",
-                                    "nonzero",
-                                    "class"), ...) 
+predict.oem <- function(object, newx, s = NULL, which.model = 1,
+                        type = c("link",
+                                 "response",
+                                 "coefficients",
+                                 "nonzero",
+                                 "class"), ...) 
 {
     type <- match.arg(type)
     
@@ -92,9 +93,9 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 #'
 #' @param x fitted "oem" model object
 #' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
-#' @param xvar What is on the X-axis. "norm" plots against the L1-norm of the coefficients, "lambda" against the log-lambda sequence, and "dev" 
+#' specify which model to plot. For example, if the oem object \code{"oemobj"} was fit with argument 
+#' \code{penalty = c("lasso", "grp.lasso")}, then \code{which.model = 2} provides a plot for the group lasso model.
+#' @param xvar What is on the X-axis. \code{"norm"} plots against the L1-norm of the coefficients, \code{"lambda"} against the log-lambda sequence, and \code{"dev"}
 #' against the percent deviance explained.
 #' @param labsize size of labels for variable names. If labsize = 0, then no variable names will be plotted
 #' @param xlab label for x-axis
@@ -119,11 +120,11 @@ predict.oemfit <- function(object, newx, s = NULL, which.model = 1,
 #' plot(fit, which.model = 1)
 #' plot(fit, which.model = 2)
 #' 
-plot.oemfit <- function(x, which.model = 1,
-                        xvar = c("norm", "lambda", "loglambda", "dev"),
-                        labsize = 0.6,
-                        xlab = iname, ylab = "Coefficients", 
-                        ...) 
+plot.oem <- function(x, which.model = 1,
+                     xvar = c("norm", "lambda", "loglambda", "dev"),
+                     labsize = 0.6,
+                     xlab = iname, ylab = "Coefficients", 
+                     ...) 
 {
     num.models <- length(x$beta)
     if (which.model > num.models)
@@ -196,7 +197,7 @@ plot.oemfit <- function(x, which.model = 1,
 }
 
 
-#' @param sign.lambda Either plot against log(lambda) (default) or its negative if sign.lambda=-1.
+#' @param sign.lambda Either plot against log(lambda) (default) or its negative if \code{sign.lambda = -1}.
 #' @rdname plot
 #' @method plot cv.oem
 #' @export 
@@ -329,9 +330,9 @@ predict.oemfit_xval_binomial <- function(object, newx, s=NULL, which.model = 1,
 #' log likelihood function for fitted oem objects
 #'
 #' @param object fitted "oem" model object.
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to plot. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides a plot for the group lasso model.
+#' @param which.model If multiple penalties are fit and returned in the same \code{oem} object, the \code{which.model} argument is used to 
+#' specify which model to plot. For example, if the oem object \code{"oemobj"} was fit with argument 
+#' \code{penalty = c("lasso", "grp.lasso")}, then \code{which.model = 2} provides a plot for the group lasso model.
 #' @param ... not used
 #' @rdname logLik
 #' @export
@@ -348,7 +349,7 @@ predict.oemfit_xval_binomial <- function(object, newx, s=NULL, which.model = 1,
 #'
 #' logLik(fit)
 #'
-logLik.oemfit <- function(object, which.model = 1, ...) {
+logLik.oem <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
     n <- as.numeric(object$nobs)
     
@@ -387,7 +388,7 @@ logLik.oemfit <- function(object, which.model = 1, ...) {
 }
 
 
-#' log likelihood function for fitted cross validation oem objects
+#' log likelihood function for fitted cross validation \code{oem} objects
 #'
 #' @rdname logLik
 #' @method logLik cv.oem
@@ -439,7 +440,7 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 }
 
 
-#' log likelihood function for fitted cross validation oem objects
+#' log likelihood function for fitted cross validation \code{oem} objects
 #'
 #' @rdname logLik
 #' @method logLik xval.oem
@@ -496,17 +497,18 @@ logLik.xval.oem <- function(object, which.model = 1, ...) {
 
 #' Prediction function for fitted cross validation oem objects
 #'
-#' @param object fitted "cv.oem" model object
-#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
-#' This argument is not used for type=c("coefficients","nonzero")
+#' @param object fitted \code{"cv.oem"} model object
+#' @param newx Matrix of new values for \code{x} at which predictions are to be made. Must be a matrix; can be sparse as in the 
+#' \code{CsparseMatrix} objects of the \pkg{Matrix} package
+#' This argument is not used for \code{type = c("coefficients","nonzero")}
 #' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
-#' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
-#' predict.cv.oem, can specify
-#' "best.model" to use the best model as estimated by cross-validation
-#' @param ... used to pass the other arguments for predict.oemfit
+#' the model. For \code{predict.cv.oem()}, can also specify \code{"lambda.1se"} or \code{"lambda.min"} for best lambdas estimated by cross validation
+#' @param which.model If multiple penalties are fit and returned in the same \code{oem} object, the \code{which.model} argument is used to 
+#' specify which model to make predictions for. For example, if the oem object \code{"oemobj"} was fit with argument 
+#' \code{penalty = c("lasso", "grp.lasso")}, then \code{which.model = 2} provides predictions for the group lasso model. For 
+#' \code{predict.cv.oem()}, can specify
+#' \code{"best.model"} to use the best model as estimated by cross-validation
+#' @param ... used to pass the other arguments for predict.oem
 #' @return An object depending on the type argument
 #' @method predict cv.oem
 #' @export 
@@ -565,16 +567,17 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
 #' Prediction function for fitted cross validation oem objects
 #'
 #' @param object fitted "cv.oem" model object
-#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in Matrix package. 
+#' @param newx Matrix of new values for x at which predictions are to be made. Must be a matrix; can be sparse as in the 
+#' \code{CsparseMatrix} objects of the \pkg{Matrix} package
 #' This argument is not used for type=c("coefficients","nonzero")
-#' @param s Value(s) of the penalty parameter lambda at which predictions are required. Default is the entire sequence used to create 
-#' the model. For predict.cv.oem, can also specify "lambda.1se" or "lambda.min" for best lambdas estimated by cross validation
-#' @param which.model If multiple penalties are fit and returned in the same oem object, the which.model argument is used to 
+#' @param s Value(s) of the penalty parameter \code{lambda} at which predictions are required. Default is the entire sequence used to create 
+#' the model. For predict.cv.oem, can also specify \code{"lambda.1se"} or \code{"lambda.min"} for best lambdas estimated by cross validation
+#' @param which.model If multiple penalties are fit and returned in the same \code{oem} object, the \code{which.model} argument is used to 
 #' specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
-#' penalty = c("lasso", "grp.lasso"), then which.model = 2 provides predictions for the group lasso model. For 
-#' predict.cv.oem, can specify
-#' "best.model" to use the best model as estimated by cross-validation
-#' @param ... used to pass the other arguments for predict.oemfit
+#' \code{penalty = c("lasso", "grp.lasso")}, then \code{which.model = 2} provides predictions for the group lasso model. For 
+#' \code{predict.cv.oem()}, can specify
+#' \code{"best.model"} to use the best model as estimated by cross-validation
+#' @param ... used to pass the other arguments for \code{predict.oem()}
 #' @return An object depending on the type argument
 #' @method predict xval.oem
 #' @export 
@@ -625,7 +628,7 @@ predict.xval.oem <- function(object, newx, which.model = "best.model",
         mod.num <- object[["model.min"]]
     }
     else stop("Invalid form for which.model")
-    predict.oemfit(object, newx, s=lambda, which.model = mod.num, ...)
+    predict.oem(object, newx, s=lambda, which.model = mod.num, ...)
 }
 
 
@@ -635,8 +638,8 @@ predict.xval.oem <- function(object, newx, which.model = "best.model",
 
 #' Plot method for Orthogonalizing EM fitted objects
 #'
-#' @param type one of "cv" or "coefficients". type = "cv" will produce a plot of cross validation results like plot.cv.oem. 
-#' type = "coefficients" will produce a coefficient path plot like plot.oemfit
+#' @param type one of \code{"cv"} or \code{"coefficients"}. \code{type = "cv"} will produce a plot of cross validation results like plot.cv.oem. 
+#' \code{type = "coefficients"} will produce a coefficient path plot like \code{plot.oem()}
 #' @rdname plot
 #' @method plot xval.oem
 #' @export
@@ -767,7 +770,7 @@ plot.xval.oem <- function(x, which.model = 1,
 
 #' summary method for cross validation Orthogonalizing EM fitted objects
 #'
-#' @param object fitted "cv.oem" object
+#' @param object fitted \code{"cv.oem"} object
 #' @param ... not used
 #' @rdname summary
 #' @method summary cv.oem
@@ -807,7 +810,7 @@ summary.xval.oem <- function(object, ...) {
     structure(val, class="summary.cv.oem")
 }
 
-#' print method for summary.cv.oem objects
+#' print method for \code{summary.cv.oem} objects
 #'
 #' @param x a "summary.cv.oem" object
 #' @param digits digits to display

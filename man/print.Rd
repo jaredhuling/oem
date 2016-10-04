@@ -2,7 +2,7 @@
 % Please edit documentation in R/methods.R
 \name{print.summary.cv.oem}
 \alias{print.summary.cv.oem}
-\title{print method for summary.cv.oem objects}
+\title{print method for \code{summary.cv.oem} objects}
 \usage{
 \method{print}{summary.cv.oem}(x, digits, ...)
 }
@@ -14,6 +14,6 @@
 \item{...}{not used}
 }
 \description{
-print method for summary.cv.oem objects
+print method for \code{summary.cv.oem} objects
 }
 
