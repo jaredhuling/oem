@@ -2,14 +2,19 @@ Package: oem
 Type: Package
 Title: Orthogonalizing EM
 Version: 2.0.1
-Date: 2016-05-19
-Author: Jared Huling
-Maintainer: <jaredhuling@gmail.com>
+Date: 2016-10-04
+Authors@R: c(
+    person("Bin", "Dai", , "dai@stat.wisc.edu", role = c("aut")),
+    person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre"))
+    )
+Maintainer: Jared Huling <jaredhuling@gmail.com>
 Description: Solving least squares problems using the orthogonalizing EM algorithm.
+URL: https://github.com/jaredhuling/oem
+BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
-    R (>= 3.0.2),
+    R (>= 3.2.0),
     bigmemory
 Imports: 
     Rcpp (>= 0.11.0), 

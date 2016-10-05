@@ -71,28 +71,6 @@
 #'                              penalty = c("lasso", "grp.lasso"), 
 #'                              groups = rep(1:20, each = 5)))
 #' 
-#' layout(matrix(1:2, ncol = 2))
-#' plot(fit)
-#' plot(fit, which.model = 2)
-#' 
-#' # logistic
-#' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
-#' 
-#' system.time(res <- oem(x, y, intercept = FALSE, 
-#'                        penalty = "lasso", 
-#'                        family = "binomial", 
-#'                        irls.tol = 1e-3, tol = 1e-8))
-#' 
-#' system.time(res.gr <- oem(x, y, intercept = FALSE, 
-#'                           penalty = "grp.lasso", 
-#'                           family = "binomial", 
-#'                           groups = rep(1:10, each = 10), 
-#'                           irls.tol = 1e-3, tol = 1e-8))
-#' 
-#' layout(matrix(1:2, ncol = 2))
-#' plot(res)
-#' plot(res.gr)
-#' 
 xval.oem <- function(x, 
                      y, 
                      nfolds           = 10L,
