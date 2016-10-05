@@ -3,9 +3,6 @@
 platform:
   - x86
 
-environment:
-  R_CHECK_ARGS: --as-cran
-
 # Download script file from GitHub
 init:
   ps: |
@@ -57,9 +54,12 @@ environment:
   matrix:
   - R_VERSION: stable
     R_ARCH: x64
+    R_CHECK_ARGS: --as-cran
     
   - R_VERSION: patched
     R_ARCH: x64
+    R_CHECK_ARGS: --as-cran
     
   - R_VERSION: devel
     R_ARCH: x64
+    R_CHECK_ARGS: --as-cran
