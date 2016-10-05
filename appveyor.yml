@@ -47,6 +47,8 @@ artifacts:
 
 # Adapt as necessary starting from here
 
+R_CHECK_ARGS: --as-cran
+
 environment:
   global:
     WARNINGS_ARE_ERRORS: 1

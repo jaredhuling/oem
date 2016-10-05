@@ -4,7 +4,7 @@ Title: Orthogonalizing EM
 Version: 2.0.1
 Date: 2016-10-04
 Authors@R: c(
-    person("Bin", "Dai", , "dai@stat.wisc.edu", role = c("aut")),
+    person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
     person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre"))
     )
 Maintainer: Jared Huling <jaredhuling@gmail.com>

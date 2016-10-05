@@ -14,3 +14,6 @@ New maintainer:
   Jared Huling <jaredhuling@gmail.com>
 Old maintainer(s):
   Bin Dai <dai@stat.wisc.edu>
+
+
+system('set PATH=%PATH%;C:/Program Files/qpdf-5.1.2/bin')
