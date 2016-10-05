@@ -54,12 +54,9 @@ environment:
   matrix:
   - R_VERSION: stable
     R_ARCH: x64
-    R_CHECK_ARGS: --as-cran
     
   - R_VERSION: patched
     R_ARCH: x64
-    R_CHECK_ARGS: --as-cran
     
   - R_VERSION: devel
     R_ARCH: x64
-    R_CHECK_ARGS: --as-cran
