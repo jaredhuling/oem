@@ -3,6 +3,9 @@
 platform:
   - x86
 
+environment:
+  R_CHECK_ARGS: --as-cran
+
 # Download script file from GitHub
 init:
   ps: |
@@ -46,8 +49,6 @@ artifacts:
 
 
 # Adapt as necessary starting from here
-
-R_CHECK_ARGS: --as-cran
 
 environment:
   global:
