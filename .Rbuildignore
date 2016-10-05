@@ -17,3 +17,4 @@ README_files
 src/old
 src/tmp
 revdep
+^NEWS\.md$

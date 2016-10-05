@@ -2,7 +2,6 @@ language: r
 cache: packages
 r:
   - release
-  - devel
 
 r_check_args: --as-cran
 
