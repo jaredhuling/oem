@@ -9,7 +9,7 @@ Description: Solving least squares problems using the orthogonalizing EM algorit
 License: GPL (>= 2)
 LazyData: TRUE
 Depends:
-    R (>= 3.0.2)
+    R (>= 3.0.2),
     bigmemory
 Imports: 
     Rcpp (>= 0.11.0), 
