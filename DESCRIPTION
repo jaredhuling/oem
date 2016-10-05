@@ -1,7 +1,7 @@
 Package: oem
 Type: Package
 Title: Orthogonalizing EM
-Version: 2.0.0
+Version: 2.0.1
 Date: 2016-05-19
 Author: Jared Huling
 Maintainer: <jaredhuling@gmail.com>
