@@ -8,7 +8,10 @@ Authors@R: c(
     person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre"))
     )
 Maintainer: Jared Huling <jaredhuling@gmail.com>
-Description: Solving least squares problems using the orthogonalizing EM algorithm.
+Description: Contains functions for solving penalized least squares problems using the orthogonalizing EM algorithm 
+of Xiong et al. (2016) <http://dx.doi.org/10.1080/00401706.2015.1054436>. The main function is oem and the functions cv.oem and xval.oem
+are for cross validation, the latter being an accelerated cross validation function for linear models. The big.oem function
+allows for out of memory fitting.
 URL: https://github.com/jaredhuling/oem
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
