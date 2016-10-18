@@ -1,7 +1,7 @@
 
 ## New Maintainer for 'oem'
 
-Added more thorough description to the description file. 
+Contributor addition
 
 Jared Huling will be taking over Bin Dai's role of the maintainer of the oem package.
 
