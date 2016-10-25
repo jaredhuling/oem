@@ -1,3 +1,4 @@
+[![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
 
 ### Build Status
 |  OS             | Build           |
