@@ -203,7 +203,7 @@ protected:
             MatrixXd XXtmp(XXdim, XXdim);
             XXtmp.setZero();
             
-            int numrowscurfirst = floor(nobs / ncores);
+            int numrowscurfirst = std::floor(double(nobs) / double(ncores) );
             
             #pragma omp parallel
             {
@@ -218,7 +218,7 @@ protected:
                     
                     if (ff + 1 == ncores)
                     {
-                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        int numrowscur = nobs - (ncores - 1) * std::floor(double(nobs) / double(ncores));
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
                                          rankUpdate(X.bottomRows(numrowscur).adjoint());
                     } else 
@@ -254,7 +254,7 @@ protected:
             MatrixXd XXtmp(XXdim, XXdim);
             XXtmp.setZero();
             
-            int numrowscurfirst = floor(nobs / ncores);
+            int numrowscurfirst = std::floor(double(nobs) / double(ncores));
             
             #pragma omp parallel
             {
@@ -270,7 +270,7 @@ protected:
                     
                     if (ff + 1 == ncores)
                     {
-                        int numrowscur = nobs - (ncores - 1) * floor(nobs / ncores);
+                        int numrowscur = nobs - (ncores - 1) * std::floor(double(nobs) / double(ncores));
                         XXtmp_private += MatrixXd(XXdim, XXdim).setZero().selfadjointView<Lower>().
                                          rankUpdate(X.bottomRows(numrowscur).adjoint() * 
                                          (weights.tail(numrowscur).array().sqrt().matrix()).asDiagonal());

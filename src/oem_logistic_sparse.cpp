@@ -1,5 +1,5 @@
-
 #include "oem_logistic_sparse.h"
+
 
 using Eigen::MatrixXf;
 using Eigen::VectorXf;
