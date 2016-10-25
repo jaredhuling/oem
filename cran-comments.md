@@ -1,9 +1,7 @@
 
-## New Maintainer for 'oem'
+## Patch for 'oem'
 
-Contributor addition
-
-Jared Huling will be taking over Bin Dai's role of the maintainer of the oem package.
+Fixed overload ambiguity for floor calls. Was told to fix this ASAP
 
 ## Test environments
 
@@ -16,7 +14,6 @@ Jared Huling will be taking over Bin Dai's role of the maintainer of the oem pac
 0 ERRORs | 0 WARNINGs | 1 NOTE
 
 NOTE:
-New maintainer:
-  Jared Huling <jaredhuling@gmail.com>
-Old maintainer(s):
-  Bin Dai <dai@stat.wisc.edu>
+Maintainer: 'Jared Huling <jaredhuling@gmail.com>'
+
+Days since last update: 6
