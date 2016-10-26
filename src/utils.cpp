@@ -268,10 +268,10 @@ void block_soft_threshold(SpVec &res, const VectorXd &vec, const double &penalty
       for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
       {
         int c_idx = gr_idx[v];
-        ds_norm += pow(vec(c_idx), 2);
+        ds_norm += std::pow(vec(c_idx), 2);
       }
-      ds_norm = sqrt(ds_norm);
-      double grp_wts = sqrt(gr_idx.size());
+      ds_norm = std::sqrt(ds_norm);
+      double grp_wts = std::sqrt(gr_idx.size());
       thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
     }
     if (thresh_factor != 0.0)
@@ -314,8 +314,8 @@ void block_soft_threshold(VectorXd &res, const VectorXd &vec, const double &pena
         int c_idx = gr_idx[v];
         ds_norm += pow(vec(c_idx), 2);
       }
-      ds_norm = sqrt(ds_norm);
-      double grp_wts = sqrt(gr_idx.size());
+      ds_norm = std::sqrt(ds_norm);
+      double grp_wts = std::sqrt(gr_idx.size());
       thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
     }
     if (thresh_factor != 0.0)

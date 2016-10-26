@@ -185,9 +185,9 @@ protected:
                 for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
                 {
                     int c_idx = gr_idx[v];
-                    ds_norm += pow(vec(c_idx), 2);
+                    ds_norm += std::pow(vec(c_idx), 2);
                 }
-                ds_norm = sqrt(ds_norm);
+                ds_norm = std::sqrt(ds_norm);
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
                 thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
@@ -528,7 +528,7 @@ protected:
                 group_weights.resize(ngroups);
                 for (int g = 0; g < ngroups; ++g) 
                 {
-                    group_weights(g) = sqrt(double(grp_idx[g].size()));
+                    group_weights(g) = std::sqrt(double(grp_idx[g].size()));
                 }
             }
         }
