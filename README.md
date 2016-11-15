@@ -21,6 +21,11 @@ Install using the **devtools** package (RcppEigen must be installed first as wel
 devtools::install_github("jaredhuling/oem")
 ```
 
+or by downloading from CRAN:
+```r
+install.packages("oem")
+```
+
 or by cloning and building using `R CMD INSTALL`
 
 ## Models
@@ -297,7 +302,6 @@ system.time(res <- oem(x, y, penalty = "grp.lasso",
 ```
 
 ```r
-# memory usage is out of control here.
 # oem uses approximately 1/3 of the memory
 system.time(res2 <- grpreg(x, y, group = groups, 
                            eps = 1e-10, lambda = res$lambda))
