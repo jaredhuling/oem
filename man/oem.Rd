@@ -10,8 +10,8 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
   group.weights = NULL, standardize = TRUE, intercept = TRUE,
   maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  ncores = -1, compute.loss = FALSE, hessian.type = c("full",
-  "upper.bound"))
+  accelerate = FALSE, ncores = -1, compute.loss = FALSE,
+  hessian.type = c("full", "upper.bound"))
 }
 \arguments{
 \item{x}{input matrix or \code{CsparseMatrix} object of the \pkg{Matrix} package. 
@@ -72,6 +72,8 @@ slightly different for a sparse matrix object and a dense matrix object}
 \item{irls.maxit}{integer. Maximum number of IRLS iterations}
 
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}}
+
+\item{accelerate}{boolean argument. Whether or not to use Nesterov acceleration with adaptive restarting}
 
 \item{ncores}{Integer scalar that specifies the number of threads to be used}
 

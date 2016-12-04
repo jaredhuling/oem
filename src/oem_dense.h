@@ -61,6 +61,7 @@ protected:
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
+    bool accelerate;
     std::string penalty;       // penalty specified
     
     double lambda;             // L1 penalty
@@ -68,6 +69,7 @@ protected:
     
     double threshval;
     int wt_len;
+    double ak, ak_prev;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -391,6 +393,7 @@ protected:
     
     void next_beta(Vector &res)
     {
+        VectorXd beta_last = beta;
         if (penalty == "lasso")
         {
             soft_threshold(beta, u, lambda, penalty_factor, d);
@@ -415,6 +418,26 @@ protected:
                                  unique_groups, groups);
         }
         
+        if (accelerate)
+        {
+            ak_prev = ak;
+            ak      = 0.5 * (1 + std::sqrt(1 + 4 * std::pow(ak, 2)));
+            double ratio_k = (ak_prev - 1) / ak;
+            
+            VectorXd beta_update = beta;
+            VectorXd beta_diff = beta - beta_last;
+            beta.array() += ratio_k * beta_diff.array();
+            
+            double adaptive_val = ((beta.array() - beta_update.array()).array() * 
+                                   beta_diff.array()).sum();
+                
+            if (adaptive_val > 0)
+            {
+                ak = 1;
+                //beta = beta_last.array() * 0.90 + beta.array() * 0.1;
+            }
+        }
+        
     }
     
     
@@ -431,7 +454,8 @@ public:
              bool &intercept_,
              bool &standardize_,
              int &ncores_,
-             const double tol_ = 1e-6) :
+             const double tol_ = 1e-6,
+             const bool accelerate_ = false) :
     oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
                              unique_groups_.size(),
@@ -453,7 +477,8 @@ public:
                              gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
                              ncores(ncores_),
-                             grp_idx(unique_groups_.size())
+                             grp_idx(unique_groups_.size()),
+                             accelerate(accelerate_)
     
     {}
     
@@ -494,6 +519,8 @@ public:
         // get indexes of members of each group.
         // best to do just once in the beginning
         get_group_indexes();
+        
+        ak = 1;
         
     }
     // when computing for the next lambda, we can use the

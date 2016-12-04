@@ -41,6 +41,7 @@
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
+#' @param accelerate boolean argument. Whether or not to use Nesterov acceleration with adaptive restarting 
 #' @param ncores Integer scalar that specifies the number of threads to be used
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 #' to \code{TRUE} will dramatically increase computational time
@@ -144,6 +145,7 @@ oem <- function(x,
                 tol = 1e-7,
                 irls.maxit = 100L,
                 irls.tol = 1e-3,
+                accelerate = FALSE,
                 ncores = -1,
                 compute.loss = FALSE,
                 hessian.type = c("full", "upper.bound")) 
@@ -305,6 +307,7 @@ oem <- function(x,
     intercept     <- as.logical(intercept)
     compute.loss  <- as.logical(compute.loss)
     ncores        <- as.integer(ncores[1])
+    accelerate    <- as.logical(accelerate)
     
     if(maxit <= 0 | irls.maxit <= 0)
     {
@@ -321,7 +324,8 @@ oem <- function(x,
                     irls_maxit   = irls.maxit,
                     irls_tol     = irls.tol,
                     ncores       = ncores,
-                    hessian.type = hessian.type)
+                    hessian.type = hessian.type,
+                    accelerate   = accelerate)
     
     res <- switch(family,
                   "gaussian" = oemfit.gaussian(is.sparse,

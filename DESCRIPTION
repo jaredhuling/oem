@@ -1,8 +1,8 @@
 Package: oem
 Type: Package
 Title: Orthogonalizing EM
-Version: 2.0.3
-Date: 2016-10-25
+Version: 2.0.4
+Date: 2016-12-04
 Authors@R: c(
     person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
     person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre")),

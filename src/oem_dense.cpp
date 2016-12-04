@@ -86,6 +86,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     bool intercept         = as<bool>(intercept_);
     bool intercept_bin     = intercept;
     bool compute_loss      = as<bool>(compute_loss_);
+    const bool accelerate  = as<double>(opts["accelerate"]);
     
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
@@ -141,12 +142,12 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     
     
     // initialize classes
-    
     if (family(0) == "gaussian")
     {
         solver = new oemDense(X, Y, weights, groups, unique_groups, 
                               group_weights, penalty_factor, 
-                              alpha, gamma, intercept, standardize, ncores, tol);
+                              alpha, gamma, intercept, standardize, 
+                              ncores, tol, accelerate);
     } else if (family(0) == "binomial")
     {
         throw std::invalid_argument("binomial not available for oem_fit_dense, use oem_fit_logistic_dense");
