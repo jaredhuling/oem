@@ -38,7 +38,7 @@ RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
         // these need to be RowVectorXd if 
         // we do not transpose A first
         Eigen::RowVectorXd mean = A.colwise().mean();
-        Eigen::RowVectorXd std = ((A.rowwise() - mean).array().square().colwise().sum() / (n - 1)).sqrt();
+        Eigen::RowVectorXd std = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
         
         MatrixXd AAt(MatrixXd(n, n).setZero().
                          selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).matrix() ));
@@ -68,7 +68,7 @@ RcppExport SEXP crossprodcpp_scaled(SEXP X)
         // these need to be RowVectorXd if 
         // we do not transpose A first
         Eigen::RowVectorXd mean = A.colwise().mean();
-        Eigen::RowVectorXd std = ((A.rowwise() - mean).array().square().colwise().sum() / (n - 1)).sqrt();
+        Eigen::RowVectorXd std = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
         
         
         // this currently induces a copy, need to fix if possible
