@@ -103,12 +103,7 @@ RcppExport SEXP largestEig(SEXP X)
         using Eigen::Lower;
         
         Rcpp::NumericMatrix xx(X);
-        const int n = xx.rows();
-        
-        MatrixXd A(n, n);
-        
-        // Copy data 
-        std::copy(xx.begin(), xx.end(), A.data());
+        const Map<const MatrixXd> A = as< Map<const MatrixXd> >(xx);
         
         Spectra::DenseSymMatProd<double> op(A);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
