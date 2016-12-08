@@ -38,10 +38,10 @@ RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
         // these need to be RowVectorXd if
         // we do not transpose A first
         Eigen::RowVectorXd mean = A.colwise().mean();
-        Eigen::RowVectorXd std = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
+        Eigen::RowVectorXd sd = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
 
         MatrixXd AAt(MatrixXd(n, n).setZero().
-                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).matrix() ));
+                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / sd.array()).matrix() ));
 
         return wrap(AAt);
     } catch (std::exception &ex) {
@@ -68,12 +68,12 @@ RcppExport SEXP crossprodcpp_scaled(SEXP X)
         // these need to be RowVectorXd if
         // we do not transpose A first
         Eigen::RowVectorXd mean = A.colwise().mean();
-        Eigen::RowVectorXd std = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
+        Eigen::RowVectorXd sd = ((A.rowwise() - mean).colwise().squaredNorm() / (n - 1)).cwiseSqrt();
 
 
         // this currently induces a copy, need to fix if possible
         MatrixXd AtA(MatrixXd(p, p).setZero().
-                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / std.array()).array().matrix().adjoint() ));
+                         selfadjointView<Lower>().rankUpdate(((A.rowwise() - mean).array().rowwise() / sd.array()).array().matrix().adjoint() ));
 
         return wrap(AtA);
     } catch (std::exception &ex) {
