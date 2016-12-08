@@ -140,7 +140,7 @@ RcppExport SEXP xpwx(SEXP X, SEXP W)
     const Eigen::Map<MatrixXd> diag(as<Map<MatrixXd> >(W));
     const int n(A.cols());
     MatrixXd AtA(MatrixXd(n, n).setZero().
-    selfadjointView<Lower>().rankUpdate(A.adjoint() * diag.sqrt()));
+    selfadjointView<Lower>().rankUpdate(A.adjoint() * diag.cwiseSqrt()));
     return wrap(AtA);
   } catch (std::exception &ex) {
     forward_exception_to_r(ex);
