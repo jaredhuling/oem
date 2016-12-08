@@ -1,14 +1,10 @@
 
 #include "Rutils.h"
 
-using namespace Rcpp;
-using namespace RcppEigen;
-
 //port faster cross product 
 RcppExport SEXP crossprodcpp(SEXP X)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::Map;
     using Eigen::MatrixXd;
@@ -31,7 +27,6 @@ RcppExport SEXP crossprodcpp(SEXP X)
 RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
 {
     using namespace Rcpp;
-    using namespace RcppEigen;
     try {
         using Eigen::Map;
         using Eigen::MatrixXd;
@@ -61,7 +56,6 @@ RcppExport SEXP tcrossprodcpp_scaled(SEXP X)
 RcppExport SEXP crossprodcpp_scaled(SEXP X)
 {
     using namespace Rcpp;
-    using namespace RcppEigen;
     try {
         using Eigen::Map;
         using Eigen::MatrixXd;
@@ -96,7 +90,6 @@ RcppExport SEXP crossprodcpp_scaled(SEXP X)
 RcppExport SEXP largestEig(SEXP X)
 {
     using namespace Rcpp;
-    using namespace RcppEigen;
     try {
         using Eigen::Map;
         using Eigen::MatrixXd;
@@ -126,7 +119,6 @@ RcppExport SEXP largestEig(SEXP X)
 RcppExport SEXP xpwx(SEXP X, SEXP W)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::Map;
     using Eigen::MatrixXd;
@@ -149,7 +141,6 @@ RcppExport SEXP xpwx(SEXP X, SEXP W)
 RcppExport SEXP xxt(SEXP X)
 {
     using namespace Rcpp;
-    using namespace RcppEigen;
     try {
         using Eigen::Map;
         using Eigen::MatrixXd;
@@ -172,7 +163,6 @@ RcppExport SEXP xxt(SEXP X)
 RcppExport SEXP subcpp(SEXP BB, SEXP CC)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::Map;
     using Eigen::MatrixXd;
@@ -193,7 +183,6 @@ RcppExport SEXP subcpp(SEXP BB, SEXP CC)
 RcppExport SEXP addcpp(SEXP BB, SEXP CC)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::Map;
     using Eigen::MatrixXd;
@@ -215,7 +204,6 @@ RcppExport SEXP addcpp(SEXP BB, SEXP CC)
 RcppExport SEXP subSparsecpp(SEXP BB, SEXP CC)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::MappedSparseMatrix;
     using Eigen::SparseMatrix;
@@ -237,7 +225,6 @@ RcppExport SEXP subSparsecpp(SEXP BB, SEXP CC)
 RcppExport SEXP addSparsecpp(SEXP BB, SEXP CC)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::MappedSparseMatrix;
     using Eigen::SparseMatrix;
@@ -259,7 +246,6 @@ RcppExport SEXP addSparsecpp(SEXP BB, SEXP CC)
 RcppExport SEXP LanczosBidiag(SEXP A, SEXP v, SEXP k)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Rcpp::List;
     using Eigen::Map;
@@ -325,7 +311,6 @@ RcppExport SEXP LanczosBidiag(SEXP A, SEXP v, SEXP k)
 RcppExport SEXP LanczosBidiagSparse(SEXP A, SEXP v, SEXP k)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Rcpp::List;
     using Eigen::Map;
@@ -395,7 +380,6 @@ RcppExport SEXP LanczosBidiagSparse(SEXP A, SEXP v, SEXP k)
 RcppExport SEXP BidiagPoly(SEXP X, SEXP alpha, SEXP beta)
 {
   using namespace Rcpp;
-  using namespace RcppEigen;
   try {
     using Eigen::MatrixXd;
     using Eigen::VectorXd;
