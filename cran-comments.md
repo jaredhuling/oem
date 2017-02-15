@@ -11,9 +11,7 @@ Fixed overload ambiguity for floor calls. Was told to fix this ASAP
 
 ## R CMD check results
 
-0 ERRORs | 0 WARNINGs | 1 NOTE
+Status: OK
 
-NOTE:
-Maintainer: 'Jared Huling <jaredhuling@gmail.com>'
 
-Days since last update: 6
+R CMD check succeeded

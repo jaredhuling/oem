@@ -100,7 +100,7 @@
 #' system.time(res <- oem(x, y, intercept = FALSE, 
 #'                        penalty = "lasso", 
 #'                        family = "binomial", 
-#'                        nlambda = 25,
+#'                        nlambda = 10,
 #'                        irls.tol = 1e-3, tol = 1e-8))
 #' 
 #' 
@@ -113,14 +113,14 @@
 #' system.time(res.gr <- oem(x.dense, ys, intercept = FALSE, 
 #'                           penalty = "grp.lasso", 
 #'                           family = "binomial", 
-#'                           nlambda = 15,
+#'                           nlambda = 10,
 #'                           groups = rep(1:5, each = 10), 
 #'                           irls.tol = 1e-3, tol = 1e-8))
 #'                           
 #' system.time(res.gr.s <- oem(xs, ys, intercept = FALSE, 
 #'                             penalty = "grp.lasso", 
 #'                             family = "binomial", 
-#'                             nlambda = 15,
+#'                             nlambda = 10,
 #'                             groups = rep(1:5, each = 10), 
 #'                             irls.tol = 1e-3, tol = 1e-8))
 #'                             
