@@ -1,7 +1,7 @@
 
 ## Patch for 'oem'
 
-Fixed an error encountered by some Mac users, various c++ optimizations
+Fixed an error encountered by some Mac users, various c++ optimizations, tried to fix 'Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols' error
 
 ## Test environments
 
