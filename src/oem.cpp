@@ -176,15 +176,15 @@ arma::colvec positive(arma::colvec input)
 
 // main port function to R
 RcppExport SEXP oemfit(SEXP X,        // design matrix
-		       SEXP Y,
-		       SEXP maxIter,
-		       SEXP tolerance,
-		       SEXP lambda,
-		       SEXP method,
-		       SEXP numGroup,
-		       SEXP alpha_,
-		       SEXP evaluate_,
-		       SEXP oem_condition) 
+        		       SEXP Y,
+        		       SEXP maxIter,
+        		       SEXP tolerance,
+        		       SEXP lambda,
+        		       SEXP method,
+        		       SEXP numGroup,
+        		       SEXP alpha_,
+        		       SEXP evaluate_,
+        		       SEXP oem_condition) 
 {
   using namespace Rcpp;
   using namespace arma;
