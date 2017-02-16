@@ -1,4 +1,5 @@
-
+#include <Rutils.h>
+#include <oem_construction.h>
 #include <Rdefines.h>
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>

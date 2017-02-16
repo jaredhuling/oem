@@ -1,5 +1,5 @@
-#ifndef _oem2_RUTILS_H
-#define _oem2_RUTILS_H
+#ifndef _oem_RUTILS_H
+#define _oem_RUTILS_H
 
 #include "Spectra/SymEigsSolver.h"
 #include <Rcpp.h>
