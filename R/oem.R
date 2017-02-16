@@ -51,7 +51,7 @@
 #' @return An object with S3 class "oem" 
 #' @references Shifeng Xiong, Bin Dai, Jared Huling, and Peter Z. G. Qian. Orthogonalizing
 #' EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
-#' @useDynLib oem
+#' @useDynLib oem, .registration=TRUE
 #' @import Rcpp
 #' @import Matrix
 #' @import foreach

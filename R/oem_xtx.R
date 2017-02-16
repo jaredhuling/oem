@@ -38,7 +38,6 @@
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
 #' @return An object with S3 class \code{"oem"}
-#' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
 #' @import foreach

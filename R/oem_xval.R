@@ -48,7 +48,6 @@
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 #' to \code{TRUE} will dramatically increase computational time
 #' @return An object with S3 class \code{"xval.oem"} 
-#' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
 #' @import foreach

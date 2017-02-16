@@ -1,5 +1,4 @@
-#ifndef _oem_OEM_CONSTRUCTION_H
-#define _oem_OEM_CONSTRUCTION_H
+
 
 #include <Rcpp.h>
 #include <RcppEigen.h>
@@ -139,5 +138,3 @@ RcppExport SEXP oem_xval_dense(SEXP,
                                SEXP,
                                SEXP,
                                SEXP);
-    
-#endif

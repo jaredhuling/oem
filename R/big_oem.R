@@ -48,7 +48,6 @@
 #' \code{hessian.type = "upper.bound"}, then an upper bound of the hessian is used. The upper bound can be dramatically
 #' faster in certain situations, ie when n >> p
 #' @return An object with S3 class "oem" 
-#' @useDynLib oem
 #' @import Rcpp
 #' @import Matrix
 #' @import bigmemory
