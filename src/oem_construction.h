@@ -1,7 +1,11 @@
 
-
+#include <Rdefines.h>
+#include <R_ext/Rdynload.h>
+#include <R_ext/Visibility.h>
 #include <Rcpp.h>
 #include <RcppEigen.h>
+
+#include "oem.h"
 
 using namespace Rcpp;
 using namespace RcppEigen;
