@@ -1,6 +1,12 @@
 #ifndef _oem_OEM_CONSTRUCTION_H
 #define _oem_OEM_CONSTRUCTION_H
 
+#include <Rcpp.h>
+#include <RcppEigen.h>
+
+using namespace Rcpp;
+using namespace RcppEigen;
+
 RcppExport SEXP oem_fit_big(SEXP, 
                             SEXP, 
                             SEXP,
