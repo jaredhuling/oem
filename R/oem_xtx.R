@@ -89,7 +89,7 @@ oem.xtx <- function(xtx,
                     irls.maxit = 100L,
                     irls.tol = 1e-3) 
 {
-    this.call <- match.call()
+    this.call    <- match.call()
     
     family       <- match.arg(family)
     

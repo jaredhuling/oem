@@ -158,7 +158,7 @@ oem <- function(x,
                 hessian.type = c("full", "upper.bound")) 
 {
     
-    this.call <- match.call()
+    this.call    <- match.call()
     
     family       <- match.arg(family)
     

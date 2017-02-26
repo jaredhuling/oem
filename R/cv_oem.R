@@ -58,7 +58,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
 {
     ## code modified from "glmnet" package
     
-    this.call <- match.call()
+    this.call    <- match.call()
 
     ## don't default to fitting all penalties!
     ## only allow multiple penalties if the user
