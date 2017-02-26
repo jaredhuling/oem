@@ -14,8 +14,10 @@ xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
   irls.tol = 0.001, compute.loss = FALSE)
 }
 \arguments{
-\item{x}{input matrix (sparse matrices not yet implemented). 
-Each row is an observation, each column corresponds to a covariate}
+\item{x}{input matrix of dimension n x p (sparse matrices not yet implemented). 
+Each row is an observation, each column corresponds to a covariate. The xval.oem() function
+is optimized for n >> p settings and may be very slow when p > n, so please use other packages
+such as \code{glmnet}, \code{ncvreg}, \code{grpreg}, or \code{gglasso} when p > n or p approx n.}
 
 \item{y}{numeric response vector of length \code{nobs = nrow(x)}.}
 

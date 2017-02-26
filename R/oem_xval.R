@@ -1,8 +1,10 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix (sparse matrices not yet implemented). 
-#' Each row is an observation, each column corresponds to a covariate
+#' @param x input matrix of dimension n x p (sparse matrices not yet implemented). 
+#' Each row is an observation, each column corresponds to a covariate. The xval.oem() function
+#' is optimized for n >> p settings and may be very slow when p > n, so please use other packages
+#' such as \code{glmnet}, \code{ncvreg}, \code{grpreg}, or \code{gglasso} when p > n or p approx n.
 #' @param y numeric response vector of length \code{nobs = nrow(x)}.
 #' @param nfolds integer number of cross validation folds. 3 is the minimum number allowed. defaults to 10
 #' @param foldid an optional vector of values between 1 and \code{nfold} specifying which fold each observation belongs to.
@@ -95,8 +97,20 @@ xval.oem <- function(x,
                      irls.tol         = 1e-3,
                      compute.loss     = FALSE) 
 {
-    family  <- match.arg(family)
-    penalty <- match.arg(penalty, several.ok = TRUE)
+    this.call <- match.call()
+    
+    family       <- match.arg(family)
+    
+    ## don't default to fitting all penalties!
+    ## only allow multiple penalties if the user
+    ## explicitly chooses multiple penalties
+    if ("penalty" %in% names(this.call))
+    {
+        penalty  <- match.arg(penalty, several.ok = TRUE)
+    } else 
+    {
+        penalty  <- match.arg(penalty, several.ok = FALSE)
+    }
     
     if (missing(type.measure)) 
         type.measure = "default"
@@ -114,7 +128,8 @@ xval.oem <- function(x,
     if (p >= n)
     {
         stop("number of observations must be greater than the number of variables
-             for xval, use cv.oem instead.")
+             for xval, use cv.oem instead, or, preferably, use another package such as
+             glmnet for the lasso, ncvreg for MCP/SCAD, or grpreg or gglasso for group lasso.")
     }
     
     if (is.null(foldid)) 

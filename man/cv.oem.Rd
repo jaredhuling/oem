@@ -11,8 +11,10 @@ cv.oem(x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
   ncores = -1, ...)
 }
 \arguments{
-\item{x}{input matrix or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
-Each row is an observation, each column corresponds to a covariate}
+\item{x}{input matrix of dimension n x p or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
+Each row is an observation, each column corresponds to a covariate. The cv.oem() function
+is optimized for n >> p settings and may be very slow when p > n, so please use other packages
+such as \code{glmnet}, \code{ncvreg}, \code{grpreg}, or \code{gglasso} when p > n or p approx n.}
 
 \item{y}{numeric response vector of length nobs.}
 

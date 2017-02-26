@@ -129,7 +129,10 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
         
         for(int i = 0; i < nlambda; i++)
         {
-            
+            if (i % 3 == 0)
+            {
+                Rcpp::checkUserInterrupt();
+            }
             ilambda = lambda[i]; // * n; //     
             if(i == 0)
                 solver->init(ilambda, penalty[pp]);

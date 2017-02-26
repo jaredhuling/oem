@@ -89,8 +89,20 @@ oem.xtx <- function(xtx,
                     irls.maxit = 100L,
                     irls.tol = 1e-3) 
 {
+    this.call <- match.call()
+    
     family       <- match.arg(family)
-    penalty      <- match.arg(penalty, several.ok = TRUE)
+    
+    ## don't default to fitting all penalties!
+    ## only allow multiple penalties if the user
+    ## explicitly chooses multiple penalties
+    if ("penalty" %in% names(this.call))
+    {
+        penalty  <- match.arg(penalty, several.ok = TRUE)
+    } else 
+    {
+        penalty  <- match.arg(penalty, several.ok = FALSE)
+    }
     
     dims <- dim(xtx)
     

@@ -226,6 +226,11 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             for(int i = 0; i < nlambda; i++)
             {
                 
+                if (i % 10 == 0)
+                {
+                    Rcpp::checkUserInterrupt();
+                }
+                
                 ilambda = lambda[i]; // * n; //  
                 if(i == 0)
                     solver->init(ilambda, penalty[pp]);

@@ -3,8 +3,10 @@
 
 #' Orthogonalizing EM
 #'
-#' @param x input matrix or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
-#' Each row is an observation, each column corresponds to a covariate
+#' @param x input matrix of dimension n x p or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
+#' Each row is an observation, each column corresponds to a covariate. The cv.oem() function
+#' is optimized for n >> p settings and may be very slow when p > n, so please use other packages
+#' such as \code{glmnet}, \code{ncvreg}, \code{grpreg}, or \code{gglasso} when p > n or p approx n.
 #' @param y numeric response vector of length nobs.
 #' @param penalty Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
 #' \code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}
@@ -55,7 +57,20 @@ cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "sca
                     grouped = TRUE, keep = FALSE, parallel = FALSE, ncores = -1, ...) 
 {
     ## code modified from "glmnet" package
-    penalty <- match.arg(penalty, several.ok = TRUE)
+    
+    this.call <- match.call()
+
+    ## don't default to fitting all penalties!
+    ## only allow multiple penalties if the user
+    ## explicitly chooses multiple penalties
+    if ("penalty" %in% names(this.call))
+    {
+        penalty  <- match.arg(penalty, several.ok = TRUE)
+    } else 
+    {
+        penalty  <- match.arg(penalty, several.ok = FALSE)
+    }
+    
     if (missing(type.measure)) 
         type.measure = "default"
     else type.measure = match.arg(type.measure)

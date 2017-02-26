@@ -1,7 +1,7 @@
 Package: oem
 Type: Package
 Title: Orthogonalizing EM
-Version: 2.0.4
+Version: 2.0.5
 Date: 2017-02-15
 Authors@R: c(
     person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
@@ -9,7 +9,7 @@ Authors@R: c(
     person("Yixuan", "Qiu", , , c("ctb"))
     )
 Maintainer: Jared Huling <jaredhuling@gmail.com>
-Description: Solves penalized least squares problems using the orthogonalizing EM algorithm of Xiong et al. (2016) <doi:10.1080/00401706.2015.1054436>. The main fitting function is oem() and the functions cv.oem() and xval.oem() are for cross validation, the latter being an accelerated cross validation function for linear models. The big.oem() function allows for out of memory fitting.
+Description: Solves penalized least squares problems for big tall data using the orthogonalizing EM algorithm of Xiong et al. (2016) <doi:10.1080/00401706.2015.1054436>. The main fitting function is oem() and the functions cv.oem() and xval.oem() are for cross validation, the latter being an accelerated cross validation function for linear models. The big.oem() function allows for out of memory fitting.
 URL: https://github.com/jaredhuling/oem
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)

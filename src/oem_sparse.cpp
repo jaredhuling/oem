@@ -159,6 +159,10 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
         
         for(int i = 0; i < nlambda; i++)
         {
+            if (i % 3 == 0)
+            {
+                Rcpp::checkUserInterrupt();
+            }
             
             ilambda = lambda[i]; // * n; //     
             if(i == 0)

@@ -177,7 +177,9 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         
         for(int i = 0; i < nlambda; i++)
         {
-            
+
+            Rcpp::checkUserInterrupt();
+
             ilambda = lambda[i]; // * n; //     
             if(i == 0)
                 solver->init(ilambda, penalty[pp]);

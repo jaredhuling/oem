@@ -14,15 +14,19 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   hessian.type = c("full", "upper.bound"))
 }
 \arguments{
-\item{x}{input matrix or \code{CsparseMatrix} object of the \pkg{Matrix} package. 
-Each row is an observation, each column corresponds to a covariate}
+\item{x}{input matrix of dimension n x p or \code{CsparseMatrix} object of the \pkg{Matrix} package. 
+Each row is an observation, each column corresponds to a covariate. The oem() function
+is optimized for n >> p settings and may be very slow when p > n, so please use other packages
+such as \code{glmnet}, \code{ncvreg}, \code{grpreg}, or \code{gglasso} when p > n or p approx n.}
 
 \item{y}{numeric response vector of length \code{nobs}.}
 
 \item{family}{\code{"gaussian"} for least squares problems, \code{"binomial"} for binary response.}
 
 \item{penalty}{Specification of penalty type. Choices include \code{"lasso"}, 
-\code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}}
+\code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}.
+Careful consideration is required for the group lasso penalty. Groups as specified by the \code{groups} argument 
+should be chosen in a scientifically sensible manner.}
 
 \item{weights}{observation weights. Not implemented yet. Defaults to 1 for each observation (setting weight vector to 
 length 0 will default all weights to 1)}

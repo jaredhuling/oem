@@ -194,7 +194,6 @@ protected:
         }
     }
     
-    
     MatrixXd XtX() const {
         if (ncores <= 1)
         {
@@ -300,7 +299,7 @@ protected:
     
     void get_group_indexes()
     {
-        if (penalty == "grp.lasso") 
+        if (penalty == "grp.lasso" || penalty == "grp.lasso.scaled") 
         {
             
             grp_idx.reserve(ngroups);

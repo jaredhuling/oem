@@ -191,6 +191,11 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
         for(int i = 0; i < nlambda; i++)
         {
             
+            if (i % 3 == 0)
+            {
+                Rcpp::checkUserInterrupt();
+            }
+            
             ilambda = lambda[i] / datstd.get_scaleY(); // * n; //     
             if(i == 0)
                 solver->init(ilambda, penalty[pp]);
