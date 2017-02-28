@@ -38,6 +38,7 @@ protected:
     VectorXd group_weights;     // group lasso penalty multiplication factors 
     int penalty_factor_size;    // size of penalty_factor vector
     int XXdim;                  // dimension of XX (different if n > p and p >= n)
+    int XXdimCalc;
     Vector XY;                  // X'Y
     MatrixXd XX;                // X'X
     MatrixXd A;                 // A = d * I - X'X
@@ -55,7 +56,9 @@ protected:
     
     double threshval;
     int wt_len;
+    int nslices;
     
+    double gigs;
     Eigen::RowVectorXd colsums;
     Eigen::RowVectorXd colsq;
     Eigen::VectorXd colsq_inv;
@@ -185,24 +188,117 @@ protected:
     
     
     MatrixXd XtX() const {
-        return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
-        rankUpdate(X.adjoint());
+        if (nslices <= 1)
+        {
+            return MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+            rankUpdate(X.adjoint());
+        } else 
+        {
+            MatrixXd XXtmp(XXdimCalc, XXdimCalc);
+            XXtmp.setZero();
+            
+            int numrowscurfirst = std::floor(double(nobs) / double(nslices) );
+            
+        //#pragma omp parallel
+        {
+            MatrixXd XXtmp_private(XXdimCalc, XXdimCalc);
+            XXtmp_private.setZero();
+            
+            // break up computation of X'X into 
+            // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+            //#pragma omp for schedule(static) nowait
+            for (int ff = 0; ff < nslices; ++ff)
+            {
+                
+                if (ff + 1 == nslices)
+                {
+                    int numrowscur = nobs - (nslices - 1) * std::floor(double(nobs) / double(nslices));
+                    XXtmp_private += MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+                    rankUpdate(X.bottomRows(numrowscur).adjoint());
+                } else 
+                {
+                    XXtmp_private += MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+                    rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint());
+                }
+            }
+            //#pragma omp critical
+            {
+                XXtmp += XXtmp_private; 
+            }
+            
+        }
+        return XXtmp;
+        }
     }
     
     MatrixXd XXt() const {
-        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+        return MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
         rankUpdate(X);
     }
     
     MatrixXd XtWX() const {
-        return MatrixXd(nvars, nvars).setZero().selfadjointView<Lower>().
-        rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
+        
+        if (nslices <= 1)
+        {
+            return MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+            rankUpdate(X.adjoint() * (weights.array().sqrt().matrix()).asDiagonal() );
+        } else 
+        {
+            MatrixXd XXtmp(XXdimCalc, XXdimCalc);
+            XXtmp.setZero();
+            
+            int numrowscurfirst = std::floor(double(nobs) / double(nslices));
+            
+            //#pragma omp parallel
+            {
+                MatrixXd XXtmp_private(XXdimCalc, XXdimCalc);
+                XXtmp_private.setZero();
+                
+                // break up computation of X'X into 
+                // X'X = X_1'X_1 + ... + X_ncores'X_ncores
+                
+                //#pragma omp for schedule(static) nowait
+                for (int ff = 0; ff < nslices; ++ff)
+                {
+                    
+                    if (ff + 1 == nslices)
+                    {
+                        int numrowscur = nobs - (nslices - 1) * std::floor(double(nobs) / double(nslices));
+                        XXtmp_private += MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+                        rankUpdate(X.bottomRows(numrowscur).adjoint() * 
+                        (weights.tail(numrowscur).array().sqrt().matrix()).asDiagonal());
+                    } else 
+                    {
+                        XXtmp_private += MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+                        rankUpdate(X.middleRows(ff * numrowscurfirst, numrowscurfirst).adjoint() * 
+                        (weights.segment(ff * numrowscurfirst, numrowscurfirst).array().sqrt().matrix()).asDiagonal());
+                    }
+                }
+                //#pragma omp critical
+                {
+                    XXtmp += XXtmp_private; 
+                }
+                
+            }
+            return XXtmp;
+        }
+    }
+    
+    MatrixXd XWXt() const {
+        return MatrixXd(XXdimCalc, XXdimCalc).setZero().selfadjointView<Lower>().
+        rankUpdate( (weights.array().sqrt().matrix()).asDiagonal() * X );
+    }
+    /*
+    MatrixXd XXt() const {
+        return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
+        rankUpdate(X);
     }
     
     MatrixXd XWXt() const {
         return MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().
         rankUpdate( (weights.array().sqrt().matrix()).asDiagonal() * X );
     }
+     */
     
     void get_group_indexes()
     {
@@ -388,7 +484,8 @@ protected:
                const double &gamma_,
                bool &intercept_,
                bool &standardize_,
-               const double tol_ = 1e-6) :
+               const double tol_ = 1e-6,
+               const double gigs_ = 4.0) :
         oemBase<Eigen::VectorXd>(X_.rows(), 
                                  X_.cols(),
                                  unique_groups_.size(),
@@ -404,12 +501,14 @@ protected:
                                  group_weights(group_weights_),
                                  penalty_factor_size(penalty_factor_.size()),
                                  XXdim( std::min(X_.cols() + int(intercept_) , X_.rows()) ),
+                                 XXdimCalc( std::min(X_.cols(), X_.rows()) ),
                                  XY(X_.cols() + int(intercept_) ), // add extra space if intercept
                                  XX(XXdim, XXdim),                 // add extra space if intercept
                                  alpha(alpha_),
                                  gamma(gamma_),
                                  default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
                                                                                     grp_idx(unique_groups_.size()),
+                                 gigs(gigs_),
                                  colsums(X_.cols()),
                                  colsq(X_.cols()),
                                  colsq_inv(X_.cols())
@@ -420,39 +519,80 @@ protected:
         double compute_lambda_zero() 
         { 
             
+            int pc = X.cols();
             wt_len = weights.size();
+            
+            double xgigs = 8.0 * double(nobs) * double(pc) / std::pow(10.0, 9);
+            
+            // calculate number of rows per slice
+            nslices = std::ceil(xgigs / gigs);
             
             if (standardize)
             {
                 if (wt_len)
                 {
-                    colsq = ( weights.asDiagonal() * (X.array().square().matrix()) ).colwise().sum() / (nobs - 1);
+                    // colsq = ( weights.asDiagonal() * (X.array().square().matrix()) ).colwise().sum() / (nobs - 1);
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        colsq(i) = (X.col(i).array().square() * weights.array()).sum() / (nobs - 1);
+                    }
                 } else 
                 {
-                    colsq = X.array().square().matrix().colwise().sum() / (nobs - 1);
+                    // colsq = X.array().square().matrix().colwise().sum() / (nobs - 1);
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        colsq(i) = X.col(i).array().square().sum() / (nobs - 1);
+                    }
                 }
                     colsq_inv = 1 / colsq.array().sqrt();
             }
+            
+            
             
             if (wt_len)
             {
                 if (intercept)
                 {
-                    XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
+                    // XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        XY(i + 1) = X.col(i).dot((Y.array() * weights.array()).matrix());
+                    }
+                    
                     XY(0) = (weights.array().sqrt() * Y.array()).sum();
                 } else
                 {
-                    XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
+                    // XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        XY(i) = X.col(i).dot((Y.array() * weights.array()).matrix());
+                    }
+                    
                 }
             } else
             {
                 if (intercept)
                 {
-                    XY.tail(nvars) = X.transpose() * Y;
+                    // XY.tail(nvars) = X.transpose() * Y;
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        XY(i + 1) = X.col(i).dot(Y);
+                    }
+                    
                     XY(0) = Y.sum();
                 } else 
                 {
-                    XY.noalias() = X.transpose() * Y;
+                    // XY.noalias() = X.transpose() * Y;
+                    // don't want to access all of X at once
+                    for (int i = 0; i < pc; ++i)
+                    {
+                        XY(i) = X.col(i).dot(Y);
+                    }
                 }
             }
             
@@ -474,7 +614,12 @@ protected:
                 u.resize(nvars + 1);
                 beta.resize(nvars + 1);
                 beta_prev.resize(nvars + 1);
-                colsums = X.colwise().sum();
+                // colsums = X.colwise().sum();
+                // don't want to access all of X at once
+                for (int i = 0; i < pc; ++i)
+                {
+                    colsums(i) = X.col(i).sum();
+                }
             }
             
             // compute XtX or XXt (depending on if n > p or not)
@@ -530,12 +675,22 @@ protected:
         virtual double get_loss()
         {
             double loss;
+            VectorXd xbeta(nobs);
+            int pc = X.cols();
+            
+            xbeta.setZero();
+            
+            for (int i = 0; i < pc; ++i)
+            {
+                xbeta.array() += (X.col(i) * beta).array();
+            }
+            
             if (wt_len)
             {
-                loss = ((Y - X * beta).array().square() * weights.array()).sum();
+                loss = ((Y - xbeta).array().square() * weights.array()).sum();
             } else 
             {
-                loss = (Y - X * beta).array().square().sum();
+                loss = (Y - xbeta).array().square().sum();
             }
             return loss;
         }

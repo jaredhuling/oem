@@ -11,7 +11,7 @@ oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   group.weights = NULL, standardize = TRUE, intercept = TRUE,
   maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
   accelerate = FALSE, ncores = -1, compute.loss = FALSE,
-  hessian.type = c("full", "upper.bound"))
+  hessian.type = c("upper.bound", "full"))
 }
 \arguments{
 \item{x}{input matrix of dimension n x p or \code{CsparseMatrix} object of the \pkg{Matrix} package. 

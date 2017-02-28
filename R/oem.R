@@ -155,7 +155,7 @@ oem <- function(x,
                 accelerate = FALSE,
                 ncores = -1,
                 compute.loss = FALSE,
-                hessian.type = c("full", "upper.bound")) 
+                hessian.type = c("upper.bound", "full")) 
 {
     
     this.call    <- match.call()

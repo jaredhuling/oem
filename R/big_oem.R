@@ -44,6 +44,8 @@
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 #' to \code{TRUE} will dramatically increase computational time
+#' @param gigs maximum number of gigs of memory available. Used to figure out how to break up calculations
+#' involving the design matrix x
 #' @param hessian.type only for logistic regression. if \code{hessian.type = "full"}, then the full hessian is used. If
 #' \code{hessian.type = "upper.bound"}, then an upper bound of the hessian is used. The upper bound can be dramatically
 #' faster in certain situations, ie when n >> p
@@ -105,6 +107,7 @@ big.oem <- function(x,
                     irls.maxit = 100L,
                     irls.tol = 1e-3,
                     compute.loss = FALSE,
+                    gigs         = 4.0,
                     hessian.type = c("full", "upper.bound")) 
 {
     family       <- match.arg(family)
@@ -245,6 +248,7 @@ big.oem <- function(x,
     gamma         <- as.double(gamma)
     tol           <- as.double(tol)
     irls.tol      <- as.double(irls.tol)
+    gigs          <- as.double(gigs)
     irls.maxit    <- as.integer(irls.maxit)
     maxit         <- as.integer(maxit)
     standardize   <- as.logical(standardize)
@@ -265,7 +269,8 @@ big.oem <- function(x,
                     tol          = tol,
                     irls_maxit   = irls.maxit,
                     irls_tol     = irls.tol,
-                    hessian.type = hessian.type)
+                    hessian.type = hessian.type,
+                    gigs         = gigs)
     
     res <- switch(family,
                   "gaussian" = oemfit.big.gaussian(x@address, 

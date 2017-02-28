@@ -79,6 +79,7 @@ RcppExport SEXP oem_fit_big(SEXP x_,
     List opts(opts_);
     const int maxit        = as<int>(opts["maxit"]);
     const double tol       = as<double>(opts["tol"]);
+    const double gigs      = as<double>(opts["gigs"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
     bool standardize       = as<bool>(standardize_);
@@ -109,7 +110,7 @@ RcppExport SEXP oem_fit_big(SEXP x_,
     {
         solver = new oemBig(X, Y, weights, groups, unique_groups, 
                             group_weights, penalty_factor, 
-                            alpha, gamma, intercept, standardize, tol);
+                            alpha, gamma, intercept, standardize, tol, gigs);
     } else if (family(0) == "binomial")
     {
         throw std::invalid_argument("binomial not available for oem_fit_dense, use oem_fit_logistic_dense");

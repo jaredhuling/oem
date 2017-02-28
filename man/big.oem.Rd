@@ -10,7 +10,7 @@ big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
   group.weights = NULL, standardize = TRUE, intercept = TRUE,
   maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  compute.loss = FALSE, hessian.type = c("full", "upper.bound"))
+  compute.loss = FALSE, gigs = 4, hessian.type = c("full", "upper.bound"))
 }
 \arguments{
 \item{x}{input big.matrix object pointing to design matrix 
@@ -75,6 +75,9 @@ slightly different for a sparse matrix object and a dense matrix object}
 
 \item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 to \code{TRUE} will dramatically increase computational time}
+
+\item{gigs}{maximum number of gigs of memory available. Used to figure out how to break up calculations
+involving the design matrix x}
 
 \item{hessian.type}{only for logistic regression. if \code{hessian.type = "full"}, then the full hessian is used. If
 \code{hessian.type = "upper.bound"}, then an upper bound of the hessian is used. The upper bound can be dramatically
