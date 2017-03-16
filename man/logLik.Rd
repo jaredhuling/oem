@@ -41,7 +41,7 @@ fit <- oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE)
 
 logLik(fit)
 
-likLik(fit, which.model = "mcp")
+logLik(fit, which.model = "mcp")
 
 
 fit <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE,
@@ -49,7 +49,7 @@ fit <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE,
 
 logLik(fit)
 
-likLik(fit, which.model = "mcp")
+logLik(fit, which.model = "mcp")
 
 
 fit <- xval.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE, 
@@ -57,7 +57,7 @@ fit <- xval.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE,
 
 logLik(fit)
 
-likLik(fit, which.model = "mcp")
+logLik(fit, which.model = "mcp")
 
 }
 

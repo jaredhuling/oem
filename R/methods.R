@@ -423,7 +423,7 @@ predict.oemfit_xval_binomial <- function(object, newx, s=NULL, which.model = 1,
 #'
 #' logLik(fit)
 #' 
-#' likLik(fit, which.model = "mcp")
+#' logLik(fit, which.model = "mcp")
 #'
 logLik.oem <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
@@ -491,7 +491,7 @@ logLik.oem <- function(object, which.model = 1, ...) {
 #'
 #' logLik(fit)
 #' 
-#' likLik(fit, which.model = "mcp")
+#' logLik(fit, which.model = "mcp")
 #'
 logLik.cv.oem <- function(object, which.model = 1, ...) {
     
@@ -561,7 +561,7 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 #'
 #' logLik(fit)
 #' 
-#' likLik(fit, which.model = "mcp")
+#' logLik(fit, which.model = "mcp")
 #'
 logLik.xval.oem <- function(object, which.model = 1, ...) {
     

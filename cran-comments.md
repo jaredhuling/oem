@@ -1,7 +1,7 @@
 
-## Patch for 'oem'
+## Update for 'oem'
 
-Fixed an error encountered by some Mac users, various c++ optimizations, tried to fix 'Found no calls to: ‘R_registerRoutines’, ‘R_useDynamicSymbols' error
+Added computation of new penalties to oem, added more flexible plotting capabilities
 
 ## Test environments
 
