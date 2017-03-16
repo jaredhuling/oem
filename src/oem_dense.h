@@ -217,7 +217,7 @@ protected:
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
                 //thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
-                thresh_factor = soft_threshold_scad_norm(ds_norm, penalty, d, gamma);
+                thresh_factor = soft_threshold_scad_norm(ds_norm, penalty * grp_wts, d, gamma);
             }
             if (thresh_factor != 0.0)
             {
@@ -259,7 +259,7 @@ protected:
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
                 //thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
-                thresh_factor = soft_threshold_mcp_norm(ds_norm, penalty, d, gamma);
+                thresh_factor = soft_threshold_mcp_norm(ds_norm, penalty * grp_wts, d, gamma);
             }
             if (thresh_factor != 0.0)
             {
