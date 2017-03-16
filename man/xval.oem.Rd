@@ -36,8 +36,24 @@ they measure the deviation from the fitted mean to the response.}
 
 \item{family}{\code{"gaussian"} for least squares problems, \code{"binomial"} for binary response (not implemented yet).}
 
-\item{penalty}{Specification of penalty type in lowercase letters. Choices include \code{"lasso"}, 
-\code{"ols"} (Ordinary least squares, no penaly), \code{"elastic.net"}, \code{"scad"}, \code{"mcp"}, \code{"grp.lasso"}}
+\item{penalty}{Specification of penalty type. Choices include:
+\itemize{
+   \item{\code{"elastic.net"}}{ - elastic net penalty, extra parameters: \code{"alpha"}}
+   \item{\code{"lasso"}}{ - lasso penalty}
+   \item{\code{"ols"}}{ - ordinary least squares}
+   \item{\code{"mcp"}}{ - minimax concave penalty, extra parameters: \code{"gamma"}}
+   \item{\code{"scad"}}{ - smoothly clipped absolute deviation, extra parameters: \code{"gamma"}}
+   \item{\code{"mcp.net"}}{ - minimax concave penalty + l2 penalty, extra parameters: 
+   \code{"gamma"}, \code{"alpha"}}
+   \item{\code{"scad.net"}}{ - smoothly clipped absolute deviation + l2 penalty, extra parameters: 
+   \code{"gamma"}, \code{"alpha"}}
+   \item{\code{"grp.lasso"}}{ - group lasso penalty}
+   \item{\code{"grp.lasso.net"}}{ - group lasso penalty + l2 penalty, extra parameters: \code{"alpha"}}
+   \item{\code{"grp.mcp"}}{ - group minimax concave penalty, extra parameters: \code{"gamma"}}
+   \item{\code{"grp.scad"}}{ - group smoothly clipped absolute deviation, extra parameters: \code{"gamma"}}
+}
+Careful consideration is required for the group lasso, group MCP, and group SCAD penalties. Groups as specified by the \code{groups} argument 
+should be chosen in a sensible manner.}
 
 \item{weights}{observation weights. defaults to 1 for each observation (setting weight vector to 
 length 0 will default all weights to 1)}
