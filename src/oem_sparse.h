@@ -160,6 +160,132 @@ protected:
         }
     }
     
+    static double soft_threshold_scad_norm(double &b, const double &pen, double &d, double &gamma)
+    {
+        double retval = 0;
+        
+        double gammad = gamma * d;
+        double gamma_minus1_d = (gamma - 1.0) * d;
+        
+        if (std::abs(b) > gammad * pen)
+            retval = 1;
+        else if (std::abs(b) > (d + 1.0) * pen)
+        {
+            double gam_ptr = (gamma - 1);
+            double gam_pen = gamma * pen / b;
+            if(gam_ptr > gam_pen)
+                retval = d * (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
+            else if(gam_ptr < -gam_pen)
+                retval = d * (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
+        }
+        else if(b > pen)
+            retval = (1 - pen / b);
+        else if(b < -pen)
+            retval = (1 + pen / b);
+        return retval;
+    }
+    
+    static double soft_threshold_mcp_norm(double &b, const double &pen, double &d, double &gamma)
+    {
+        double retval = 0;
+        
+        double gammad = gamma * d;
+        double d_minus_gammainv = d - 1.0 / gamma;
+        
+        if (std::abs(b) > gammad * pen)
+            retval = 1;
+        else if(b > pen)
+            retval = d * (1 - pen / b)/(d_minus_gammainv);
+        else if(b < -pen)
+            retval = d * (1 + pen / b)/(d_minus_gammainv);
+        
+        return retval;
+    }
+    
+    static void block_soft_threshold_scad(VectorXd &res, const VectorXd &vec, const double &penalty,
+                                          VectorXd &pen_fact, double &d,
+                                          std::vector<std::vector<int> > &grp_idx, 
+                                          const int &ngroups, VectorXi &unique_grps, VectorXi &grps,
+                                          double & gamma)
+    {
+        //int v_size = vec.size();
+        res.setZero();
+        
+        for (int g = 0; g < ngroups; ++g) 
+        {
+            double thresh_factor;
+            std::vector<int> gr_idx = grp_idx[g];
+            
+            if (unique_grps(g) == 0) // the 0 group represents unpenalized variables
+            {
+                thresh_factor = 1.0;
+            } else 
+            {
+                double ds_norm = 0.0;
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    ds_norm += std::pow(vec(c_idx), 2);
+                }
+                ds_norm = std::sqrt(ds_norm);
+                // double grp_wts = sqrt(gr_idx.size());
+                double grp_wts = pen_fact(g);
+                //thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
+                thresh_factor = soft_threshold_scad_norm(ds_norm, penalty, d, gamma);
+            }
+            if (thresh_factor != 0.0)
+            {
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    res(c_idx) = vec(c_idx) * thresh_factor / d;
+                }
+            }
+        }
+    }
+    
+    static void block_soft_threshold_mcp(VectorXd &res, const VectorXd &vec, const double &penalty,
+                                         VectorXd &pen_fact, double &d,
+                                         std::vector<std::vector<int> > &grp_idx, 
+                                         const int &ngroups, VectorXi &unique_grps, VectorXi &grps,
+                                         double & gamma)
+    {
+        //int v_size = vec.size();
+        res.setZero();
+        
+        for (int g = 0; g < ngroups; ++g) 
+        {
+            double thresh_factor;
+            std::vector<int> gr_idx = grp_idx[g];
+            
+            if (unique_grps(g) == 0) // the 0 group represents unpenalized variables
+            {
+                thresh_factor = 1.0;
+            } else 
+            {
+                double ds_norm = 0.0;
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    ds_norm += std::pow(vec(c_idx), 2);
+                }
+                ds_norm = std::sqrt(ds_norm);
+                // double grp_wts = sqrt(gr_idx.size());
+                double grp_wts = pen_fact(g);
+                //thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
+                thresh_factor = soft_threshold_mcp_norm(ds_norm, penalty, d, gamma);
+            }
+            if (thresh_factor != 0.0)
+            {
+                for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
+                {
+                    int c_idx = gr_idx[v];
+                    res(c_idx) = vec(c_idx) * thresh_factor / d;
+                }
+            }
+        }
+    }
+    
     static void block_soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty,
                                      VectorXd &pen_fact, double &d,
                                      std::vector<std::vector<int> > &grp_idx, 
@@ -552,6 +678,16 @@ protected:
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+        } else if (penalty == "grp.mcp")
+        {
+            block_soft_threshold_mcp(beta, u, lambda, group_weights,
+                                     d, grp_idx, ngroups, 
+                                     unique_groups, groups, gamma);
+        } else if (penalty == "grp.scad")
+        {
+            block_soft_threshold_scad(beta, u, lambda, group_weights,
+                                      d, grp_idx, ngroups, 
+                                      unique_groups, groups, gamma);
         }
         
     }

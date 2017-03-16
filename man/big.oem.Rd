@@ -5,7 +5,8 @@
 \title{Orthogonalizing EM}
 \usage{
 big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
-  "lasso", "ols", "mcp", "scad", "grp.lasso"), weights = numeric(0),
+  "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
+  "grp.lasso.net", "grp.mcp", "grp.scad"), weights = numeric(0),
   lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
   alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
   group.weights = NULL, standardize = TRUE, intercept = TRUE,
