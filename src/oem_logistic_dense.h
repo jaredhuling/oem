@@ -105,7 +105,7 @@ protected:
         int v_size = vec.size();
         res.setZero();
         double gammad = gamma * d;
-        double d_minus_gammainv = d - 1 / gamma;
+        double d_minus_gammainv = d - 1.0 / gamma;
         
         
         const double *ptr = vec.data();
@@ -139,14 +139,14 @@ protected:
             
             if (std::abs(ptr[i]) > gammad * total_pen)
                 res(i) = ptr[i]/d;
-            else if (std::abs(ptr[i]) > (d + 1) * total_pen)
+            else if (std::abs(ptr[i]) > (d + 1.0) * total_pen)
             {
-                double gam_ptr = (gamma - 1) * ptr[i];
+                double gam_ptr = (gamma - 1.0) * ptr[i];
                 double gam_pen = gamma * total_pen;
                 if(gam_ptr > gam_pen)
-                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
                 else if(gam_ptr < -gam_pen)
-                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
             }
             else if(ptr[i] > total_pen)
                 res(i) = (ptr[i] - total_pen)/d;
@@ -158,16 +158,16 @@ protected:
     
     static double soft_threshold_scad_norm(double &b, const double &pen, double &d, double &gamma)
     {
-        double retval = 0;
+        double retval = 0.0;
         
         double gammad = gamma * d;
         double gamma_minus1_d = (gamma - 1.0) * d;
         
         if (std::abs(b) > gammad * pen)
-            retval = 1;
+            retval = 1.0;
         else if (std::abs(b) > (d + 1.0) * pen)
         {
-            double gam_ptr = (gamma - 1);
+            double gam_ptr = (gamma - 1.0);
             double gam_pen = gamma * pen / b;
             if(gam_ptr > gam_pen)
                 retval = d * (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
@@ -175,25 +175,25 @@ protected:
                 retval = d * (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
         }
         else if(b > pen)
-            retval = (1 - pen / b);
+            retval = (1.0 - pen / b);
         else if(b < -pen)
-            retval = (1 + pen / b);
+            retval = (1.0 + pen / b);
         return retval;
     }
     
     static double soft_threshold_mcp_norm(double &b, const double &pen, double &d, double &gamma)
     {
-        double retval = 0;
+        double retval = 0.0;
         
         double gammad = gamma * d;
         double d_minus_gammainv = d - 1.0 / gamma;
         
         if (std::abs(b) > gammad * pen)
-            retval = 1;
+            retval = 1.0;
         else if(b > pen)
-            retval = d * (1 - pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 - pen / b)/(d_minus_gammainv);
         else if(b < -pen)
-            retval = d * (1 + pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 + pen / b)/(d_minus_gammainv);
         
         return retval;
     }
@@ -227,7 +227,7 @@ protected:
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
                 //thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
-                thresh_factor = soft_threshold_scad_norm(ds_norm, penalty, d, gamma);
+                thresh_factor = soft_threshold_scad_norm(ds_norm, penalty * grp_wts, d, gamma);
             }
             if (thresh_factor != 0.0)
             {
@@ -297,11 +297,11 @@ protected:
             
             if (unique_grps(g) == 0) 
             {
-                thresh_factor = 1;
+                thresh_factor = 1.0;
                 
             } else 
             {
-                double ds_norm = 0;
+                double ds_norm = 0.0;
                 for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
                 {
                     int c_idx = gr_idx[v];
@@ -310,7 +310,7 @@ protected:
                 ds_norm = std::sqrt(ds_norm);
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
-                thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
+                thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
             }
             if (thresh_factor != 0.0)
             {
@@ -441,10 +441,10 @@ protected:
         {
             if (y(ii) == 1)
             {
-                dev += std::sqrt(2 * std::log(1/prob(ii)));
+                dev += std::sqrt(2.0 * std::log(1.0/prob(ii)));
             } else 
             {
-                dev += std::sqrt(2 * std::log(1/(1 - prob(ii))));
+                dev += std::sqrt(2.0 * std::log(1.0/(1.0 - prob(ii))));
             }
         }
         return dev;
@@ -487,7 +487,7 @@ protected:
         {
             XX = XWXt();
             if (intercept)
-                XX.array() += 1; // adding 1 to all of XX' for the intercept
+                XX.array() += 1.0; // adding 1 to all of XX' for the intercept
         }
         
         // scale by sample size. needed for SCAD/MCP
@@ -564,7 +564,7 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
@@ -572,7 +572,7 @@ protected:
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
             
@@ -581,7 +581,7 @@ protected:
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
             
@@ -592,7 +592,7 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
@@ -673,9 +673,9 @@ public:
             //    colsq = ((weights.array().matrix()).asDiagonal() * X).array().square().matrix().colwise().sum() / (nobs - 1);
             //} else 
             //{
-            colsq = X.array().square().matrix().colwise().sum() / (nobs - 1);
+            colsq = X.array().square().matrix().colwise().sum() / (double(nobs) - 1.0);
             //}
-            colsq_inv = 1 / colsq.array().sqrt();
+            colsq_inv = 1.0 / colsq.array().sqrt();
         }
         
         //if (wt_len)

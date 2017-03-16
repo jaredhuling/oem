@@ -87,7 +87,7 @@ protected:
         int v_size = vec.size();
         res.setZero();
         double gammad = gamma * d;
-        double d_minus_gammainv = d - 1 / gamma;
+        double d_minus_gammainv = d - 1.0 / gamma;
         
         
         const double *ptr = vec.data();
@@ -112,7 +112,7 @@ protected:
         int v_size = vec.size();
         res.setZero();
         double gammad = gamma * d;
-        double gamma_minus1_d = (gamma - 1) * d;
+        double gamma_minus1_d = (gamma - 1.0) * d;
         
         const double *ptr = vec.data();
         for(int i = 0; i < v_size; i++)
@@ -121,14 +121,14 @@ protected:
             
             if (std::abs(ptr[i]) > gammad * total_pen)
                 res(i) = ptr[i]/d;
-            else if (std::abs(ptr[i]) > (d + 1) * total_pen)
+            else if (std::abs(ptr[i]) > (d + 1.0) * total_pen)
             {
-                double gam_ptr = (gamma - 1) * ptr[i];
+                double gam_ptr = (gamma - 1.0) * ptr[i];
                 double gam_pen = gamma * total_pen;
                 if(gam_ptr > gam_pen)
-                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
                 else if(gam_ptr < -gam_pen)
-                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
             }
             else if(ptr[i] > total_pen)
                 res(i) = (ptr[i] - total_pen)/d;
@@ -140,7 +140,7 @@ protected:
     
     static double soft_threshold_scad_norm(double &b, const double &pen, double &d, double &gamma)
     {
-        double retval = 0;
+        double retval = 0.0;
         
         double gammad = gamma * d;
         double gamma_minus1_d = (gamma - 1.0) * d;
@@ -149,7 +149,7 @@ protected:
             retval = 1;
         else if (std::abs(b) > (d + 1.0) * pen)
         {
-            double gam_ptr = (gamma - 1);
+            double gam_ptr = (gamma - 1.0);
             double gam_pen = gamma * pen / b;
             if(gam_ptr > gam_pen)
                 retval = d * (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
@@ -157,9 +157,9 @@ protected:
                 retval = d * (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
         }
         else if(b > pen)
-            retval = (1 - pen / b);
+            retval = (1.0 - pen / b);
         else if(b < -pen)
-            retval = (1 + pen / b);
+            retval = (1.0 + pen / b);
         return retval;
     }
     
@@ -173,9 +173,9 @@ protected:
         if (std::abs(b) > gammad * pen)
             retval = 1;
         else if(b > pen)
-            retval = d * (1 - pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 - pen / b)/(d_minus_gammainv);
         else if(b < -pen)
-            retval = d * (1 + pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 + pen / b)/(d_minus_gammainv);
         
         return retval;
     }
@@ -287,10 +287,10 @@ protected:
             */
             if (unique_grps(g) == 0) 
             {
-                thresh_factor = 1;
+                thresh_factor = 1.0;
             } else 
             {
-                double ds_norm = 0;
+                double ds_norm = 0.0;
                 for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
                 {
                     int c_idx = gr_idx[v];
@@ -299,7 +299,7 @@ protected:
                 ds_norm = std::sqrt(ds_norm);
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
-                thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
+                thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
             }
             if (thresh_factor != 0.0)
             {
@@ -497,7 +497,7 @@ protected:
             {
                 XX = XWXt();
                 if (intercept)
-                    XX.array() += 1; // adding 1 to all of XX' for the intercept
+                    XX.array() += 1.0; // adding 1 to all of XX' for the intercept
             }
         } else 
         {
@@ -531,7 +531,7 @@ protected:
             {
                 XX = XXt();
                 if (intercept)
-                    XX.array() += 1; // adding 1 to all of XX' for the intercept
+                    XX.array() += 1.0; // adding 1 to all of XX' for the intercept
             }
         }
         
@@ -579,7 +579,7 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
@@ -588,7 +588,7 @@ protected:
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
             
@@ -597,7 +597,7 @@ protected:
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
             
@@ -608,7 +608,7 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
@@ -699,10 +699,10 @@ protected:
                     // don't want to access all of X at once
                     for (int i = 0; i < pc; ++i)
                     {
-                        colsq(i) = X.col(i).array().square().sum() / (nobs - 1);
+                        colsq(i) = X.col(i).array().square().sum() / (double(nobs) - 1.0);
                     }
                 }
-                    colsq_inv = 1 / colsq.array().sqrt();
+                    colsq_inv = 1.0 / colsq.array().sqrt();
             }
             
             

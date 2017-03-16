@@ -131,7 +131,7 @@ protected:
                 res(i) = ptr[i]/d;
             else if (std::abs(ptr[i]) > (d + 1.0) * total_pen)
             {
-                double gam_ptr = (gamma - 1) * ptr[i];
+                double gam_ptr = (gamma - 1.0) * ptr[i];
                 double gam_pen = gamma * total_pen;
                 if(gam_ptr > gam_pen)
                     res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
@@ -148,7 +148,7 @@ protected:
     
     static double soft_threshold_scad_norm(double &b, const double &pen, double &d, double &gamma)
     {
-        double retval = 0;
+        double retval = 0.0;
         
         double gammad = gamma * d;
         double gamma_minus1_d = (gamma - 1.0) * d;
@@ -157,7 +157,7 @@ protected:
             retval = 1;
         else if (std::abs(b) > (d + 1.0) * pen)
         {
-            double gam_ptr = (gamma - 1);
+            double gam_ptr = (gamma - 1.0);
             double gam_pen = gamma * pen / b;
             if(gam_ptr > gam_pen)
                 retval = d * (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
@@ -165,15 +165,15 @@ protected:
                 retval = d * (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
         }
         else if(b > pen)
-            retval = (1 - pen / b);
+            retval = (1.0 - pen / b);
         else if(b < -pen)
-            retval = (1 + pen / b);
+            retval = (1.0 + pen / b);
         return retval;
     }
     
     static double soft_threshold_mcp_norm(double &b, const double &pen, double &d, double &gamma)
     {
-        double retval = 0;
+        double retval = 0.0;
         
         double gammad = gamma * d;
         double d_minus_gammainv = d - 1.0 / gamma;
@@ -181,9 +181,9 @@ protected:
         if (std::abs(b) > gammad * pen)
             retval = 1;
         else if(b > pen)
-            retval = d * (1 - pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 - pen / b)/(d_minus_gammainv);
         else if(b < -pen)
-            retval = d * (1 + pen / b)/(d_minus_gammainv);
+            retval = d * (1.0 + pen / b)/(d_minus_gammainv);
         
         return retval;
     }
@@ -523,7 +523,7 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
@@ -532,7 +532,7 @@ protected:
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
         
@@ -541,7 +541,7 @@ protected:
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
             
@@ -552,7 +552,7 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda;
             double lam = alpha * lambda;
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
@@ -575,8 +575,8 @@ protected:
         if (accelerate)
         {
             ak_prev = ak;
-            ak      = 0.5 * (1 + std::sqrt(1 + 4 * std::pow(ak, 2)));
-            double ratio_k = (ak_prev - 1) / ak;
+            ak      = 0.5 * (1 + std::sqrt(1.0 + 4.0 * std::pow(ak, 2)));
+            double ratio_k = (ak_prev - 1.0) / ak;
             
             VectorXd beta_update = beta;
             VectorXd beta_diff = beta - beta_last;

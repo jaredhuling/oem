@@ -255,8 +255,10 @@ oem <- function(x,
         }
         
         unique.groups <- sort(unique(groups))
-        zero.idx <- unique.groups[which(unique.groups == 0)]
-        groups <- drop(groups)
+        
+        ## index of '0' group
+        zero.idx      <- unique.groups[which(unique.groups == 0)]
+        groups        <- drop(groups)
         if (!is.null(group.weights))
         {
             
@@ -296,7 +298,8 @@ oem <- function(x,
         }
         
         
-        
+        ## the intercept is calculated implicitly
+        ## only for gaussian family
         if ((intercept & family != "gaussian") |
             (intercept & is.sparse))
         {
@@ -305,7 +308,8 @@ oem <- function(x,
         }
         
         
-    } else {
+    } else 
+    {
         unique.groups <- numeric(0)
         group.weights <- numeric(0)
     }
