@@ -78,7 +78,7 @@ fit <- cv.oem(x = x, y = y, penalty = c("lasso", "grp.lasso"), groups = rep(1:10
 
 layout(matrix(1:2, ncol = 2))
 plot(fit, which.model = 1)
-plot(fit, which.model = 2)
+plot(fit, which.model = "grp.lasso")
 
 set.seed(123)
 n.obs <- 1e4

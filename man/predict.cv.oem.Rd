@@ -52,5 +52,13 @@ fit <- cv.oem(x = x, y = y,
 preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
 
 apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
+
+preds.gl <- predict(fit, newx = x.test, type = "response", which.model = "grp.lasso")
+
+apply(preds.gl, 2, function(x) mean((y.test - x) ^ 2))
+
+preds.l <- predict(fit, newx = x.test, type = "response", which.model = 1)
+
+apply(preds.l, 2, function(x) mean((y.test - x) ^ 2))
 }
 

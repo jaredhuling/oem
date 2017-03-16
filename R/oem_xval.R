@@ -369,6 +369,8 @@ xval.oem <- function(x,
         rownames(res$beta[[i]]) <- c("(Intercept)", varnames)
     }
     
+    names(res$beta) <- penalty
+    
     nz <- lapply(1:length(res$beta), function(m) 
         sapply(predict.oem(res, type = "nonzero", which.model = m), length) - 1
     )

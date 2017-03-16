@@ -55,11 +55,27 @@ predict.oem <- function(object, newx, s = NULL, which.model = 1,
     type <- match.arg(type)
     
     num.models <- length(object$beta)
-    if (which.model > num.models)
+    which.model <- which.model[1]
+    pen.names   <- names(object$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
+    
+    
     if(missing(newx)){
         if(!match(type, c("coefficients", "nonzero"), FALSE))stop("A value for 'newx' must be supplied")
     }
@@ -129,10 +145,26 @@ plot.oem <- function(x, which.model = 1,
                      ...) 
 {
     num.models <- length(x$beta)
-    if (which.model > num.models)
+    
+    
+    which.model <- which.model[1]
+    pen.names   <- names(x$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     
@@ -243,17 +275,32 @@ plot.oem <- function(x, which.model = 1,
 #' 
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit, which.model = 1)
-#' plot(fit, which.model = 2)
+#' plot(fit, which.model = "grp.lasso")
 #' 
 plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
 {
     # modified from glmnet
     object = x
     num.models <- length(object$cvm)
-    if (which.model > num.models)
+    
+    which.model <- which.model[1]
+    pen.names   <- names(object$oem.fit$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     main.txt <- x$oem.fit$penalty[which.model]
@@ -372,19 +419,36 @@ predict.oemfit_xval_binomial <- function(object, newx, s=NULL, which.model = 1,
 #' x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #'
-#' fit <- oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+#' fit <- oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE)
 #'
 #' logLik(fit)
+#' 
+#' likLik(fit, which.model = "mcp")
 #'
 logLik.oem <- function(object, which.model = 1, ...) {
     # taken from ncvreg. Thanks to Patrick Breheny.
     n <- as.numeric(object$nobs)
     
     num.models <- length(object$beta)
-    if (which.model > num.models)
+    
+    which.model <- which.model[1]
+    pen.names   <- names(object$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     if (all(object$loss[[which.model]] == 1e99))
@@ -422,9 +486,12 @@ logLik.oem <- function(object, which.model = 1, ...) {
 #' @export 
 #' @examples
 #'
-#' fit <- cv.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+#' fit <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE,
+#'               nlambda = 25)
 #'
 #' logLik(fit)
+#' 
+#' likLik(fit, which.model = "mcp")
 #'
 logLik.cv.oem <- function(object, which.model = 1, ...) {
     
@@ -433,10 +500,25 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
     n <- as.numeric(object$nobs)
     
     num.models <- length(object$beta)
-    if (which.model > num.models)
+    
+    which.model <- which.model[1]
+    pen.names   <- names(object$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     if (all(object$loss[[which.model]] == 1e99))
@@ -474,9 +556,12 @@ logLik.cv.oem <- function(object, which.model = 1, ...) {
 #' @export 
 #' @examples
 #'
-#' fit <- xval.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+#' fit <- xval.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE, 
+#'                 nlambda = 25)
 #'
 #' logLik(fit)
+#' 
+#' likLik(fit, which.model = "mcp")
 #'
 logLik.xval.oem <- function(object, which.model = 1, ...) {
     
@@ -484,10 +569,25 @@ logLik.xval.oem <- function(object, which.model = 1, ...) {
     n <- as.numeric(object$nobs)
     
     num.models <- length(object$beta)
-    if (which.model > num.models)
+    
+    which.model <- which.model[1]
+    pen.names   <- names(object$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     if (all(object$loss[[which.model]] == 1e99))
@@ -560,9 +660,18 @@ logLik.xval.oem <- function(object, which.model = 1, ...) {
 #' preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
 #' 
 #' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
+#' 
+#' preds.gl <- predict(fit, newx = x.test, type = "response", which.model = "grp.lasso")
+#' 
+#' apply(preds.gl, 2, function(x) mean((y.test - x) ^ 2))
+#' 
+#' preds.l <- predict(fit, newx = x.test, type = "response", which.model = 1)
+#' 
+#' apply(preds.l, 2, function(x) mean((y.test - x) ^ 2))
 predict.cv.oem <- function(object, newx, which.model = "best.model",
                            s=c("lambda.min", "lambda.1se"), ...)
 {
+    which.model <- which.model[1]
     if(is.numeric(s))lambda=s
     else 
         if(is.character(s)){
@@ -582,7 +691,20 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
     }
     else if(is.character(which.model))
     {
-        mod.num <- object[["model.min"]]
+        if (which.model == "best.model")
+        {
+            mod.num <- object[["model.min"]]
+        } else 
+        {
+            pen.names   <- names(object$oem.fit$beta)
+            
+            if (!(which.model %in% pen.names))
+            {
+                err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+                stop(err.txt)
+            }
+            mod.num <- match(which.model, pen.names)
+        }
     }
     
     else stop("Invalid form for s")
@@ -629,9 +751,19 @@ predict.cv.oem <- function(object, newx, which.model = "best.model",
 #' preds.best <- predict(fit, newx = x.test, type = "response", which.model = "best.model")
 #' 
 #' apply(preds.best, 2, function(x) mean((y.test - x) ^ 2))
+#' 
+#' preds.gl <- predict(fit, newx = x.test, type = "response", which.model = "grp.lasso")
+#' 
+#' apply(preds.gl, 2, function(x) mean((y.test - x) ^ 2))
+#' 
+#' preds.l <- predict(fit, newx = x.test, type = "response", which.model = 1)
+#' 
+#' apply(preds.l, 2, function(x) mean((y.test - x) ^ 2))
 predict.xval.oem <- function(object, newx, which.model = "best.model",
                              s = c("lambda.min", "lambda.1se"),...)
 {
+    
+    which.model <- which.model[1]
     if(is.numeric(s))lambda=s
     else 
         if(is.character(s)){
@@ -652,7 +784,20 @@ predict.xval.oem <- function(object, newx, which.model = "best.model",
     }
     else if(is.character(which.model))
     {
-        mod.num <- object[["model.min"]]
+        if (which.model == "best.model")
+        {
+            mod.num <- object[["model.min"]]
+        } else 
+        {
+            pen.names   <- names(object$beta)
+            
+            if (!(which.model %in% pen.names))
+            {
+                err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+                stop(err.txt)
+            }
+            mod.num <- match(which.model, pen.names)
+        }
     }
     else stop("Invalid form for which.model")
     predict.oem(object, newx, s=lambda, which.model = mod.num, ...)
@@ -701,10 +846,25 @@ plot.xval.oem <- function(x, which.model = 1,
 {
     type       <- match.arg(type)
     num.models <- length(x$beta)
-    if (which.model > num.models)
+    
+    which.model <- which.model[1]
+    pen.names   <- names(x$beta)
+    
+    if (!is.character(which.model))
     {
-        err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
-        stop(err.txt)
+        if (which.model > num.models)
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but only ", num.models, " were computed.")
+            stop(err.txt)
+        }
+    } else 
+    {
+        if (!(which.model %in% pen.names))
+        {
+            err.txt <- paste0("Model ", which.model, " specified, but ", which.model, " not computed.")
+            stop(err.txt)
+        }
+        which.model <- match(which.model, pen.names)
     }
     
     

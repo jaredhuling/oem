@@ -37,19 +37,27 @@ true.beta <- c(runif(15, -0.25, 0.25), rep(0, n.vars - 15))
 x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
-fit <- oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+fit <- oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE)
 
 logLik(fit)
 
+likLik(fit, which.model = "mcp")
 
-fit <- cv.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
+
+fit <- cv.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE,
+              nlambda = 25)
+
+logLik(fit)
+
+likLik(fit, which.model = "mcp")
+
+
+fit <- xval.oem(x = x, y = y, penalty = c("lasso", "mcp"), compute.loss = TRUE, 
+                nlambda = 25)
 
 logLik(fit)
 
-
-fit <- xval.oem(x = x, y = y, penalty = "lasso", compute.loss = TRUE)
-
-logLik(fit)
+likLik(fit, which.model = "mcp")
 
 }
 
