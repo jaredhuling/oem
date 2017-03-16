@@ -51,7 +51,12 @@
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
 #' plot(fit, which.model = 2)
-cv.oem <- function (x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "grp.lasso"),
+cv.oem <- function (x, y, penalty = c("elastic.net", 
+                                      "lasso", 
+                                      "ols", 
+                                      "mcp",       "scad", 
+                                      "mcp.net",   "scad.net",
+                                      "grp.lasso", "grp.lasso.net"),
                     weights = numeric(0), lambda = NULL, 
                     type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10, foldid = NULL, 
                     grouped = TRUE, keep = FALSE, parallel = FALSE, ncores = -1, ...) 
