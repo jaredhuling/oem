@@ -172,8 +172,10 @@ plot.oem <- function(x, which.model = 1,
     ## create sequence that grabs one of ROYGBIV and repeats with
     ## an increment up the rainbow spectrum with each step from 1:7 on ROYGBIV
     n.cols <- 7L
-    scramble.seq <- rep(((1:n.cols) - 1) * (length(cols) %/% (n.cols)) + 1, length(cols) %/% n.cols + 1)[1:length(cols)] + 
+    scramble.seq <- rep(((1:n.cols) - 1) * (length(cols) %/% (n.cols)) + 1, length(cols) %/% n.cols)[1:length(cols)] + 
         (((0:(length(cols)-1)) %/% n.cols))
+    
+    scramble.seq[is.na(scramble.seq)] <- which(!(1:length(cols) %in% scramble.seq))
     colseq <- cols[scramble.seq]
     
     matplot(index, t(nbeta[!remove,,drop=FALSE]), 
