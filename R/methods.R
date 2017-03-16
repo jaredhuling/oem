@@ -16,7 +16,7 @@
 #' \code{type = "response"} gives the fitted probabilities for \code{"binomial"}. \code{type = "coefficients"} computes the coefficients at the requested values for \code{s}.
 #' \code{type = "class"} applies only to \code{"binomial"} and produces the class label corresponding to the maximum probability.
 #' @param ... not used 
-#' @importFrom graphics abline abline axis matplot points segments mtext
+#' @importFrom graphics abline abline axis matplot mtext points segments 
 #' @importFrom methods as
 #' @importFrom stats approx predict quantile runif weighted.mean
 #' @return An object depending on the type argument
