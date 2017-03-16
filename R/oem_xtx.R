@@ -170,7 +170,7 @@ oem.xtx <- function(xtx,
     }
     penalty.factor <- drop(penalty.factor)
     
-    if (any(penalty == "grp.lasso")) {
+    if (any(grep("grp", penalty) > 0)) {
         if (length(groups) != p) {
             stop("groups must have same length as number of columns in x")
         }

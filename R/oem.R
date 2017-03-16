@@ -86,12 +86,13 @@
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
 #' fit <- oem(x = x, y = y, 
-#'            penalty = c("lasso", "grp.lasso"), 
+#'            penalty = c("lasso", "grp.lasso", "sparse.grp.lasso"), 
 #'            groups = rep(1:10, each = 5))
 #' 
-#' layout(matrix(1:2, ncol = 2))
+#' layout(matrix(1:3, ncol = 3))
 #' plot(fit)
 #' plot(fit, which.model = 2)
+#' plot(fit, which.model = "sparse.grp.lasso")
 #' 
 #' # the oem package has support for
 #' # sparse design matrices
@@ -117,11 +118,16 @@
 #' y <- rbinom(n.obs, 1, prob = 1 / (1 + exp(-x %*% true.beta)))
 #' 
 #' system.time(res <- oem(x, y, intercept = FALSE, 
-#'                        penalty = "lasso", 
+#'                        penalty = c("lasso", "sparse.grp.lasso", "mcp"), 
 #'                        family = "binomial", 
+#'                        groups = rep(1:10, each = 5),
 #'                        nlambda = 10,
 #'                        irls.tol = 1e-3, tol = 1e-8))
 #' 
+#' layout(matrix(1:3, ncol = 3))
+#' plot(res)
+#' plot(res, which.model = 2)
+#' plot(res, which.model = "sparse.grp.lasso")
 #' 
 #' 
 #' # sparse design matrix
@@ -252,9 +258,9 @@ oem <- function(x,
     }
     
     
-    if (any(penalty == "grp.lasso")) {
+    if (any(grep("grp", penalty) > 0)) {
         if (length(groups) != p) {
-            stop("If grp.lasso is used groups must have same length as number of columns in x")
+            stop("If any group penalty is used groups must have same length as number of columns in x")
         }
         
         unique.groups <- sort(unique(groups))

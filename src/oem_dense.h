@@ -71,7 +71,7 @@ protected:
     double threshval;
     int wt_len;
     double ak, ak_prev;
-    
+    bool found_grp_idx;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -420,9 +420,12 @@ protected:
     
     void get_group_indexes()
     {
-        if (penalty == "grp.lasso" || penalty == "grp.lasso.scaled") 
+        // if the group is any group penalty
+        std::string grptxt("grp");
+        
+        if (penalty.find(grptxt) != std::string::npos)
         {
-            
+            found_grp_idx = true;
             grp_idx.reserve(ngroups);
             for (int g = 0; g < ngroups; ++g) 
             {
@@ -658,6 +661,8 @@ public:
         
         wt_len = weights.size();
         
+        found_grp_idx = false;
+        
         if (wt_len)
         {
             XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
@@ -696,7 +701,10 @@ public:
         
         // get indexes of members of each group.
         // best to do just once in the beginning
-        get_group_indexes();
+        if (!found_grp_idx)
+        {
+            get_group_indexes();
+        }
         
         ak = 1;
         

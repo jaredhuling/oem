@@ -85,6 +85,7 @@ protected:
     int wt_len;
     
     VectorXd colsq_inv;
+    bool found_grp_idx;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
                                VectorXd &pen_fact, double &d)
@@ -451,9 +452,11 @@ protected:
     
     void get_group_indexes()
     {
-        if (penalty == "grp.lasso") 
+        // if the group is any group penalty
+        std::string grptxt("grp");
+        if (penalty.find(grptxt) != std::string::npos) 
         {
-            
+            found_grp_idx = true;
             grp_idx.reserve(ngroups);
             for (int g = 0; g < ngroups; ++g) 
             {
@@ -759,6 +762,8 @@ public:
             beta_prev.resize(nvars + 1);
         }
         
+        found_grp_idx = false;
+        
         wt_len = weights.size();
         
         // compute XtX or XXt (depending on if n > p or not)
@@ -834,7 +839,10 @@ public:
         
         // get indexes of members of each group.
         // best to do just once in the beginning
-        get_group_indexes();
+        if (!found_grp_idx)
+        {
+            get_group_indexes();
+        }
         
     }
     // when computing for the next lambda, we can use the
