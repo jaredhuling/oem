@@ -53,13 +53,11 @@ protected:
     Vector XY;                  // X'Y
     MatrixXd XX;                // X'X
     MatrixXd A;                 // A = d * I - X'X
-    double d, d_use;            // d value (largest eigenvalue of X'X)
+    double d;                   // d value (largest eigenvalue of X'X)
     double alpha;               // alpha = mixing parameter for elastic net
-    double l2;                  // l2 penalty amount
     double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
     int ncores;
-    bool addl2;                 // are we using an l2 penalty?
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
@@ -97,7 +95,7 @@ protected:
         int v_size = vec.size();
         res.setZero();
         double gammad = gamma * d;
-        double d_minus_gammainv = d - 1 / gamma;
+        double d_minus_gammainv = d - 1.0 / gamma;
         
         
         const double *ptr = vec.data();
@@ -131,14 +129,14 @@ protected:
             
             if (std::abs(ptr[i]) > gammad * total_pen)
                 res(i) = ptr[i]/d;
-            else if (std::abs(ptr[i]) > (d + 1) * total_pen)
+            else if (std::abs(ptr[i]) > (d + 1.0) * total_pen)
             {
                 double gam_ptr = (gamma - 1) * ptr[i];
                 double gam_pen = gamma * total_pen;
                 if(gam_ptr > gam_pen)
-                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr - gam_pen)/(gamma_minus1_d - 1.0);
                 else if(gam_ptr < -gam_pen)
-                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1);
+                    res(i) = (gam_ptr + gam_pen)/(gamma_minus1_d - 1.0);
             }
             else if(ptr[i] > total_pen)
                 res(i) = (ptr[i] - total_pen)/d;
@@ -160,21 +158,13 @@ protected:
         {
             double thresh_factor;
             std::vector<int> gr_idx = grp_idx[g];
-            /*
-            for (int v = 0; v < v_size; ++v) 
+            
+            if (unique_grps(g) == 0) // the 0 group represents unpenalized variables
             {
-                if (grps(v) == unique_grps(g)) 
-                {
-                    gr_idx.push_back(v);
-                }
-            }
-             */
-            if (unique_grps(g) == 0) 
-            {
-                thresh_factor = 1;
+                thresh_factor = 1.0;
             } else 
             {
-                double ds_norm = 0;
+                double ds_norm = 0.0;
                 for (std::vector<int>::size_type v = 0; v < gr_idx.size(); ++v)
                 {
                     int c_idx = gr_idx[v];
@@ -183,7 +173,7 @@ protected:
                 ds_norm = std::sqrt(ds_norm);
                 // double grp_wts = sqrt(gr_idx.size());
                 double grp_wts = pen_fact(g);
-                thresh_factor = std::max(0.0, 1 - penalty * grp_wts / (ds_norm) );
+                thresh_factor = std::max(0.0, 1.0 - penalty * grp_wts / (ds_norm) );
             }
             if (thresh_factor != 0.0)
             {
@@ -399,7 +389,7 @@ protected:
         VectorXd beta_last = beta;
         if (penalty == "lasso")
         {
-            soft_threshold(beta, u, lambda, penalty_factor, d_use);
+            soft_threshold(beta, u, lambda, penalty_factor, d);
         } else if (penalty == "ols")
         {
             beta = u / d;
@@ -410,14 +400,34 @@ protected:
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
         {
-            soft_threshold_scad(beta, u, lambda, penalty_factor, d_use, gamma);
+            soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
+            
+        } else if (penalty == "scad.net") 
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
+        
         } else if (penalty == "mcp") 
         {
-            soft_threshold_mcp(beta, u, lambda, penalty_factor, d_use, gamma);
+            soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
+        } else if (penalty == "mcp.net") 
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
+            
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
                                  d, grp_idx, ngroups, 
+                                 unique_groups, groups);
+        } else if (penalty == "grp.lasso.net")
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            block_soft_threshold(beta, u, lam, group_weights,
+                                 denom, grp_idx, ngroups, 
                                  unique_groups, groups);
         }
         
@@ -522,41 +532,7 @@ public:
         lambda = lambda_;
         penalty = penalty_;
         
-        d_use = d;
-        addl2 = false;
         
-        // modifying stepsize instead of modifying
-        // thresholding operator leads to faster 
-        // convergence rates due to conditioning!
-        if (penalty == "mcp.net")
-        {
-            l2      = (1 - alpha) * lambda;
-            lambda *= alpha;
-            addl2   = true;
-            
-            // eigenvalues of (X'X + cI) = eigenvalues of (X'X) + c
-            d_use   += l2;
-            penalty = "mcp";
-        } else if (penalty == "scad.net")
-        {
-            l2      = (1 - alpha) * lambda;
-            lambda *= alpha;
-            addl2   = true;
-            
-            // eigenvalues of (X'X + cI) = eigenvalues of (X'X) + c
-            d_use   += l2;
-            penalty = "scad";
-        } else if (penalty == "elastic.net")
-        {
-            l2      = (1 - alpha) * lambda;
-            
-            lambda *= alpha;
-            addl2   = true;
-            
-            // eigenvalues of (X'X + cI) = eigenvalues of (X'X) + c
-            d_use   += l2;
-            penalty = "lasso";
-        }
         
         // get indexes of members of each group.
         // best to do just once in the beginning
@@ -570,15 +546,6 @@ public:
     void init_warm(double lambda_)
     {
         lambda = lambda_;
-        
-        // need to adjust things if l2
-        // penalty is used
-        if (addl2) 
-        {
-            l2      = (1 - alpha) * lambda;
-            lambda *= alpha;
-            d_use   = d + l2;
-        }
     }
     
     VectorXd get_beta() 

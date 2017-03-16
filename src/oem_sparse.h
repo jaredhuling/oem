@@ -525,13 +525,32 @@ protected:
         } else if (penalty == "scad") 
         {
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
+        } else if (penalty == "scad.net") 
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
+            
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
+        } else if (penalty == "mcp.net") 
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
+            
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
                                  d, grp_idx, ngroups, 
+                                 unique_groups, groups);
+        } else if (penalty == "grp.lasso.net")
+        {
+            double denom = d + (1 - alpha) * lambda;
+            double lam = alpha * lambda;
+            block_soft_threshold(beta, u, lam, group_weights,
+                                 denom, grp_idx, ngroups, 
                                  unique_groups, groups);
         }
         
