@@ -788,8 +788,8 @@ plot.xval.oem <- function(x, which.model = 1,
             for (i in 1:sum(!remove)) {
                 j <- take[i]
                 axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
-                     las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
-                     lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i], ...)
+                     las=1, cex.axis=labsize, col.axis = colseq[i], 
+                     lty = (i - 1) %% 5 + 1, col = colseq[i], ...)
             }
         }
         par("mai"=margins)
