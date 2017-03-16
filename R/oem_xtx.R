@@ -36,6 +36,7 @@
 #' depends on the sample size nobs relative to the number of variables nvars. The default is 0.0001
 #' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
+#' @param tau mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 #' should be put in group 0
 #' @param scale.factor of length \code{nvars === ncol(xtx) == length(xty)} for scaling columns of \code{x}. The standard deviation
@@ -69,7 +70,13 @@
 #' y <- rnorm(n.obs, sd = 3) + x %*% true.beta
 #' 
 #' fit <- oem(x = x, y = y, 
-#'            penalty = c("lasso", "grp.lasso"), 
+#'            penalty = c("lasso", "elastic.net", 
+#'                         "ols", 
+#'                         "mcp",       "scad", 
+#'                         "mcp.net",   "scad.net",
+#'                         "grp.lasso", "grp.lasso.net",
+#'                         "grp.mcp",   "grp.scad",
+#'                         "sparse.grp.lasso"), 
 #'            standardize = FALSE, intercept = FALSE,
 #'            groups = rep(1:20, each = 5))
 #'            
@@ -77,7 +84,13 @@
 #' xty <- crossprod(x, y) / n.obs
 #' 
 #' fit.xtx <- oem.xtx(xtx = xtx, xty = xty, 
-#'                    penalty = c("lasso", "grp.lasso"), 
+#'                    penalty = c("lasso", "elastic.net", 
+#'                                "ols", 
+#'                                "mcp",       "scad", 
+#'                                "mcp.net",   "scad.net",
+#'                                "grp.lasso", "grp.lasso.net",
+#'                                "grp.mcp",   "grp.scad",
+#'                                "sparse.grp.lasso"), 
 #'                    groups = rep(1:20, each = 5))    
 #'                    
 #' max(abs(fit$beta[[1]][-1,] - fit.xtx$beta[[1]]))
@@ -96,12 +109,14 @@ oem.xtx <- function(xtx,
                                 "mcp",       "scad", 
                                 "mcp.net",   "scad.net",
                                 "grp.lasso", "grp.lasso.net",
-                                "grp.mcp",   "grp.scad"),
+                                "grp.mcp",   "grp.scad",
+                                "sparse.grp.lasso"),
                     lambda = numeric(0),
                     nlambda = 100L,
                     lambda.min.ratio = NULL,
                     alpha = 1,
                     gamma = 3,
+                    tau   = 0.5,
                     groups = numeric(0),
                     scale.factor   = numeric(0),
                     penalty.factor = NULL,
@@ -222,6 +237,7 @@ oem.xtx <- function(xtx,
     nlambda       <- as.integer(nlambda)
     alpha         <- as.double(alpha)
     gamma         <- as.double(gamma)
+    tau           <- as.double(tau)
     tol           <- as.double(tol)
     irls.tol      <- as.double(irls.tol)
     irls.maxit    <- as.integer(irls.maxit)
@@ -260,6 +276,7 @@ oem.xtx <- function(xtx,
                                                    lambda.min.ratio,
                                                    alpha,
                                                    gamma,
+                                                   tau,
                                                    scale.factor,
                                                    penalty.factor,
                                                    options),
@@ -274,6 +291,7 @@ oem.xtx <- function(xtx,
                                                    lambda.min.ratio,
                                                    alpha,
                                                    gamma,
+                                                   tau,
                                                    scale.factor,
                                                    penalty.factor,
                                                    options)
@@ -314,6 +332,7 @@ oemfit.xtx.gaussian <- function(xtx,
                                 lambda.min.ratio,
                                 alpha,
                                 gamma,
+                                tau,
                                 scale.factor,
                                 penalty.factor,
                                 options)
@@ -331,6 +350,7 @@ oemfit.xtx.gaussian <- function(xtx,
                  lambda.min.ratio,
                  alpha,
                  gamma,
+                 tau,
                  scale.factor,
                  penalty.factor,
                  options,
@@ -353,6 +373,7 @@ oemfit.xtx.binomial <- function(xtx,
                                 lambda.min.ratio,
                                 alpha,
                                 gamma,
+                                tau,
                                 scale.factor,
                                 penalty.factor,
                                 options)
@@ -371,6 +392,7 @@ oemfit.xtx.binomial <- function(xtx,
                  lambda.min.ratio,
                  alpha,
                  gamma,
+                 tau,
                  scale.factor,
                  penalty.factor,
                  options,

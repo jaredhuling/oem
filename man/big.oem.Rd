@@ -6,12 +6,13 @@
 \usage{
 big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
-  "grp.lasso.net", "grp.mcp", "grp.scad"), weights = numeric(0),
-  lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
-  alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
-  group.weights = NULL, standardize = TRUE, intercept = TRUE,
-  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  compute.loss = FALSE, gigs = 4, hessian.type = c("full", "upper.bound"))
+  "grp.lasso.net", "grp.mcp", "grp.scad", "sparse.grp.lasso"),
+  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
+  lambda.min.ratio = NULL, alpha = 1, gamma = 3, tau = 0.5,
+  groups = numeric(0), penalty.factor = NULL, group.weights = NULL,
+  standardize = TRUE, intercept = TRUE, maxit = 500L, tol = 1e-07,
+  irls.maxit = 100L, irls.tol = 0.001, compute.loss = FALSE, gigs = 4,
+  hessian.type = c("full", "upper.bound"))
 }
 \arguments{
 \item{x}{input big.matrix object pointing to design matrix 
@@ -60,6 +61,8 @@ when \code{nobs < nvars}.}
 \item{alpha}{mixing value for \code{elastic.net}. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
+
+\item{tau}{mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)}
 
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}
@@ -125,7 +128,13 @@ for (i in 1:ncols) bigmat[,i] = rnorm(nrows)*i
 y <- rnorm(nrows) + bigmat[,1] - bigmat[,2]
 
 fit <- big.oem(x = bigmat, y = y, 
-               penalty = c("lasso", "grp.lasso"), 
+               penalty = c("lasso", "elastic.net", 
+                           "ols", 
+                           "mcp",       "scad", 
+                           "mcp.net",   "scad.net",
+                           "grp.lasso", "grp.lasso.net",
+                           "grp.mcp",   "grp.scad",
+                           "sparse.grp.lasso"), 
                groups = rep(1:20, each = 5))
                
 fit2 <- oem(x = bigmat[,], y = y, 

@@ -6,11 +6,12 @@
 \usage{
 oem.xtx(xtx, xty, family = c("gaussian", "binomial"),
   penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "mcp.net",
-  "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad"),
-  lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
-  alpha = 1, gamma = 3, groups = numeric(0), scale.factor = numeric(0),
-  penalty.factor = NULL, group.weights = NULL, maxit = 500L,
-  tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001)
+  "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
+  "sparse.grp.lasso"), lambda = numeric(0), nlambda = 100L,
+  lambda.min.ratio = NULL, alpha = 1, gamma = 3, tau = 0.5,
+  groups = numeric(0), scale.factor = numeric(0), penalty.factor = NULL,
+  group.weights = NULL, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
+  irls.tol = 0.001)
 }
 \arguments{
 \item{xtx}{input matrix equal to \code{crossprod(x) / nrow(x)}. 
@@ -57,6 +58,8 @@ depends on the sample size nobs relative to the number of variables nvars. The d
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 
+\item{tau}{mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)}
+
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}
 
@@ -99,7 +102,13 @@ x <- matrix(rnorm(n.obs * n.vars), n.obs, n.vars)
 y <- rnorm(n.obs, sd = 3) + x \%*\% true.beta
 
 fit <- oem(x = x, y = y, 
-           penalty = c("lasso", "grp.lasso"), 
+           penalty = c("lasso", "elastic.net", 
+                        "ols", 
+                        "mcp",       "scad", 
+                        "mcp.net",   "scad.net",
+                        "grp.lasso", "grp.lasso.net",
+                        "grp.mcp",   "grp.scad",
+                        "sparse.grp.lasso"), 
            standardize = FALSE, intercept = FALSE,
            groups = rep(1:20, each = 5))
            
@@ -107,7 +116,13 @@ xtx <- crossprod(x) / n.obs
 xty <- crossprod(x, y) / n.obs
 
 fit.xtx <- oem.xtx(xtx = xtx, xty = xty, 
-                   penalty = c("lasso", "grp.lasso"), 
+                   penalty = c("lasso", "elastic.net", 
+                               "ols", 
+                               "mcp",       "scad", 
+                               "mcp.net",   "scad.net",
+                               "grp.lasso", "grp.lasso.net",
+                               "grp.mcp",   "grp.scad",
+                               "sparse.grp.lasso"), 
                    groups = rep(1:20, each = 5))    
                    
 max(abs(fit$beta[[1]][-1,] - fit.xtx$beta[[1]]))

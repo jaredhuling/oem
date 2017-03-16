@@ -7,12 +7,13 @@
 xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
   "deviance", "class", "auc", "mae"), ncores = -1, family = c("gaussian",
   "binomial"), penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
-  "mcp.net", "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad"),
-  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
-  lambda.min.ratio = NULL, alpha = 1, gamma = 3, groups = numeric(0),
-  penalty.factor = NULL, group.weights = NULL, standardize = TRUE,
-  intercept = TRUE, maxit = 500L, tol = 1e-07, irls.maxit = 100L,
-  irls.tol = 0.001, compute.loss = FALSE)
+  "mcp.net", "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
+  "sparse.grp.lasso"), weights = numeric(0), lambda = numeric(0),
+  nlambda = 100L, lambda.min.ratio = NULL, alpha = 1, gamma = 3,
+  tau = 0.5, groups = numeric(0), penalty.factor = NULL,
+  group.weights = NULL, standardize = TRUE, intercept = TRUE,
+  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
+  compute.loss = FALSE)
 }
 \arguments{
 \item{x}{input matrix of dimension n x p (sparse matrices not yet implemented). 
@@ -73,6 +74,8 @@ depends on the sample size nobs relative to the number of variables nvars. If
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 
+\item{tau}{mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)}
+
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}
 
@@ -126,6 +129,15 @@ system.time(fit <- oem(x = x, y = y,
 system.time(xfit <- xval.oem(x = x, y = y, 
                              penalty = c("lasso", "grp.lasso"), 
                              groups = rep(1:20, each = 5)))
+                             
+system.time(xfit2 <- xval.oem(x = x, y = y, 
+                              penalty = c("lasso", "grp.lasso",
+                                          "mcp",       "scad", 
+                                          "mcp.net",   "scad.net",
+                                          "grp.lasso", "grp.lasso.net",
+                                          "grp.mcp",   "grp.scad",
+                                          "sparse.grp.lasso"), 
+                              groups = rep(1:20, each = 5)))
 
 }
 

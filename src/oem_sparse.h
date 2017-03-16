@@ -66,8 +66,6 @@ protected:
     MatrixXd XX;                // X'X
     MatrixXd A;                 // A = d * I - X'X
     double d;                   // d value (largest eigenvalue of X'X)
-    double alpha;               // alpha = mixing parameter for elastic net
-    double gamma;               // extra tuning parameter for mcp/scad
     bool default_group_weights; // do we need to compute default group weights?
     int ncores;
     double xxdiag;
@@ -79,6 +77,9 @@ protected:
     
     double lambda;              // L1 penalty
     double lambda0;             // minimum lambda to make coefficients all zero
+    double alpha;               // alpha = mixing parameter for elastic net
+    double gamma;               // extra tuning parameter for mcp/scad
+    double tau;                 // mixing parameter for group sparse penalties
     
     double threshval;
     int wt_len;
@@ -688,7 +689,25 @@ protected:
             block_soft_threshold_scad(beta, u, lambda, group_weights,
                                       d, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
-        }
+        } else if (penalty == "sparse.grp.lasso")
+        {
+            double lam_grp = (1.0 - tau) * lambda;
+            double lam_l1  = tau * lambda;
+            
+            double fact = 1.0;
+            
+            // first apply soft thresholding
+            // but don't divide by d
+            soft_threshold(beta, u, lam_l1, penalty_factor, fact);
+            
+            VectorXd beta_tmp = beta;
+            
+            // then apply block soft thresholding
+            block_soft_threshold(beta, beta_tmp, lam_grp, 
+                                 group_weights,
+                                 d, grp_idx, ngroups, 
+                                 unique_groups, groups);
+        } 
         
     }
     
@@ -701,8 +720,6 @@ public:
               const VectorXi &unique_groups_,
               VectorXd &group_weights_,
               VectorXd &penalty_factor_,
-              const double &alpha_,
-              const double &gamma_,
               bool &intercept_,
               bool &standardize_,
               int &ncores_,
@@ -724,8 +741,6 @@ public:
                              XXdim( std::min(X_.cols(), X_.rows()) + intercept_ * (X_.rows() > X_.cols()) ),
                              XY(XXdim),            // add extra space if intercept and n > p
                              XX(XXdim, XXdim),     // add extra space if intercept and n > p
-                             alpha(alpha_),
-                             gamma(gamma_),
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
                              ncores(ncores_),
                              grp_idx(unique_groups_.size()),
@@ -805,12 +820,17 @@ public:
     double get_d() { return d; }
     
     // init() is a cold start for the first lambda
-    void init(double lambda_, std::string penalty_)
+    void init(double lambda_, std::string penalty_,
+              double alpha_, double gamma_, double tau_)
     {
         beta.setZero();
         
         lambda = lambda_;
         penalty = penalty_;
+        
+        alpha = alpha_;
+        gamma = gamma_;
+        tau   = tau_;
         
         // get indexes of members of each group.
         // best to do just once in the beginning

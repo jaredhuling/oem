@@ -6,13 +6,13 @@
 \usage{
 oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
-  "grp.lasso.net", "grp.mcp", "grp.scad"), weights = numeric(0),
-  lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
-  alpha = 1, gamma = 3, groups = numeric(0), penalty.factor = NULL,
-  group.weights = NULL, standardize = TRUE, intercept = TRUE,
-  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  accelerate = FALSE, ncores = -1, compute.loss = FALSE,
-  hessian.type = c("upper.bound", "full"))
+  "grp.lasso.net", "grp.mcp", "grp.scad", "sparse.grp.lasso"),
+  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
+  lambda.min.ratio = NULL, alpha = 1, gamma = 3, tau = 0.5,
+  groups = numeric(0), penalty.factor = NULL, group.weights = NULL,
+  standardize = TRUE, intercept = TRUE, maxit = 500L, tol = 1e-07,
+  irls.maxit = 100L, irls.tol = 0.001, accelerate = FALSE, ncores = -1,
+  compute.loss = FALSE, hessian.type = c("upper.bound", "full"))
 }
 \arguments{
 \item{x}{input matrix of dimension n x p or \code{CsparseMatrix} object of the \pkg{Matrix} package. 
@@ -62,6 +62,8 @@ when \code{nobs < nvars}.}
 \item{alpha}{mixing value for \code{elastic.net}. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
+
+\item{tau}{mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)}
 
 \item{groups}{A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 should be put in group 0}

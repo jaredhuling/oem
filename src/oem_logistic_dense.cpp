@@ -39,6 +39,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
                                        SEXP lmin_ratio_,
                                        SEXP alpha_,
                                        SEXP gamma_,
+                                       SEXP tau_,
                                        SEXP penalty_factor_,
                                        SEXP standardize_, 
                                        SEXP intercept_,
@@ -82,6 +83,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     const double tol       = as<double>(opts["tol"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
+    const double tau       = as<double>(tau_);
     bool standardize       = as<bool>(standardize_);
     bool intercept         = as<bool>(intercept_);
     bool intercept_bin     = intercept;
@@ -136,7 +138,7 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     // initialize classes
     solver = new oemLogisticDense(X, Y, weights, groups, unique_groups, 
                                   group_weights, penalty_factor, 
-                                  alpha, gamma, intercept, standardize, ncores,
+                                  intercept, standardize, ncores,
                                   hessian_type[0],
                                   irls_maxit, irls_tol, tol);
     
@@ -182,7 +184,8 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
 
             ilambda = lambda[i]; // * n; //     
             if(i == 0)
-                solver->init(ilambda, penalty[pp]);
+                solver->init(ilambda, penalty[pp],
+                             alpha, gamma, tau);
             else
                 solver->init_warm(ilambda);
             

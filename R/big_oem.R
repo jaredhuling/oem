@@ -38,6 +38,7 @@
 #' when \code{nobs < nvars}.
 #' @param alpha mixing value for \code{elastic.net}. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
+#' @param tau mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
 #' should be put in group 0
 #' @param penalty.factor Separate penalty factors can be applied to each coefficient. 
@@ -90,7 +91,13 @@
 #' y <- rnorm(nrows) + bigmat[,1] - bigmat[,2]
 #' 
 #' fit <- big.oem(x = bigmat, y = y, 
-#'                penalty = c("lasso", "grp.lasso"), 
+#'                penalty = c("lasso", "elastic.net", 
+#'                            "ols", 
+#'                            "mcp",       "scad", 
+#'                            "mcp.net",   "scad.net",
+#'                            "grp.lasso", "grp.lasso.net",
+#'                            "grp.mcp",   "grp.scad",
+#'                            "sparse.grp.lasso"), 
 #'                groups = rep(1:20, each = 5))
 #'                
 #' fit2 <- oem(x = bigmat[,], y = y, 
@@ -112,13 +119,15 @@ big.oem <- function(x,
                                 "mcp",       "scad", 
                                 "mcp.net",   "scad.net",
                                 "grp.lasso", "grp.lasso.net",
-                                "grp.mcp",   "grp.scad"),
+                                "grp.mcp",   "grp.scad",
+                                "sparse.grp.lasso"),
                     weights = numeric(0),
                     lambda = numeric(0),
                     nlambda = 100L,
                     lambda.min.ratio = NULL,
                     alpha = 1,
                     gamma = 3,
+                    tau   = 0.5,
                     groups = numeric(0),
                     penalty.factor = NULL,
                     group.weights = NULL,
@@ -268,6 +277,7 @@ big.oem <- function(x,
     nlambda       <- as.integer(nlambda)
     alpha         <- as.double(alpha)
     gamma         <- as.double(gamma)
+    tau           <- as.double(tau)
     tol           <- as.double(tol)
     irls.tol      <- as.double(irls.tol)
     gigs          <- as.double(gigs)
@@ -308,6 +318,7 @@ big.oem <- function(x,
                                                    lambda.min.ratio,
                                                    alpha,
                                                    gamma,
+                                                   tau,
                                                    penalty.factor,
                                                    standardize,
                                                    intercept,
@@ -326,6 +337,7 @@ big.oem <- function(x,
                                                    lambda.min.ratio,
                                                    alpha,
                                                    gamma,
+                                                   tau,
                                                    penalty.factor,
                                                    standardize,
                                                    intercept,
@@ -370,6 +382,7 @@ oemfit.big.gaussian <- function(x,
                                 lambda.min.ratio,
                                 alpha,
                                 gamma,
+                                tau,
                                 penalty.factor,
                                 standardize,
                                 intercept,
@@ -389,6 +402,7 @@ oemfit.big.gaussian <- function(x,
                  lambda.min.ratio,
                  alpha,
                  gamma,
+                 tau,
                  penalty.factor,
                  standardize,
                  intercept,
@@ -413,6 +427,7 @@ oemfit.big.binomial <- function(x,
                                 lambda.min.ratio,
                                 alpha,
                                 gamma,
+                                tau,
                                 penalty.factor,
                                 standardize,
                                 intercept,
@@ -432,6 +447,7 @@ oemfit.big.binomial <- function(x,
                  lambda.min.ratio,
                  alpha,
                  gamma,
+                 tau,
                  penalty.factor,
                  standardize,
                  intercept,

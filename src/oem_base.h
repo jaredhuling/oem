@@ -120,7 +120,8 @@ public:
     
     virtual double get_loss() { return 1e99; }
     
-    virtual void init(double lambda_, std::string penalty_) {}
+    virtual void init(double lambda_, std::string penalty_,
+                      double alpha_, double gamma_, double tau_) {}
     virtual void init_warm(double lambda_) {}
 };
 

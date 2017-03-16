@@ -40,6 +40,7 @@ RcppExport SEXP oem_fit_big(SEXP x_,
                             SEXP lmin_ratio_,
                             SEXP alpha_,
                             SEXP gamma_,
+                            SEXP tau_,
                             SEXP penalty_factor_,
                             SEXP standardize_, 
                             SEXP intercept_,
@@ -82,6 +83,7 @@ RcppExport SEXP oem_fit_big(SEXP x_,
     const double gigs      = as<double>(opts["gigs"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
+    const double tau       = as<double>(tau_);
     bool standardize       = as<bool>(standardize_);
     bool intercept         = as<bool>(intercept_);
     bool compute_loss      = as<bool>(compute_loss_);
@@ -110,7 +112,7 @@ RcppExport SEXP oem_fit_big(SEXP x_,
     {
         solver = new oemBig(X, Y, weights, groups, unique_groups, 
                             group_weights, penalty_factor, 
-                            alpha, gamma, intercept, standardize, tol, gigs);
+                            intercept, standardize, tol, gigs);
     } else if (family(0) == "binomial")
     {
         throw std::invalid_argument("binomial not available for oem_fit_dense, use oem_fit_logistic_dense");
@@ -156,7 +158,8 @@ RcppExport SEXP oem_fit_big(SEXP x_,
             
             ilambda = lambda[i]; // * n; //     
             if(i == 0)
-                solver->init(ilambda, penalty[pp]);
+                solver->init(ilambda, penalty[pp],
+                             alpha, gamma, tau);
             else
                 solver->init_warm(ilambda);
             

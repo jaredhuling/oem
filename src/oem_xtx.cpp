@@ -38,6 +38,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
                         SEXP lmin_ratio_,
                         SEXP alpha_,
                         SEXP gamma_,
+                        SEXP tau_,
                         SEXP scale_factor_,
                         SEXP penalty_factor_,
                         SEXP opts_)
@@ -68,6 +69,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
     const double tol       = as<double>(opts["tol"]);
     const double alpha     = as<double>(alpha_);
     const double gamma     = as<double>(gamma_);
+    const double tau       = as<double>(tau_);
     
     CharacterVector family(as<CharacterVector>(family_));
     std::vector<std::string> penalty(as< std::vector<std::string> >(penalty_));
@@ -84,8 +86,7 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
     {
         solver = new oemXTX(xtx, xty, groups, unique_groups, 
                             group_weights, penalty_factor, 
-                            scale_factor,
-                            alpha, gamma, tol);
+                            scale_factor, tol);
     } else if (family(0) == "binomial")
     {
         throw std::invalid_argument("binomial not available for oem_fit_dense, use oem_fit_logistic_dense");
@@ -135,7 +136,8 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
             }
             ilambda = lambda[i]; // * n; //     
             if(i == 0)
-                solver->init(ilambda, penalty[pp]);
+                solver->init(ilambda, penalty[pp],
+                             alpha, gamma, tau);
             else
                 solver->init_warm(ilambda);
             
