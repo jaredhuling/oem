@@ -100,6 +100,7 @@ predict.oem <- function(object, newx, s = NULL, which.model = 1,
 #' @param labsize size of labels for variable names. If labsize = 0, then no variable names will be plotted
 #' @param xlab label for x-axis
 #' @param ylab label for y-axis
+#' @param main main title for plot
 #' @param ... other graphical parameters for the plot
 #' @rdname plot
 #' @export
@@ -123,7 +124,8 @@ predict.oem <- function(object, newx, s = NULL, which.model = 1,
 plot.oem <- function(x, which.model = 1,
                      xvar = c("norm", "lambda", "loglambda", "dev"),
                      labsize = 0.6,
-                     xlab = iname, ylab = "Coefficients", 
+                     xlab = iname, ylab = NULL, 
+                     main = x$penalty[which.model],
                      ...) 
 {
     num.models <- length(x$beta)
@@ -133,8 +135,8 @@ plot.oem <- function(x, which.model = 1,
         stop(err.txt)
     }
     
-    main.txt <- x$penalty[which.model]
     
+
     xvar <- match.arg(xvar)
     nbeta <- as.matrix(x$beta[[which.model]][-1,]) ## remove intercept
     remove <- apply(nbeta, 1, function(betas) all(betas == 0) )
@@ -178,16 +180,29 @@ plot.oem <- function(x, which.model = 1,
     scramble.seq[is.na(scramble.seq)] <- which(!(1:length(cols) %in% scramble.seq))
     colseq <- cols[scramble.seq]
     
+
     matplot(index, t(nbeta[!remove,,drop=FALSE]), 
-            lty = 1, xlab = xlab, 
+            lty = 1, 
+            xlab = xlab, 
+            ylab = "",
             col = colseq,
-            ylab = ylab, xlim = xlim,
+            xlim = xlim,
             type = 'l', ...)
+    
+    if (is.null(ylab)) 
+    {
+        mtext(expression(hat(beta)), side = 2, cex = par("cex"), line = 3, las = 1)
+    } else 
+    {
+        mtext(ylab, side = 2, cex = par("cex"), line = 3)
+        ylab = ""
+    }
     
     atdf <- pretty(index, n = 10L)
     plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
     axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0, ...)
-    title(main.txt, line = 2.5, ...)
+    
+    title(main, line = 2.5, ...)
     
     
     
@@ -679,7 +694,8 @@ plot.xval.oem <- function(x, which.model = 1,
                           type = c("cv", "coefficients"),
                           xvar = c("norm", "lambda", "loglambda", "dev"),
                           labsize = 0.6,
-                          xlab = iname, ylab = "Coefficients", 
+                          xlab = iname, ylab = NULL, 
+                          main = x$penalty[which.model],
                           sign.lambda = 1,
                           ...) 
 {
@@ -691,12 +707,11 @@ plot.xval.oem <- function(x, which.model = 1,
         stop(err.txt)
     }
     
-    main.txt <- x$penalty[which.model]
     
     if (type == "coefficients")
     {
         xvar <- match.arg(xvar)
-        nbeta <- as.matrix(x$beta[[which.model]])
+        nbeta <- as.matrix(x$beta[[which.model]][-1,]) ## remove intercept from plot
         remove <- apply(nbeta, 1, function(betas) all(betas == 0) )
         switch(xvar,
                "norm" = {
@@ -726,16 +741,40 @@ plot.xval.oem <- function(x, which.model = 1,
         )
         if (all(remove)) stop("All beta estimates are zero for all values of lambda. No plot returned.")
         
+        cols <- rainbow(sum(!remove))
+        
+        ## create sequence that grabs one of ROYGBIV and repeats with
+        ## an increment up the rainbow spectrum with each step from 1:7 on ROYGBIV
+        n.cols <- 7L
+        scramble.seq <- rep(((1:n.cols) - 1) * (length(cols) %/% (n.cols)) + 1, length(cols) %/% n.cols)[1:length(cols)] + 
+            (((0:(length(cols)-1)) %/% n.cols))
+        
+        scramble.seq[is.na(scramble.seq)] <- which(!(1:length(cols) %in% scramble.seq))
+        colseq <- cols[scramble.seq]
+        
+        
         matplot(index, t(nbeta[!remove,,drop=FALSE]), 
-                lty = 1, xlab = xlab, 
-                col=rainbow(sum(!remove)),
-                ylab = ylab, xlim = xlim,
+                lty = 1, 
+                xlab = xlab, 
+                ylab = "",
+                col = colseq,
+                xlim = xlim,
                 type = 'l', ...)
+        
+        if (is.null(ylab)) 
+        {
+            mtext(expression(hat(beta)), side = 2, cex = par("cex"), line = 3, las = 1)
+        } else 
+        {
+            mtext(ylab, side = 2, cex = par("cex"), line = 3)
+            ylab = ""
+        }
+        
         
         atdf <- pretty(index, n = 10L)
         plotnz <- approx(x = index, y = x$nzero[[which.model]], xout = atdf, rule = 2, method = "constant", f = approx.f)$y
         axis(side=3, at = atdf, labels = plotnz, tick=FALSE, line=0, ...)
-        title(main.txt, line = 2.5, ...)
+        title(main, line = 2.5, ...)
         
         
         
@@ -774,7 +813,7 @@ plot.xval.oem <- function(x, which.model = 1,
         axis(side=3,at=sign.lambda*log(x$lambda),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0, ...)
         abline(v = sign.lambda * log(x$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
         abline(v = sign.lambda * log(x$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
-        title(main.txt, line = 2.5, ...)
+        title(main, line = 2.5, ...)
     }
 }
 
