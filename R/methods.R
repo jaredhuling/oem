@@ -166,9 +166,19 @@ plot.oem <- function(x, which.model = 1,
     )
     if (all(remove)) stop("All beta estimates are zero for all values of lambda. No plot returned.")
     
+    
+    cols <- rainbow(sum(!remove))
+    
+    ## create sequence that grabs one of ROYGBIV and repeats with
+    ## an increment up the rainbow spectrum with each step from 1:7 on ROYGBIV
+    n.cols <- 7L
+    scramble.seq <- rep(((1:n.cols) - 1) * (length(cols) %/% (n.cols)) + 1, length(cols) %/% n.cols + 1)[1:length(cols)] + 
+        (((0:(length(cols)-1)) %/% n.cols))
+    colseq <- cols[scramble.seq]
+    
     matplot(index, t(nbeta[!remove,,drop=FALSE]), 
             lty = 1, xlab = xlab, 
-            col=rainbow(sum(!remove)),
+            col = colseq,
             ylab = ylab, xlim = xlim,
             type = 'l', ...)
     
@@ -189,8 +199,8 @@ plot.oem <- function(x, which.model = 1,
         for (i in 1:sum(!remove)) {
             j <- take[i]
             axis(4, at = nbeta[j, ncol(nbeta)], labels = rownames(nbeta)[j],
-                 las=1, cex.axis=labsize, col.axis=rainbow(sum(!remove))[i], 
-                 lty = (i - 1) %% 5 + 1, col = rainbow(sum(!remove))[i], ...)
+                 las=1, cex.axis=labsize, col.axis = colseq[i], 
+                 lty = (i - 1) %% 5 + 1, col = colseq[i], ...)
         }
     }
     par("mai"=margins)
