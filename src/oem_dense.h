@@ -384,6 +384,7 @@ protected:
         
     }
     
+    
     void next_beta(Vector &res)
     {
         VectorXd beta_last = beta;
@@ -430,6 +431,7 @@ protected:
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
         }
+        
         
         
         
