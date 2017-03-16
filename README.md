@@ -1,3 +1,4 @@
+
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
 
 ### Build Status
@@ -9,19 +10,21 @@
 
 
 
+
+
+
+
+
+
 ## Introduction
 
 The oem package provides estimaton for various penalized linear models using the [Orthogonalizing EM algorithm](http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436). Documentation for the package can be found here: [oem site](http://casualinference.org/oem) (still under construction).
 
 Install using the **devtools** package (RcppEigen must be installed first as well):
 
+
 ```r
 devtools::install_github("jaredhuling/oem")
-```
-
-or by downloading from CRAN:
-```r
-install.packages("oem")
 ```
 
 or by cloning and building using `R CMD INSTALL`
@@ -64,8 +67,8 @@ microbenchmark(
 ```
 ## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.292307 7.383917 7.658757 7.580808 7.671030 8.365722     5
-##     oem[lasso] 2.040648 2.047586 2.113338 2.063423 2.078822 2.336209     5
+##  glmnet[lasso] 7.488129 7.566939 7.973072 7.668140 7.848791 9.293363     5
+##     oem[lasso] 2.101342 2.124854 2.251222 2.136056 2.169275 2.724582     5
 ##  cld
 ##    b
 ##   a
@@ -160,25 +163,24 @@ microbenchmark(
 )
 ```
 
-
 ```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1740.2711 1740.4014 1745.6558 1746.0448 1749.9996
-##        oem[mcp]  156.1490  156.3148  157.4937  156.6029  158.7574
-##     ncvreg[mcp] 8332.3995 8376.8815 8405.0775 8387.1697 8451.3359
-##       plus[mcp] 1704.8241 1723.2366 1756.4895 1727.7677 1796.3541
-##       oem[scad]  132.5754  132.5845  133.0697  132.6441  133.2717
-##    ncvreg[scad] 8527.7561 8595.5140 8637.7294 8670.6568 8692.7131
-##      plus[scad] 1886.8247 1901.8046 1982.6517 1961.2432 2041.5625
-##        max neval   cld
-##  1751.5619     5  b   
-##   159.6443     5 a    
-##  8477.6007     5    d 
-##  1830.2648     5  b   
-##   134.2728     5 a    
-##  8702.0070     5     e
-##  2121.8234     5   c
+##  sparsenet[mcp] 1829.8318 1845.6693 1863.1905 1848.3258 1857.3867
+##        oem[mcp]  162.7853  171.5975  197.9511  181.2363  230.4670
+##     ncvreg[mcp] 8746.1551 8747.7794 9255.6102 9277.9949 9498.3349
+##       plus[mcp] 1753.9781 1876.0145 1928.9479 1961.3218 2019.7042
+##       oem[scad]  136.1576  138.7363  153.0702  144.7693  149.4673
+##    ncvreg[scad] 9174.4442 9323.6009 9590.5794 9709.5543 9832.5159
+##      plus[scad] 1934.0018 2101.1985 2489.9754 2617.9484 2832.4267
+##         max neval  cld
+##   1934.7387     5  b  
+##    243.6693     5 a   
+##  10007.7867     5    d
+##   2033.7209     5  bc 
+##    196.2204     5 a   
+##   9912.7814     5    d
+##   2964.3016     5   c
 ```
 
 ```r
@@ -231,6 +233,8 @@ microbenchmark(
                                             eps = 1e-8)},
     "oem[grp.lasso]"    = {res2 <- oem(x, y,  
                                        groups = groups,
+                                       intercept = FALSE,
+                                       standardize = FALSE,
                                        penalty = "grp.lasso",
                                        lambda = grp.lam,
                                        tol = 1e-10)},
@@ -248,16 +252,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr        min         lq       mean     median
-##   gglasso[grp.lasso] 1758.24982 1760.96713 1764.63203 1767.35226
-##       oem[grp.lasso]   79.10119   79.33289   79.85101   79.80578
-##  grplasso[grp.lasso] 2575.35601 2602.75647 2609.91463 2613.97859
-##    grpreg[grp.lasso] 1036.92605 1041.19859 1042.27122 1041.82265
-##          uq        max neval  cld
-##  1767.53028 1769.06064     5   c 
-##    80.06472   80.95049     5 a   
-##  2623.16826 2634.31381     5    d
-##  1044.23010 1047.17872     5  b
+##                 expr        min        lq      mean    median       uq
+##   gglasso[grp.lasso] 1904.09593 1915.2421 2054.5685 1938.2952 2196.247
+##       oem[grp.lasso]   84.57905  111.4009  115.7424  114.5228  124.859
+##  grplasso[grp.lasso] 3111.49448 3182.9091 3565.0081 3355.3438 3984.198
+##    grpreg[grp.lasso] 1278.37857 1285.9549 1360.7423 1307.7054 1454.978
+##        max neval  cld
+##  2318.9625     5   c 
+##   143.3503     5 a   
+##  4191.0953     5    d
+##  1476.6949     5  b
 ```
 
 ```r
@@ -270,8 +274,8 @@ diffs
 
 ```
 ##                      abs diff
-## oem and gglasso  8.341970e-05
-## oem and grplasso 8.341973e-05
+## oem and gglasso  1.729379e-06
+## oem and grplasso 4.828369e-08
 ```
 
 #### Bigger Group Lasso Example
@@ -296,10 +300,11 @@ system.time(res <- oem(x, y, penalty = "grp.lasso",
 
 ```
 ##    user  system elapsed 
-##    3.17    0.17    3.34
+##    3.23    0.25    3.57
 ```
 
 ```r
+# memory usage is out of control here.
 # oem uses approximately 1/3 of the memory
 system.time(res2 <- grpreg(x, y, group = groups, 
                            eps = 1e-10, lambda = res$lambda))
@@ -307,7 +312,7 @@ system.time(res2 <- grpreg(x, y, group = groups,
 
 ```
 ##    user  system elapsed 
-##   73.89    1.44   75.83
+##   81.53    1.84   85.29
 ```
 
 ```r
@@ -362,11 +367,11 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 236.5429 236.9945 244.4077 238.2651 249.9254
-##  oem[lasso/mcp/scad/ols] 249.6645 252.7753 260.2248 252.9913 265.3522
+##               oem[lasso] 220.9932 225.7868 228.5817 227.7959 233.1894
+##  oem[lasso/mcp/scad/ols] 249.1216 252.6742 259.4960 254.4962 257.7128
 ##       max neval cld
-##  260.3107     5   a
-##  280.3408     5   a
+##  235.1433     5  a 
+##  283.4752     5   b
 ```
 
 ```r
@@ -374,10 +379,14 @@ microbenchmark(
 #
 
 layout(matrix(1:4, ncol=2, byrow = TRUE))
-plot(res2, which.model = 1, lwd = 2)
-plot(res2, which.model = 2, lwd = 2)
-plot(res2, which.model = 3, lwd = 2)
-plot(res2, which.model = 4, lwd = 2)
+plot(res2, which.model = 1, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 2, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 3, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 4, lwd = 2,
+     xvar = "lambda")
 ```
 
-<img src="README_files/figure-html/mult-1.png" title="" alt="" style="display: block; margin: auto;" />
+<img src="README_files/figure-html/mult-1.png" style="display: block; margin: auto;" />

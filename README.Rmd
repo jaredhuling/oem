@@ -2,15 +2,18 @@
 output:
   html_document:
     keep_md: yes
+    self_contained: true
 ---
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
 
 ### Build Status
-| OS              | Build           |
+|  OS             | Build           |
 |-----------------|-----------------|
-| Linux x86_64    | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
-| OSX             | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)          |
+| Linux x86_64 / OSX   | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
+| Windows x86_64     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
+
+
 
 
 
@@ -185,6 +188,8 @@ microbenchmark(
                                             eps = 1e-8)},
     "oem[grp.lasso]"    = {res2 <- oem(x, y,  
                                        groups = groups,
+                                       intercept = FALSE,
+                                       standardize = FALSE,
                                        penalty = "grp.lasso",
                                        lambda = grp.lam,
                                        tol = 1e-10)},
@@ -270,8 +275,12 @@ microbenchmark(
 #
 
 layout(matrix(1:4, ncol=2, byrow = TRUE))
-plot(res2, which.model = 1, lwd = 2)
-plot(res2, which.model = 2, lwd = 2)
-plot(res2, which.model = 3, lwd = 2)
-plot(res2, which.model = 4, lwd = 2)
+plot(res2, which.model = 1, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 2, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 3, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 4, lwd = 2,
+     xvar = "lambda")
 ```
