@@ -688,8 +688,8 @@ public:
                              colsq_inv(X_.cols())
     {}
     
-    double compute_lambda_zero() 
-    { 
+    void init_oem()
+    {
         wt_len = weights.size();
         
         xxdiag = 0;
@@ -757,6 +757,11 @@ public:
         }
         
         XY /= nobs;
+        
+    }
+    
+    double compute_lambda_zero() 
+    { 
         
         if (intercept)
         {

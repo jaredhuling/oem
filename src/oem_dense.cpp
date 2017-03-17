@@ -159,17 +159,18 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     }
     
     
+    solver->init_oem();
+    
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero() * datstd.get_scaleY(); // 
     
     
-    if (nlambda < 1) {
-        
+    if (nlambda < 1) 
+    {
         double lmin = as<double>(lmin_ratio_) * lmax;
         lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
         lambda = lambda.exp();
         nlambda = lambda.size();
-        
     }
     
     

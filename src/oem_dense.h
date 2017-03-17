@@ -655,13 +655,11 @@ public:
     
     {}
     
-    
-    double compute_lambda_zero() 
-    { 
+    void init_oem()
+    {
+        found_grp_idx = false;
         
         wt_len = weights.size();
-        
-        found_grp_idx = false;
         
         if (wt_len)
         {
@@ -676,8 +674,10 @@ public:
         // compute XtX or XXt (depending on if n > p or not)
         // and compute A = dI - XtX (if n > p)
         compute_XtX_d_update_A();
-        
-        
+    }
+    
+    double compute_lambda_zero() 
+    { 
         lambda0 = XY.cwiseAbs().maxCoeff();
         return lambda0; 
     }

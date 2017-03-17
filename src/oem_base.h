@@ -109,6 +109,8 @@ public:
         return i + 1;
     }
     
+    virtual void init_oem() {}
+    
     virtual void init_xtx(bool add_int_) {}
     virtual void update_xtx(int fold_) {}
     virtual double compute_lambda_zero() { return 0; }

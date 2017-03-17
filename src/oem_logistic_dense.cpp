@@ -143,6 +143,8 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
                                   irls_maxit, irls_tol, tol);
     
     
+    // compute initial pieces of oem
+    solver->init_oem();
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 

@@ -751,10 +751,8 @@ public:
     
     {}
     
-    
-    double compute_lambda_zero() 
-    { 
-        
+    void init_oem()
+    {
         if (intercept)
         {
             u.resize(nvars + 1);
@@ -811,6 +809,10 @@ public:
         
         XY /= nobs;
         
+    }
+    
+    double compute_lambda_zero() 
+    { 
         
         if (intercept)
         {

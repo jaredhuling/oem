@@ -692,9 +692,8 @@ protected:
                                                                                     {}
         
         
-        double compute_lambda_zero() 
-        { 
-            
+        void init_oem()
+        {
             int pc = X.cols();
             wt_len = weights.size();
             
@@ -724,7 +723,7 @@ protected:
                         colsq(i) = X.col(i).array().square().sum() / (double(nobs) - 1.0);
                     }
                 }
-                    colsq_inv = 1.0 / colsq.array().sqrt();
+                colsq_inv = 1.0 / colsq.array().sqrt();
             }
             
             
@@ -803,8 +802,10 @@ protected:
             // compute XtX or XXt (depending on if n > p or not)
             // and compute A = dI - XtX (if n > p)
             compute_XtX_d_update_A();
-            
-            
+        }
+        
+        double compute_lambda_zero() 
+        { 
             lambda0 = XY.cwiseAbs().maxCoeff();
             return lambda0; 
         }

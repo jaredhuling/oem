@@ -93,7 +93,8 @@ RcppExport SEXP oem_xtx(SEXP xtx_,
         //solver = new oem(X, Y, penalty_factor, irls_tol, irls_maxit, eps_abs, eps_rel);
     }
     
-    
+    // initialize oem
+    solver->init_oem();
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 

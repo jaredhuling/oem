@@ -125,6 +125,9 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
         throw std::invalid_argument("binomial not available for oem_fit_sparse, use oem_fit_logistic_sparse");
     }
     
+    // compute initial pieces of oem
+    solver->init_oem();
+    
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 
     

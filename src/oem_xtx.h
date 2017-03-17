@@ -481,8 +481,8 @@ protected:
                                                                                     {}
         
         
-        double compute_lambda_zero() 
-        { 
+        void init_oem()
+        {
             scale_len = scale_factor.size();
             
             found_grp_idx = false;
@@ -499,7 +499,10 @@ protected:
             // compute XtX or XXt (depending on if n > p or not)
             // and compute A = dI - XtX (if n > p)
             compute_XtX_d_update_A();
-            
+        }
+        
+        double compute_lambda_zero() 
+        { 
             lambda0 = XY.cwiseAbs().maxCoeff();
             return lambda0; 
         }

@@ -681,8 +681,8 @@ public:
                              grp_idx(unique_groups_.size())
     {}
     
-    double compute_lambda_zero() 
-    { 
+    void init_oem()
+    {
         wt_len = weights.size();
         
         found_grp_idx = false;
@@ -752,6 +752,10 @@ public:
         }
         
         XY /= nobs;
+    }
+    
+    double compute_lambda_zero() 
+    { 
         
         if (intercept)
         {
