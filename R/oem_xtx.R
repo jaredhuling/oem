@@ -311,7 +311,7 @@ oem.xtx <- function(xtx,
     names(res$beta) <- penalty
     
     nz <- lapply(1:length(res$beta), function(m) 
-        sapply(predict.oem(res, type = "nonzero", which.model = m), length) - 1
+        sapply(predict.oem(res, type = "nonzero", which.model = m), length)
     )
     
     res$nvars    <- p

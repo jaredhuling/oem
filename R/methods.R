@@ -89,8 +89,10 @@ predict.oem <- function(object, newx, s = NULL, which.model = 1,
         #dimnames(nbeta)=list(vnames,paste(seq(along=s)))
     }
     if (type == "coefficients") return(nbeta)
-    if (type == "nonzero") {
-        newbeta <- abs(as.matrix(object$beta[[which.model]])) > 0
+    if (type == "nonzero") 
+    {
+        nbeta[1,] <- 0 ## rem intercept
+        newbeta <- abs(as.matrix(nbeta)) > 0
         index <- 1:(dim(newbeta)[1])
         nzel <- function(x, index) if(any(x)) index[x] else NULL
         betaList <- apply(newbeta, 2, nzel, index)
