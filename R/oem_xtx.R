@@ -24,6 +24,9 @@
 #'    \item{\code{"grp.lasso.net"}}{ - group lasso penalty + l2 penalty, extra parameters: \code{"alpha"}}
 #'    \item{\code{"grp.mcp"}}{ - group minimax concave penalty, extra parameters: \code{"gamma"}}
 #'    \item{\code{"grp.scad"}}{ - group smoothly clipped absolute deviation, extra parameters: \code{"gamma"}}
+#'    \item{\code{"grp.mcp.net"}}{ - group minimax concave penalty + l2 penalty, extra parameters: \code{"gamma"}, \code{"alpha"}}
+#'    \item{\code{"grp.scad.net"}}{ - group smoothly clipped absolute deviation + l2 penalty, extra parameters: \code{"gamma"}, \code{"alpha"}}
+#'    \item{\code{"sparse.grp.lasso"}}{ - sparse group lasso penalty (group lasso + lasso), extra parameters: \code{"tau"}}
 #' }
 #' Careful consideration is required for the group lasso, group MCP, and group SCAD penalties. Groups as specified by the \code{groups} argument 
 #' should be chosen in a sensible manner.
@@ -34,7 +37,8 @@
 #' @param lambda.min.ratio Smallest value for lambda, as a fraction of \code{lambda.max}, the (data derived) entry
 #' value (i.e. the smallest value for which all coefficients are zero). The default
 #' depends on the sample size nobs relative to the number of variables nvars. The default is 0.0001
-#' @param alpha mixing value for elastic.net. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)
+#' @param alpha mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
+#' penalty applied is ((1 - alpha)/alpha) * (ridge penalty) + (lasso/mcp/mcp/grp.lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param tau mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
@@ -106,10 +110,11 @@ oem.xtx <- function(xtx,
                     penalty = c("elastic.net", 
                                 "lasso", 
                                 "ols", 
-                                "mcp",       "scad", 
-                                "mcp.net",   "scad.net",
-                                "grp.lasso", "grp.lasso.net",
-                                "grp.mcp",   "grp.scad",
+                                "mcp",           "scad", 
+                                "mcp.net",       "scad.net",
+                                "grp.lasso",     "grp.lasso.net",
+                                "grp.mcp",       "grp.scad",
+                                "grp.mcp.net",   "grp.scad.net",
                                 "sparse.grp.lasso"),
                     lambda = numeric(0),
                     nlambda = 100L,

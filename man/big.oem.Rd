@@ -6,13 +6,13 @@
 \usage{
 big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
-  "grp.lasso.net", "grp.mcp", "grp.scad", "sparse.grp.lasso"),
-  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
-  lambda.min.ratio = NULL, alpha = 1, gamma = 3, tau = 0.5,
-  groups = numeric(0), penalty.factor = NULL, group.weights = NULL,
-  standardize = TRUE, intercept = TRUE, maxit = 500L, tol = 1e-07,
-  irls.maxit = 100L, irls.tol = 0.001, compute.loss = FALSE, gigs = 4,
-  hessian.type = c("full", "upper.bound"))
+  "grp.lasso.net", "grp.mcp", "grp.scad", "grp.mcp.net", "grp.scad.net",
+  "sparse.grp.lasso"), weights = numeric(0), lambda = numeric(0),
+  nlambda = 100L, lambda.min.ratio = NULL, alpha = 1, gamma = 3,
+  tau = 0.5, groups = numeric(0), penalty.factor = NULL,
+  group.weights = NULL, standardize = TRUE, intercept = TRUE,
+  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
+  compute.loss = FALSE, gigs = 4, hessian.type = c("full", "upper.bound"))
 }
 \arguments{
 \item{x}{input big.matrix object pointing to design matrix 
@@ -38,6 +38,9 @@ Each row is an observation, each column corresponds to a covariate}
    \item{\code{"grp.lasso.net"}}{ - group lasso penalty + l2 penalty, extra parameters: \code{"alpha"}}
    \item{\code{"grp.mcp"}}{ - group minimax concave penalty, extra parameters: \code{"gamma"}}
    \item{\code{"grp.scad"}}{ - group smoothly clipped absolute deviation, extra parameters: \code{"gamma"}}
+   \item{\code{"grp.mcp.net"}}{ - group minimax concave penalty + l2 penalty, extra parameters: \code{"gamma"}, \code{"alpha"}}
+   \item{\code{"grp.scad.net"}}{ - group smoothly clipped absolute deviation + l2 penalty, extra parameters: \code{"gamma"}, \code{"alpha"}}
+   \item{\code{"sparse.grp.lasso"}}{ - sparse group lasso penalty (group lasso + lasso), extra parameters: \code{"tau"}}
 }
 Careful consideration is required for the group lasso, group MCP, and group SCAD penalties. Groups as specified by the \code{groups} argument 
 should be chosen in a sensible manner.}
@@ -58,7 +61,8 @@ depends on the sample size nobs relative to the number of variables nvars. If
 is 0.01. A very small value of \code{lambda.min.ratio} will lead to a saturated fit
 when \code{nobs < nvars}.}
 
-\item{alpha}{mixing value for \code{elastic.net}. penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso penalty)}
+\item{alpha}{mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
+penalty applied is ((1 - alpha)/alpha) * (ridge penalty) + (lasso/mcp/mcp/grp.lasso penalty)}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 
