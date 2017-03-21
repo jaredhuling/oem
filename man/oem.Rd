@@ -168,7 +168,7 @@ system.time(res <- oem(x, y, intercept = FALSE,
 layout(matrix(1:3, ncol = 3))
 plot(res)
 plot(res, which.model = 2)
-plot(res, which.model = "sparse.grp.lasso")
+plot(res, which.model = "mcp")
 
 
 # sparse design matrix
