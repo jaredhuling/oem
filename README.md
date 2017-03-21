@@ -67,8 +67,8 @@ microbenchmark(
 ```
 ## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.488129 7.566939 7.973072 7.668140 7.848791 9.293363     5
-##     oem[lasso] 2.101342 2.124854 2.251222 2.136056 2.169275 2.724582     5
+##  glmnet[lasso] 7.443072 7.465033 7.511237 7.473748 7.517085 7.657246     5
+##     oem[lasso] 2.040831 2.108731 2.119171 2.125527 2.127454 2.193313     5
 ##  cld
 ##    b
 ##   a
@@ -164,23 +164,36 @@ microbenchmark(
 ```
 
 ```
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+```
+
+```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1829.8318 1845.6693 1863.1905 1848.3258 1857.3867
-##        oem[mcp]  162.7853  171.5975  197.9511  181.2363  230.4670
-##     ncvreg[mcp] 8746.1551 8747.7794 9255.6102 9277.9949 9498.3349
-##       plus[mcp] 1753.9781 1876.0145 1928.9479 1961.3218 2019.7042
-##       oem[scad]  136.1576  138.7363  153.0702  144.7693  149.4673
-##    ncvreg[scad] 9174.4442 9323.6009 9590.5794 9709.5543 9832.5159
-##      plus[scad] 1934.0018 2101.1985 2489.9754 2617.9484 2832.4267
-##         max neval  cld
-##   1934.7387     5  b  
-##    243.6693     5 a   
-##  10007.7867     5    d
-##   2033.7209     5  bc 
-##    196.2204     5 a   
-##   9912.7814     5    d
-##   2964.3016     5   c
+##  sparsenet[mcp] 1732.5257 1738.7517 1748.5446 1740.5216 1751.3204
+##        oem[mcp]  158.6103  159.1179  160.3924  159.9310  160.9344
+##     ncvreg[mcp] 8264.7436 8480.7807 8508.0602 8500.5591 8625.1292
+##       plus[mcp] 1692.1115 1742.6563 1765.5701 1780.0216 1801.3493
+##       oem[scad]  134.1860  134.3585  137.3976  134.9959  135.2000
+##    ncvreg[scad] 8568.0948 8646.1719 8746.7105 8733.7292 8785.1230
+##      plus[scad] 1799.8596 1826.1522 1941.5508 1980.3372 1984.9401
+##        max neval  cld
+##  1779.6036     5  b  
+##   163.3683     5 a   
+##  8669.0884     5   c 
+##  1811.7120     5  b  
+##   148.2476     5 a   
+##  9000.4334     5    d
+##  2116.4648     5  b
 ```
 
 ```r
@@ -252,16 +265,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr        min        lq      mean    median       uq
-##   gglasso[grp.lasso] 1904.09593 1915.2421 2054.5685 1938.2952 2196.247
-##       oem[grp.lasso]   84.57905  111.4009  115.7424  114.5228  124.859
-##  grplasso[grp.lasso] 3111.49448 3182.9091 3565.0081 3355.3438 3984.198
-##    grpreg[grp.lasso] 1278.37857 1285.9549 1360.7423 1307.7054 1454.978
-##        max neval  cld
-##  2318.9625     5   c 
-##   143.3503     5 a   
-##  4191.0953     5    d
-##  1476.6949     5  b
+##                 expr        min         lq       mean     median
+##   gglasso[grp.lasso] 1835.67253 1854.43731 1879.21554 1886.08074
+##       oem[grp.lasso]   83.56342   83.65776   84.20327   84.03552
+##  grplasso[grp.lasso] 2921.92955 2934.10441 2946.44845 2943.06267
+##    grpreg[grp.lasso] 1185.90070 1186.58831 1193.20823 1196.86218
+##          uq        max neval  cld
+##  1886.19205 1933.69509     5   c 
+##    84.80917   84.95048     5 a   
+##  2948.67170 2984.47393     5    d
+##  1197.55532 1199.13461     5  b
 ```
 
 ```r
@@ -300,7 +313,7 @@ system.time(res <- oem(x, y, penalty = "grp.lasso",
 
 ```
 ##    user  system elapsed 
-##    3.23    0.25    3.57
+##    3.26    0.22    3.49
 ```
 
 ```r
@@ -312,7 +325,7 @@ system.time(res2 <- grpreg(x, y, group = groups,
 
 ```
 ##    user  system elapsed 
-##   81.53    1.84   85.29
+##   74.74    1.81   77.27
 ```
 
 ```r
@@ -367,11 +380,11 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 220.9932 225.7868 228.5817 227.7959 233.1894
-##  oem[lasso/mcp/scad/ols] 249.1216 252.6742 259.4960 254.4962 257.7128
+##               oem[lasso] 219.9073 220.1758 223.4888 223.8072 224.3511
+##  oem[lasso/mcp/scad/ols] 238.4752 238.4823 247.5485 249.0822 249.1572
 ##       max neval cld
-##  235.1433     5  a 
-##  283.4752     5   b
+##  229.2023     5  a 
+##  262.5458     5   b
 ```
 
 ```r
@@ -389,4 +402,4 @@ plot(res2, which.model = 4, lwd = 2,
      xvar = "lambda")
 ```
 
-<img src="README_files/figure-html/mult-1.png" style="display: block; margin: auto;" />
+<img src="vignettes/mult-1.png" style="display: block; margin: auto;" />
