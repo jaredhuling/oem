@@ -1,7 +1,7 @@
 
 ## Update for 'oem'
 
-Added computation of new penalties to oem, added more flexible plotting capabilities, fixed bug with predict function when type argument set to "nonzero".
+Added computation of new penalties to oem, added more flexible plotting capabilities, fixed bug with predict function when type argument set to nonzero.
 
 ## Test environments
 
