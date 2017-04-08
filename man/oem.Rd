@@ -64,7 +64,7 @@ is 0.01. A very small value of \code{lambda.min.ratio} will lead to a saturated 
 when \code{nobs < nvars}.}
 
 \item{alpha}{mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
-penalty applied is ((1 - alpha)/alpha) * (ridge penalty) + (lasso/mcp/mcp/grp.lasso penalty)}
+penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso/mcp/mcp/grp.lasso penalty)}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 

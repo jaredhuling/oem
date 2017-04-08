@@ -74,7 +74,7 @@ depends on the sample size nobs relative to the number of variables nvars. If
 \code{nobs > nvars}, the default is 0.0001, close to zero.}
 
 \item{alpha}{mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
-penalty applied is ((1 - alpha)/alpha) * (ridge penalty) + (lasso/mcp/mcp/grp.lasso penalty)}
+penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso/mcp/mcp/grp.lasso penalty)}
 
 \item{gamma}{tuning parameter for SCAD and MCP penalties. must be >= 1}
 

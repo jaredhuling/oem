@@ -38,7 +38,7 @@
 #' value (i.e. the smallest value for which all coefficients are zero). The default
 #' depends on the sample size nobs relative to the number of variables nvars. The default is 0.0001
 #' @param alpha mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
-#' penalty applied is ((1 - alpha)/alpha) * (ridge penalty) + (lasso/mcp/mcp/grp.lasso penalty)
+#' penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso/mcp/mcp/grp.lasso penalty)
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param tau mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
