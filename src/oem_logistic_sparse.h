@@ -578,6 +578,13 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             soft_threshold(beta, u, lam, penalty_factor, denom);
         } else if (penalty == "scad") 
         {
@@ -587,6 +594,13 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
             
         } else if (penalty == "mcp") 
@@ -596,6 +610,13 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
             
         } else if (penalty == "grp.lasso")
@@ -607,9 +628,17 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+            
         } else if (penalty == "grp.mcp")
         {
             block_soft_threshold_mcp(beta, u, lambda, group_weights,
@@ -624,6 +653,13 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             block_soft_threshold_mcp(beta, u, lam, group_weights,
                                      denom, grp_idx, ngroups, 
                                      unique_groups, groups, gamma);
@@ -631,6 +667,13 @@ protected:
         {
             double denom = d + (1.0 - alpha) * lambda / alpha;
             double lam = lambda;
+            
+            if (alpha == 0)
+            {
+                lam   = 0;
+                denom = d + lambda;
+            }
+            
             block_soft_threshold_scad(beta, u, lam, group_weights,
                                       denom, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
@@ -652,7 +695,7 @@ protected:
                                  group_weights,
                                  d, grp_idx, ngroups, 
                                  unique_groups, groups);
-        } 
+        }
         
         
     }
