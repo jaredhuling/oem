@@ -137,4 +137,3 @@ plot(fit.xtx)
 plot(fit.xtx, which.model = 2)
 
 }
-

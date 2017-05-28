@@ -58,4 +58,3 @@ apply(preds.lasso,     2, function(x) mean((y.test - x) ^ 2))
 apply(preds.grp.lasso, 2, function(x) mean((y.test - x) ^ 2))
 
 }
-

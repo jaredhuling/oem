@@ -1,0 +1,6 @@
+navbar:
+  left:
+  - text: Intro
+    href: articles/oem_vignette.html
+  - text: Reference
+    href: reference/index.html

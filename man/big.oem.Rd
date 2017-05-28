@@ -152,4 +152,3 @@ plot(fit)
 plot(fit, which.model = 2)
 
 }
-

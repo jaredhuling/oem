@@ -144,4 +144,3 @@ system.time(xfit2 <- xval.oem(x = x, y = y,
                               groups = rep(1:20, each = 5)))
 
 }
-

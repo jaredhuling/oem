@@ -61,4 +61,3 @@ preds.l <- predict(fit, newx = x.test, type = "response", which.model = 1)
 
 apply(preds.l, 2, function(x) mean((y.test - x) ^ 2))
 }
-

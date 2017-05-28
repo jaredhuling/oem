@@ -18,3 +18,5 @@ src/old
 src/tmp
 revdep
 ^NEWS\.md$
+^.*\docs$
+^\_pkgdown\.yml$

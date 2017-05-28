@@ -78,4 +78,3 @@ layout(matrix(1:2, ncol = 2))
 plot(fit)
 plot(fit, which.model = 2)
 }
-
