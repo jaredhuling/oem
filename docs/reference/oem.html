@@ -279,11 +279,11 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
 <span class='fu'>system.time</span>(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x.dense</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>ys</span>,
                        <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>), <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.51    0.03    0.55 </div><div class='input'>
+#&gt;    0.69    0.02    0.73 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>fits</span> <span class='kw'>&lt;-</span> <span class='fu'>oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>xs</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>ys</span>,
                         <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                         <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>), <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>lambda</span> <span class='kw'>=</span> <span class='no'>fit</span>$<span class='no'>lambda</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.05    0.00    0.09 </div><div class='input'>
+#&gt;    0.06    0.02    0.07 </div><div class='input'>
 <span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>fit</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]] - <span class='no'>fits</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]]))</div><div class='output co'>#&gt; [1] 2.277662e-06</div><div class='input'><span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>fit</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>2</span>]] - <span class='no'>fits</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>2</span>]]))</div><div class='output co'>#&gt; [1] 1.792073e-06</div><div class='input'>
 <span class='co'># logistic</span>
 <span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'>rbinom</span>(<span class='no'>n.obs</span>, <span class='fl'>1</span>, <span class='kw'>prob</span> <span class='kw'>=</span> <span class='fl'>1</span> / (<span class='fl'>1</span> + <span class='fu'>exp</span>(-<span class='no'>x</span> <span class='kw'>%*%</span> <span class='no'>true.beta</span>)))
@@ -311,14 +311,14 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
                           <span class='kw'>nlambda</span> <span class='kw'>=</span> <span class='fl'>10</span>,
                           <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>10</span>),
                           <span class='kw'>irls.tol</span> <span class='kw'>=</span> <span class='fl'>1e-3</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-8</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.14    0.03    0.17 </div><div class='input'>
+#&gt;    0.17    0.02    0.20 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>res.gr.s</span> <span class='kw'>&lt;-</span> <span class='fu'>oem</span>(<span class='no'>xs</span>, <span class='no'>ys</span>, <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
                             <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='st'>"grp.lasso"</span>,
                             <span class='kw'>family</span> <span class='kw'>=</span> <span class='st'>"binomial"</span>,
                             <span class='kw'>nlambda</span> <span class='kw'>=</span> <span class='fl'>10</span>,
                             <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>10</span>),
                             <span class='kw'>irls.tol</span> <span class='kw'>=</span> <span class='fl'>1e-3</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-8</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.03    0.00    0.06 </div><div class='input'>
+#&gt;    0.05    0.00    0.08 </div><div class='input'>
 <span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>res.gr</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]] - <span class='no'>res.gr.s</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]]))</div><div class='output co'>#&gt; [1] 1.134368e-05</div><div class='input'>
 </div></pre>
   </div>

@@ -83,7 +83,7 @@ max(abs(coef(res1) - res2$beta[[1]]))
 
 ### Nonconvex Penalties
 
-```{r mcp, message = FALSE, warnings = FALSE}
+```{r mcp, message = FALSE, warning = FALSE}
 library(sparsenet)
 library(ncvreg)
 library(plus)
@@ -162,7 +162,7 @@ diffs
 
 ### Group Lasso
 
-```{r group, message = FALSE, warnings = FALSE}
+```{r group, message = FALSE, warning = FALSE}
 library(gglasso)
 library(grpreg)
 library(grplasso)
@@ -215,7 +215,7 @@ diffs
 
 #### Bigger Group Lasso Example
 
-```{r grouptwo}
+```{r grouptwo, message = FALSE, warning = FALSE}
 set.seed(123)
 n <- 500000
 p <- 200

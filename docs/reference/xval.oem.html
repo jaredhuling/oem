@@ -263,7 +263,7 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
 <span class='fu'>system.time</span>(<span class='no'>xfit</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                              <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                              <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.31    0.02    0.34 </div><div class='input'>
+#&gt;    0.31    0.00    0.32 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit2</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                               <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>,
                                           <span class='st'>"mcp"</span>,       <span class='st'>"scad"</span>,
@@ -272,7 +272,7 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
                                           <span class='st'>"grp.mcp"</span>,   <span class='st'>"grp.scad"</span>,
                                           <span class='st'>"sparse.grp.lasso"</span>),
                               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    1.47    0.00    1.47 </div><div class='input'>
+#&gt;    1.58    0.00    1.65 </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
