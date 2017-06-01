@@ -122,8 +122,8 @@ lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">
 )</code></pre></div>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 8.294205 8.548777 8.679897 8.555808 8.831074 9.169622     5
-##     oem[lasso] 2.286724 2.291439 2.385966 2.310500 2.343363 2.697804     5</code></pre>
+##  glmnet[lasso] 7.938060 8.138273 8.358889 8.357559 8.395648 8.964907     5
+##     oem[lasso] 2.128907 2.191268 2.430306 2.449499 2.454517 2.927340     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># difference of results</span>
 <span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) -<span class="st"> </span>res2$beta[[<span class="dv">1</span>]]))</code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -211,21 +211,21 @@ scad.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.h
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1889.8152 1928.2564 1963.5809 1955.3438 1958.6847
-##        oem[mcp]  159.1412  163.5882  164.5914  163.9233  164.8805
-##     ncvreg[mcp] 7748.1288 7882.9730 7971.7769 7962.2764 8113.1847
-##       plus[mcp] 1762.3784 1798.2267 1840.4282 1832.9899 1847.2313
-##       oem[scad]  137.9061  145.9289  147.2907  150.3033  150.8069
-##    ncvreg[scad] 8048.3493 8087.4063 8181.8925 8237.2580 8258.5788
-##      plus[scad] 1956.8998 2043.6544 2206.7900 2145.8492 2311.9522
+##  sparsenet[mcp] 1826.6230 1832.1815 1882.6305 1848.6586 1906.9917
+##        oem[mcp]  155.9794  156.4010  191.4032  157.1186  202.6081
+##     ncvreg[mcp] 7166.5206 7250.1052 7935.0528 7318.2200 8420.2316
+##       plus[mcp] 1638.5337 1708.5294 1725.0798 1712.0745 1743.7789
+##       oem[scad]  132.8986  133.3667  133.8485  133.6422  134.0330
+##    ncvreg[scad] 7615.0100 7721.4982 8210.5580 8063.8088 8351.3625
+##      plus[scad] 1782.9623 1841.1951 2007.2924 1940.2403 2098.3529
 ##        max neval
-##  2085.8045     5
-##   171.4239     5
-##  8152.3215     5
-##  1961.3144     5
-##   151.5084     5
-##  8277.8703     5
-##  2575.5945     5</code></pre>
+##  1998.6978     5
+##   284.9086     5
+##  9520.1863     5
+##  1822.4823     5
+##   135.3021     5
+##  9301.1106     5
+##  2373.7115     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,
@@ -284,16 +284,16 @@ grp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.ht
     <span class="dt">times =</span> <span class="dv">5</span>
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr        min         lq       mean     median        uq
-##   gglasso[grp.lasso] 1970.23445 2017.16904 2059.54051 2071.67804 2102.5026
-##       oem[grp.lasso]   88.51906   88.68997   92.31372   89.86271   95.7994
-##  grplasso[grp.lasso] 5058.40298 5101.44044 5419.10864 5186.80050 5641.8234
-##    grpreg[grp.lasso] 1205.62344 1211.52066 1286.61055 1241.81751 1299.1993
-##         max neval
-##  2136.11837     5
-##    98.69748     5
-##  6107.07595     5
-##  1474.89183     5</code></pre>
+##                 expr        min         lq       mean    median         uq
+##   gglasso[grp.lasso] 1845.71946 1951.62624 2062.28094 1984.9100 1989.83776
+##       oem[grp.lasso]   83.49379   84.27574   90.68919   84.3093   88.62129
+##  grplasso[grp.lasso] 4330.15263 4373.55362 5009.09593 4530.1962 5226.72671
+##    grpreg[grp.lasso] 1093.06789 1126.79137 1201.43302 1178.0597 1240.50702
+##        max neval
+##  2539.3112     5
+##   112.7458     5
+##  6584.8505     5
+##  1368.7391     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)
@@ -320,13 +320,13 @@ groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv
                        <span class="dt">intercept =</span> <span class="ot">TRUE</span>,
                        <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.38    0.23    3.83</code></pre>
+##    3.04    0.17    3.21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># memory usage is out of control here.</span>
 <span class="co"># oem uses approximately 1/3 of the memory</span>
 <span class="kw">system.time</span>(res2 &lt;-<span class="st"> </span><span class="kw">grpreg</span>(x, y, <span class="dt">group =</span> groups, 
                            <span class="dt">eps =</span> <span class="fl">1e-10</span>, <span class="dt">lambda =</span> res$lambda))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##   72.20    1.25   75.45</code></pre>
+##   64.17    1.15   65.75</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># I think the standardization is done</span>
 <span class="co"># differently for grpreg</span>
 <span class="kw">max</span>(<span class="kw">abs</span>(res$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res2$beta))</code></pre></div>
@@ -364,11 +364,11 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 239.2636 239.5928 242.1121 240.1620 240.2504
-##  oem[lasso/mcp/scad/ols] 250.8244 260.2256 277.0720 274.8482 277.1124
+##               oem[lasso] 220.0712 220.5291 228.8863 222.2841 226.6679
+##  oem[lasso/mcp/scad/ols] 239.3659 240.8303 255.4489 241.3245 265.1960
 ##       max neval
-##  251.2917     5
-##  322.3493     5</code></pre>
+##  254.8794     5
+##  290.5280     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span>
 <span class="co">#</span>
 

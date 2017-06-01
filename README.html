@@ -181,8 +181,8 @@ microbenchmark(
 )</code></pre>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.928666 8.292441 8.720699 8.749717 8.869741 9.762932     5
-##     oem[lasso] 2.147068 2.276210 2.313844 2.300738 2.332990 2.512210     5</code></pre>
+##  glmnet[lasso] 7.575130 7.647406 8.185526 8.134984 8.448356 9.121753     5
+##     oem[lasso] 2.048697 2.237141 2.296096 2.245134 2.273289 2.676219     5</code></pre>
 <pre class="r"><code># difference of results
 max(abs(coef(res1) - res2$beta[[1]]))</code></pre>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -269,21 +269,21 @@ microbenchmark(
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1874.3928 1878.6945 2002.3684 2057.3514 2081.0070
-##        oem[mcp]  164.1463  166.5305  173.0275  175.5607  177.2974
-##     ncvreg[mcp] 7747.7238 7776.5543 7925.6028 7844.6391 7918.3745
-##       plus[mcp] 1767.6749 1862.9528 1919.7753 1934.2133 1961.2102
-##       oem[scad]  138.0679  139.6930  144.4245  145.4177  146.5624
-##    ncvreg[scad] 8168.3490 8190.0219 8255.9754 8196.8696 8299.8637
-##      plus[scad] 2006.9863 2065.7875 2219.5906 2098.4239 2376.2346
+##  sparsenet[mcp] 1772.2340 1783.1975 1857.9591 1835.0776 1904.5578
+##        oem[mcp]  156.1389  156.6702  172.6061  157.2951  159.4313
+##     ncvreg[mcp] 7053.6730 7127.6700 7184.7262 7156.3276 7206.7456
+##       plus[mcp] 1600.8701 1708.5586 1759.7027 1778.9716 1837.7239
+##       oem[scad]  131.9789  133.0584  141.9454  137.8785  140.9257
+##    ncvreg[scad] 7583.0249 7632.4411 7727.6092 7641.8928 7802.3927
+##      plus[scad] 1750.1372 1757.9950 1999.7647 2043.7093 2101.0122
 ##        max neval
-##  2120.3964     5
-##   181.6027     5
-##  8340.7222     5
-##  2072.8255     5
-##   152.3815     5
-##  8424.7730     5
-##  2550.5207     5</code></pre>
+##  1994.7284     5
+##   233.4951     5
+##  7379.2148     5
+##  1872.3896     5
+##   165.8855     5
+##  7978.2944     5
+##  2345.9697     5</code></pre>
 <pre class="r"><code>diffs &lt;- array(NA, dim = c(4, 1))
 colnames(diffs) &lt;- &quot;abs diff&quot;
 rownames(diffs) &lt;- c(&quot;MCP:  oem and ncvreg&quot;, &quot;SCAD: oem and ncvreg&quot;,
@@ -341,16 +341,16 @@ microbenchmark(
     times = 5
 )</code></pre>
 <pre><code>## Unit: milliseconds
-##                 expr       min         lq       mean     median        uq
-##   gglasso[grp.lasso] 1978.9528 2055.48279 2074.99003 2061.55882 2075.8160
-##       oem[grp.lasso]   88.9876   89.03062   89.69803   89.04799   89.8331
-##  grplasso[grp.lasso] 5118.5293 5179.82449 5346.66026 5195.05384 5581.9713
-##    grpreg[grp.lasso] 1222.1581 1262.40725 1338.06540 1314.12198 1340.3891
-##         max neval
-##  2203.13981     5
-##    91.59082     5
-##  5657.92228     5
-##  1551.25053     5</code></pre>
+##                 expr        min         lq       mean     median
+##   gglasso[grp.lasso] 1871.23145 1947.55818 2011.37105 1981.32627
+##       oem[grp.lasso]   84.79955   85.49979   92.73577   91.10412
+##  grplasso[grp.lasso] 4319.38172 4683.59374 4885.40948 5011.62115
+##    grpreg[grp.lasso] 1161.21075 1181.88023 1283.63716 1307.33189
+##          uq       max neval
+##  2055.28069 2201.4587     5
+##    98.26249  104.0129     5
+##  5162.37125 5250.0795     5
+##  1332.52493 1435.2380     5</code></pre>
 <pre class="r"><code>diffs &lt;- array(NA, dim = c(2, 1))
 colnames(diffs) &lt;- &quot;abs diff&quot;
 rownames(diffs) &lt;- c(&quot;oem and gglasso&quot;, &quot;oem and grplasso&quot;)
@@ -376,13 +376,13 @@ system.time(res &lt;- oem(x, y, penalty = &quot;grp.lasso&quot;,
                        intercept = TRUE,
                        nlambda = 100, tol = 1e-10))</code></pre>
 <pre><code>##    user  system elapsed 
-##    3.24    0.20    3.68</code></pre>
+##    3.29    0.16    3.48</code></pre>
 <pre class="r"><code># memory usage is out of control here.
 # oem uses approximately 1/3 of the memory
 system.time(res2 &lt;- grpreg(x, y, group = groups, 
                            eps = 1e-10, lambda = res$lambda))</code></pre>
 <pre><code>##    user  system elapsed 
-##   72.68    1.64   76.74</code></pre>
+##   71.49    2.03   80.37</code></pre>
 <pre class="r"><code># I think the standardization is done
 # differently for grpreg
 max(abs(res$beta[[1]] - res2$beta))</code></pre>
@@ -418,12 +418,12 @@ microbenchmark(
     times = 5
 )</code></pre>
 <pre><code>## Unit: milliseconds
-##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 226.2586 243.8077 261.7543 247.9962 251.6194
-##  oem[lasso/mcp/scad/ols] 255.9322 269.5483 283.0102 272.1617 282.6638
+##                     expr      min       lq     mean  median       uq
+##               oem[lasso] 258.9629 272.3903 317.1007 300.378 363.5564
+##  oem[lasso/mcp/scad/ols] 260.3768 267.3488 279.7942 281.632 287.8948
 ##       max neval
-##  339.0896     5
-##  334.7453     5</code></pre>
+##  390.2162     5
+##  301.7185     5</code></pre>
 <pre class="r"><code>#png(&quot;../mcp_path.png&quot;, width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = &quot;mcp&quot;,lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()
 #
 

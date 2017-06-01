@@ -248,13 +248,15 @@ faster in certain situations, ie when n &gt;&gt; p</p></td>
 <span class='no'>bigmat</span> <span class='kw'>&lt;-</span> <span class='fu'>filebacked.big.matrix</span>(<span class='kw'>nrow</span><span class='kw'>=</span><span class='no'>nrows</span>, <span class='kw'>ncol</span><span class='kw'>=</span><span class='no'>ncols</span>, <span class='kw'>type</span><span class='kw'>=</span><span class='st'>"double"</span>,
                                 <span class='kw'>backingfile</span><span class='kw'>=</span><span class='no'>bkFile</span>, <span class='kw'>backingpath</span><span class='kw'>=</span><span class='st'>"."</span>,
                                 <span class='kw'>descriptorfile</span><span class='kw'>=</span><span class='no'>descFile</span>,
-                                <span class='kw'>dimnames</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='kw'>NULL</span>,<span class='kw'>NULL</span>))</div><div class='output co'>#&gt; <span class='error'>Error in filebacked.big.matrix(nrow = nrows, ncol = ncols, type = "double",     backingfile = bkFile, backingpath = ".", descriptorfile = descFile,     dimnames = c(NULL, NULL)): Backing file already exists! Either remove or specify</span>
-#&gt; <span class='error'>             different backing file</span></div><div class='input'>
+                                <span class='kw'>dimnames</span><span class='kw'>=</span><span class='fu'>c</span>(<span class='kw'>NULL</span>,<span class='kw'>NULL</span>))
+
 <span class='co'># Each column value with be the column number multiplied by</span>
 <span class='co'># samples from a standard normal distribution.</span>
 <span class='fu'>set.seed</span>(<span class='fl'>123</span>)
-<span class='kw'>for</span> (<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='no'>ncols</span>) <span class='no'>bigmat</span>[,<span class='no'>i</span>] <span class='kw'>=</span> <span class='fu'>rnorm</span>(<span class='no'>nrows</span>)*<span class='no'>i</span></div><div class='output co'>#&gt; <span class='error'>Error in bigmat[, i] = rnorm(nrows) * i: object 'bigmat' not found</span></div><div class='input'>
-<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'>rnorm</span>(<span class='no'>nrows</span>) + <span class='no'>bigmat</span>[,<span class='fl'>1</span>] - <span class='no'>bigmat</span>[,<span class='fl'>2</span>]</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'bigmat' not found</span></div><div class='input'>
+<span class='kw'>for</span> (<span class='no'>i</span> <span class='kw'>in</span> <span class='fl'>1</span>:<span class='no'>ncols</span>) <span class='no'>bigmat</span>[,<span class='no'>i</span>] <span class='kw'>=</span> <span class='fu'>rnorm</span>(<span class='no'>nrows</span>)*<span class='no'>i</span>
+
+<span class='no'>y</span> <span class='kw'>&lt;-</span> <span class='fu'>rnorm</span>(<span class='no'>nrows</span>) + <span class='no'>bigmat</span>[,<span class='fl'>1</span>] - <span class='no'>bigmat</span>[,<span class='fl'>2</span>]
+
 <span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'>big.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>bigmat</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"elastic.net"</span>,
                            <span class='st'>"ols"</span>,
@@ -263,13 +265,16 @@ faster in certain situations, ie when n &gt;&gt; p</p></td>
                            <span class='st'>"grp.lasso"</span>, <span class='st'>"grp.lasso.net"</span>,
                            <span class='st'>"grp.mcp"</span>,   <span class='st'>"grp.scad"</span>,
                            <span class='st'>"sparse.grp.lasso"</span>),
-               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>))</div><div class='output co'>#&gt; <span class='error'>Error in is.big.matrix(x): object 'bigmat' not found</span></div><div class='input'>
+               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>))
+
 <span class='no'>fit2</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='oem.html'>oem</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>bigmat</span>[,], <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
             <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
-            <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>))</div><div class='output co'>#&gt; <span class='error'>Error in oem(x = bigmat[, ], y = y, penalty = c("lasso", "grp.lasso"),     groups = rep(1:20, each = 5)): object 'bigmat' not found</span></div><div class='input'>
-<span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>fit</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]] - <span class='no'>fit2</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]]))</div><div class='output co'>#&gt; <span class='error'>Error in eval(expr, envir, enclos): object 'fit' not found</span></div><div class='input'>
+            <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>))
+
+<span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>fit</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]] - <span class='no'>fit2</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]]))</div><div class='output co'>#&gt; [1] 1.534783e-05</div><div class='input'>
 <span class='fu'>layout</span>(<span class='fu'>matrix</span>(<span class='fl'>1</span>:<span class='fl'>2</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>2</span>))
-<span class='fu'>plot</span>(<span class='no'>fit</span>)</div><div class='output co'>#&gt; <span class='error'>Error in plot(fit): object 'fit' not found</span></div><div class='input'><span class='fu'>plot</span>(<span class='no'>fit</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><div class='output co'>#&gt; <span class='error'>Error in plot(fit, which.model = 2): object 'fit' not found</span></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>fit</span>)
+<span class='fu'>plot</span>(<span class='no'>fit</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='fl'>2</span>)</div><img src='big.oem-4.png' alt='' width='540' height='400' /><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
