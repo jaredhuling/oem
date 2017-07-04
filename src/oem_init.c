@@ -1,5 +1,6 @@
 #include <R.h>
 #include <Rinternals.h>
+#include <stdlib.h> // for NULL
 #include <R_ext/Rdynload.h>
 
 /*
@@ -166,5 +167,5 @@ R_CallMethodDef callMethods[] = {
 void R_init_oem(DllInfo *info)
 {
     R_registerRoutines(info, NULL, NULL, NULL, NULL);
-    R_useDynamicSymbols(info, TRUE);
+    R_useDynamicSymbols(info, FALSE);
 }
