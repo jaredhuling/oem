@@ -81,10 +81,11 @@ predict.oem <- function(object, newx, s = NULL, which.model = 1,
     }
     nbeta <- object$beta[[which.model]]
     
-    if(!is.null(s)){
+    if(!is.null(s))
+    {
         #vnames=dimnames(nbeta)[[1]]
-        lambda <- object$lambda
-        lamlist <- lambda.interp(object$lambda,s)
+        lambda <- object$lambda[[which.model]]
+        lamlist <- lambda.interp(object$lambda[[which.model]], s)
         nbeta <- nbeta[,lamlist$left,drop=FALSE]*lamlist$frac +nbeta[,lamlist$right,drop=FALSE]*(1-lamlist$frac)
         #dimnames(nbeta)=list(vnames,paste(seq(along=s)))
     }
@@ -182,13 +183,13 @@ plot.oem <- function(x, which.model = 1,
                approx.f <- 1
            },
            "lambda" = {
-               index    <- x$lambda
+               index    <- x$lambda[[which.model]]
                iname    <- expression(lambda)
                xlim     <- rev(range(index))
                approx.f <- 0
            },
            "loglambda" = {
-               index    <- log(x$lambda)
+               index    <- log(x$lambda[[which.model]])
                iname    <- expression(log(lambda))
                xlim     <- rev(range(index))
                approx.f <- 1
@@ -309,7 +310,7 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
     
     xlab=expression(log(lambda))
     if(sign.lambda<0)xlab=paste("-",xlab,sep="")
-    plot.args=list(x    = sign.lambda * log(object$lambda),
+    plot.args=list(x    = sign.lambda * log(object$lambda[[which.model]]),
                    y    = object$cvm[[which.model]],
                    ylim = range(object$cvup[[which.model]], object$cvlo[[which.model]]),
                    xlab = xlab,
@@ -318,11 +319,11 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
     new.args=list(...)
     if(length(new.args))plot.args[names(new.args)]=new.args
     do.call("plot", plot.args)
-    error.bars(sign.lambda * log(object$lambda), 
+    error.bars(sign.lambda * log(object$lambda[[which.model]]), 
                object$cvup[[which.model]], 
                object$cvlo[[which.model]], width = 0.005)
-    points(sign.lambda*log(object$lambda), object$cvm[[which.model]], pch=20, col="dodgerblue")
-    axis(side=3,at=sign.lambda*log(object$lambda),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0, ...)
+    points(sign.lambda*log(object$lambda[[which.model]]), object$cvm[[which.model]], pch=20, col="dodgerblue")
+    axis(side=3,at=sign.lambda*log(object$lambda[[which.model]]),labels = paste(object$nzero[[which.model]]), tick=FALSE, line=0, ...)
     abline(v = sign.lambda * log(object$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
     abline(v = sign.lambda * log(object$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
     title(main.txt, line = 2.5, ...)
@@ -883,13 +884,13 @@ plot.xval.oem <- function(x, which.model = 1,
                    approx.f <- 1
                },
                "lambda" = {
-                   index    <- x$lambda
+                   index    <- x$lambda[[which.model]]
                    iname    <- expression(lambda)
                    xlim     <- rev(range(index))
                    approx.f <- 0
                },
                "loglambda" = {
-                   index    <- log(x$lambda)
+                   index    <- log(x$lambda[[which.model]])
                    iname    <- expression(log(lambda))
                    xlim     <- rev(range(index))
                    approx.f <- 1
@@ -959,7 +960,7 @@ plot.xval.oem <- function(x, which.model = 1,
     {
         xlab=expression(log(lambda))
         if(sign.lambda<0)xlab=paste("-",xlab,sep="")
-        plot.args=list(x    = sign.lambda * log(x$lambda),
+        plot.args=list(x    = sign.lambda * log(x$lambda[[which.model]]),
                        y    = x$cvm[[which.model]],
                        ylim = range(x$cvup[[which.model]], x$cvlo[[which.model]]),
                        xlab = xlab,
@@ -968,11 +969,11 @@ plot.xval.oem <- function(x, which.model = 1,
         new.args=list(...)
         if(length(new.args))plot.args[names(new.args)]=new.args
         do.call("plot", plot.args)
-        error.bars(sign.lambda * log(x$lambda), 
+        error.bars(sign.lambda * log(x$lambda[[which.model]]), 
                    x$cvup[[which.model]], 
                    x$cvlo[[which.model]], width = 0.005)
-        points(sign.lambda*log(x$lambda), x$cvm[[which.model]], pch=20, col="dodgerblue")
-        axis(side=3,at=sign.lambda*log(x$lambda),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0, ...)
+        points(sign.lambda*log(x$lambda[[which.model]]), x$cvm[[which.model]], pch=20, col="dodgerblue")
+        axis(side=3,at=sign.lambda*log(x$lambda[[which.model]]),labels = paste(x$nzero[[which.model]]), tick=FALSE, line=0, ...)
         abline(v = sign.lambda * log(x$lambda.min.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
         abline(v = sign.lambda * log(x$lambda.1se.models[which.model]), lty=2, lwd = 2, col = "firebrick1")
         title(main, line = 2.5, ...)

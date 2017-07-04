@@ -146,11 +146,13 @@ x.dense <- as.matrix(xs)
 
 system.time(fit <- oem(x = x.dense, y = ys, 
                        penalty = c("lasso", "grp.lasso"), 
-                       groups = rep(1:20, each = 5), intercept = TRUE))
+                       groups = rep(1:20, each = 5), intercept = FALSE,
+                       standardize = FALSE))
 
 system.time(fits <- oem(x = xs, y = ys, 
                         penalty = c("lasso", "grp.lasso"), 
-                        groups = rep(1:20, each = 5), intercept = TRUE, lambda = fit$lambda))
+                        groups = rep(1:20, each = 5), intercept = FALSE, 
+                        standardize = FALSE, lambda = fit$lambda))
                         
 max(abs(fit$beta[[1]] - fits$beta[[1]]))
 max(abs(fit$beta[[2]] - fits$beta[[2]]))

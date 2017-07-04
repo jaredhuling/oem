@@ -1,7 +1,7 @@
 
 ## Update for 'oem'
 
-Added computation of new penalties to oem, added more flexible plotting capabilities, fixed bug with predict function when type argument set to nonzero.
+Added more flexible specification of lambda.
 
 ## Test environments
 

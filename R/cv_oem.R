@@ -171,32 +171,33 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
             }
         }
     }
-    fun = paste("cv", class(oem.object)[[1]], sep = ".")
-    lambda = oem.object$lambda
+    fun <- paste("cv", class(oem.object)[[1]], sep = ".")
+    lambda <- oem.object$lambda
     
     if (!length(weights))
     {
         weights <- rep(1, N)
     }
     
-    cvstuff = do.call(fun, list(outlist, lambda, x, y, weights, 
-                                foldid, type.measure, grouped, keep))
-    cvm = cvstuff$cvm
-    cvsd = cvstuff$cvsd
+    cvstuff <- do.call(fun, list(outlist, lambda, x, y, weights, 
+                                 foldid, type.measure, grouped, keep))
+    cvm  <- cvstuff$cvm
+    cvsd <- cvstuff$cvsd
     nas.list <- vector(mode = "list", length = length(cvm))
     for (m in 1:length(cvm))
     {
-        nas.list[[m]]=is.na(cvsd[[m]]) | is.nan(cvsd[[m]])
+        nas.list[[m]] <- is.na(cvsd[[m]]) | is.nan(cvsd[[m]])
     }
     
     nas <- Reduce("+", nas.list) > 0
     if(any(nas)){
-        lambda=lambda[!nas]
+        
         for (m in 1:length(cvm))
         {
-            cvm[[m]]=cvm[[m]][!nas]
-            cvsd[[m]]=cvsd[[m]][!nas]
-            nz[[m]]=nz[[m]][!nas]
+            cvm[[m]]    <- cvm[[m]][!nas]
+            cvsd[[m]]   <- cvsd[[m]][!nas]
+            nz[[m]]     <- nz[[m]][!nas]
+            lambda[[m]] <- lambda[[m]][!nas]
         }
     }
     
@@ -208,12 +209,12 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
                nzero = nz, name = cvname, oem.fit = oem.object)
     if (keep) 
         out = c(out, list(fit.preval = cvstuff$fit.preval, foldid = foldid))
-    lamin=if(cvname=="AUC")getmin(lambda, lapply(cvm, function(ccvvmm) -ccvvmm), cvsd)
+    lamin <- if(cvname == "AUC") getmin(lambda, lapply(cvm, function(ccvvmm) -ccvvmm), cvsd)
     else getmin(lambda, cvm, cvsd)
-    obj = c(out, as.list(lamin))
+    obj <- c(out, as.list(lamin))
     obj$best.model <- penalty[obj$model.min]
     obj$penalty <- penalty
-    class(obj) = "cv.oem"
+    class(obj) <- "cv.oem"
     obj
 }
 
@@ -226,61 +227,75 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
     if (type.measure == "default") 
         type.measure = "deviance"
     if (!match(type.measure, c("mse", "mae", "deviance", "auc", 
-                               "class"), FALSE)) {
+                               "class"), FALSE)) 
+    {
         warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
         type.measure = "deviance"
     }
     prob_min = 1e-05
     prob_max = 1 - prob_min
     nc = dim(y)
-    if (is.null(nc)) {
-        y = as.factor(y)
-        ntab = table(y)
-        nc = as.integer(length(ntab))
-        y = diag(nc)[as.numeric(y), ]
+    if (is.null(nc)) 
+    {
+        y    <- as.factor(y)
+        ntab <- table(y)
+        nc   <- as.integer(length(ntab))
+        y    <- diag(nc)[as.numeric(y), ]
     }
-    N = nrow(y)
-    nfolds = max(foldid)
+    N <- nrow(y)
+    nfolds <- max(foldid)
     nmodels <- length(outlist[[1]]$beta)
-    if ((N/nfolds < 10) && type.measure == "auc") {
+    if ((N/nfolds < 10) && type.measure == "auc") 
+    {
         warning("Too few (< 10) observations per fold for type.measure='auc' in cv.lognet; changed to type.measure='deviance'. Alternatively, use smaller value for nfolds", 
                 call. = FALSE)
         type.measure = "deviance"
     }
-    if ((N/nfolds < 3) && grouped) {
+    if ((N/nfolds < 3) && grouped) 
+    {
         warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold", 
                 call. = FALSE)
         grouped = FALSE
     }
-    mlami=max(sapply(outlist, function(obj)min(obj$lambda)))
-    which_lam=lambda >= mlami
     
-    predmat = matrix(NA, nrow(y), length(lambda))
+    mlami <- which_lam <- vector(mode = "list", length = nmodels)
+    
+    for (m in 1:nmodels)
+    {
+        mlami[[m]]     <- max(sapply(outlist, function(obj) min(obj$lambda[[m]])))
+        which_lam[[m]] <- lambda[[m]] >= mlami[[m]]
+    }
+    
+    predmat  <- matrix(NA, nrow(y), length(lambda[[1]]))
     predlist <- rep(list(predmat), nmodels)
-    nlams = double(nfolds)
-    for (i in seq(nfolds)) {
-        which = foldid == i
-        fitobj = outlist[[i]]
+    nlams    <- double(nfolds)
+    for (i in seq(nfolds)) 
+    {
+        which  <- foldid == i
+        fitobj <- outlist[[i]]
         for (m in 1:nmodels)
         {
-            preds = predict(fitobj,x[which, , drop = FALSE], s=lambda[which_lam], 
-                            which.model = m,
-                            type = "response")
-            nlami = sum(which_lam)
+            preds <- predict(fitobj, x[which, , drop = FALSE], s = lambda[[m]][which_lam[[m]]], 
+                             which.model = m,
+                             type = "response")
+            nlami <- sum(which_lam[[m]])
             predlist[[m]][which, seq(nlami)] = preds
         }
         nlams[i] = nlami
     }
-    if (type.measure == "auc") {
-        cvraw = rep(list(matrix(NA, nfolds, length(lambda))), nmodels)
-        N = vector(mode = "list", length = nmodels)
+    if (type.measure == "auc") 
+    {
+        cvraw <- rep(list(matrix(NA, nfolds, length(lambda[[1]]))), nmodels)
+        N     <- vector(mode = "list", length = nmodels)
         for (m in 1:nmodels)
         {
-            good = matrix(0, nfolds, length(lambda))
-            for (i in seq(nfolds)) {
+            good <- matrix(0, nfolds, length(lambda[[1]]))
+            for (i in seq(nfolds)) 
+            {
                 good[i, seq(nlams[i])] = 1
-                which = foldid == i
-                for (j in seq(nlams[i])) {
+                which <- foldid == i
+                for (j in seq(nlams[i])) 
+                {
                     cvraw[[m]][i, j] = auc.mat(y[which, ], predlist[[m]][which, j], weights[which])
                 }
             }
@@ -288,10 +303,10 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
         }
         weights = tapply(weights, foldid, sum)
         weights = rep(list(weights), nmodels)
-    }
-    else {
-        ywt = apply(y, 1, sum)
-        y = y/ywt
+    } else 
+    {
+        ywt <- apply(y, 1, sum)
+        y <- y / ywt
         weights = weights * ywt
         N <- lapply(1:nmodels, function(xx) nrow(y) - apply(is.na(predlist[[xx]]), 2, sum))
         
@@ -310,19 +325,19 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
                            }, class = y[, 1] * (predlist[[xx]] > 0.5) + y[, 2] * (predlist[[xx]] <= 0.5))
         )
         if (grouped) {
-            cvob = lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
-            cvraw = lapply(cvob, function(x) x$cvraw)
-            weights = lapply(cvob, function(x) x$weights)
-            N = lapply(cvob, function(x) x$N)
+            cvob    <- lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
+            cvraw   <- lapply(cvob, function(x) x$cvraw)
+            weights <- lapply(cvob, function(x) x$weights)
+            N       <- lapply(cvob, function(x) x$N)
         } else 
         {
-            weights = rep(list(weights), nmodels)
+            weights <- rep(list(weights), nmodels)
         }
     }
-    cvm = lapply(1:length(cvraw), function(m) apply(cvraw[[m]], 2, weighted.mean, w = weights[[m]], na.rm = TRUE))
-    cvsd = lapply(1:length(cvraw), function(m) sqrt(apply(scale(cvraw[[m]], cvm[[m]], FALSE)^2, 2, weighted.mean, 
-                                                  w = weights[[m]], na.rm = TRUE)/(N[[m]] - 1)))
-    out = list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
+    cvm  <- lapply(1:length(cvraw), function(m) apply(cvraw[[m]], 2, weighted.mean, w = weights[[m]], na.rm = TRUE))
+    cvsd <- lapply(1:length(cvraw), function(m) sqrt(apply(scale(cvraw[[m]], cvm[[m]], FALSE)^2, 2, weighted.mean, 
+                                                   w = weights[[m]], na.rm = TRUE)/(N[[m]] - 1)))
+    out  <- list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
     if (keep) 
         out$fit.preval = predlist
     out
@@ -340,29 +355,36 @@ cv.oemfit_gaussian <- function (outlist, lambda, x, y, weights, foldid, type.mea
         warning("Only 'mse', 'deviance' or 'mae'  available for Gaussian models; 'mse' used")
         type.measure = "mse"
     }
-    ##We dont want to extrapolate lambdas on the small side
-    mlami=max(sapply(outlist,function(obj)min(obj$lambda)))
-    which_lam=lambda >= mlami
+    
     nmodels <- length(outlist[[1]]$beta)
     
-    predmat = matrix(NA, length(y), length(lambda))
+    ## We dont want to extrapolate smaller lambdas
+    mlami <- which_lam <- vector(mode = "list", length = nmodels)
+    
+    for (m in 1:nmodels)
+    {
+        mlami[[m]]     <- max(sapply(outlist, function(obj) min(obj$lambda[[m]])))
+        which_lam[[m]] <- lambda[[m]] >= mlami[[m]]
+    }
+    
+    predmat  <- matrix(NA, length(y), length(lambda[[1]]))
     predlist <- rep(list(predmat), nmodels)
-    nfolds = max(foldid)
-    nlams = double(nfolds)
+    nfolds   <- max(foldid)
+    nlams    <- double(nfolds)
     for (i in seq(nfolds)) 
     {
-        which = foldid == i
-        fitobj = outlist[[i]]
-        x.tmp = x[which, , drop = FALSE]
+        which  <- foldid == i
+        fitobj <- outlist[[i]]
+        x.tmp  <- x[which, , drop = FALSE]
         for (m in 1:nmodels)
         {
-            preds = predict(fitobj, x.tmp, s=lambda[which_lam], which.model = m)
+            preds <- predict(fitobj, x.tmp, s = lambda[[m]][which_lam[[m]]], which.model = m)
             
             
-            nlami = sum(which_lam)
-            predlist[[m]][which, seq(nlami)] = preds
+            nlami <- sum(which_lam[[m]])
+            predlist[[m]][which, seq(nlami)] <- preds
         }
-        nlams[i] = nlami
+        nlams[i] <- nlami
     }
     
     N <- lapply(1:nmodels, function(xx) length(y) - apply(is.na(predlist[[xx]]), 2, sum))
@@ -376,22 +398,24 @@ cv.oemfit_gaussian <- function (outlist, lambda, x, y, weights, foldid, type.mea
                mae = abs(y - predlist[[xx]]))
     )
     
-    if ((length(y)/nfolds < 3) && grouped) {
+    if ((length(y)/nfolds < 3) && grouped) 
+    {
         warning("Option grouped=FALSE enforced in cv.glmnet, since < 3 observations per fold", 
                 call. = FALSE)
         grouped = FALSE
     }
-    if (grouped) {
-        cvob = lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
-        cvraw = lapply(cvob, function(x) x$cvraw)
-        weights = lapply(cvob, function(x) x$weights)
-        N = lapply(cvob, function(x) x$N)
+    if (grouped) 
+    {
+        cvob    <- lapply(1:nmodels, function(xx) cvcompute(cvraw[[xx]], weights, foldid, nlams))
+        cvraw   <- lapply(cvob, function(x) x$cvraw)
+        weights <- lapply(cvob, function(x) x$weights)
+        N       <- lapply(cvob, function(x) x$N)
     }
-    cvm = lapply(1:length(cvraw), function(m) apply(cvraw[[m]], 2, weighted.mean, w = weights[[m]], na.rm = TRUE))
-    cvsd = lapply(1:length(cvraw), function(m) sqrt(apply(scale(cvraw[[m]], cvm[[m]], FALSE)^2, 2, weighted.mean, 
-                                                          w = weights[[m]], na.rm = TRUE)/(N[[m]] - 1)))
-    out = list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
+    cvm  <- lapply(1:length(cvraw), function(m) apply(cvraw[[m]], 2, weighted.mean, w = weights[[m]], na.rm = TRUE))
+    cvsd <- lapply(1:length(cvraw), function(m) sqrt(apply(scale(cvraw[[m]], cvm[[m]], FALSE)^2, 2, weighted.mean, 
+                                                           w = weights[[m]], na.rm = TRUE)/(N[[m]] - 1)))
+    out  <- list(cvm = cvm, cvsd = cvsd, name = typenames[type.measure])
     if (keep) 
-        out$fit.preval = predlist
+        out$fit.preval <- predlist
     out
 }

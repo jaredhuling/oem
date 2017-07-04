@@ -71,10 +71,21 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     //   1/(2n) * ||y - X * beta||^2 + lambda * ||beta||_1
     // which is equivalent to minimizing
     //   1/2 * ||y - X * beta||^2 + n * lambda * ||beta||_1
-    ArrayXd lambda(as<ArrayXd>(lambda_));
+    //ArrayXd lambda(as<ArrayXd>(lambda_)); // old lambda code
     VectorXd weights(as<VectorXd>(weights_));
     VectorXd group_weights(as<VectorXd>(group_weights_));
-    int nlambda = lambda.size();
+    
+    
+    std::vector<VectorXd> lambda(as< std::vector<VectorXd> >(lambda_));
+    
+    VectorXd lambda_tmp;
+    lambda_tmp = lambda[0];
+    
+    int nl = as<int>(nlambda_);
+    VectorXd lambda_base(nl);
+    
+    
+    int nlambda = lambda_tmp.size();
     
     
     List opts(opts_);
@@ -165,12 +176,19 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     lmax = solver->compute_lambda_zero() * datstd.get_scaleY(); // 
     
     
+    bool provided_lambda = false;
     if (nlambda < 1) 
     {
         double lmin = as<double>(lmin_ratio_) * lmax;
-        lambda.setLinSpaced(as<int>(nlambda_), std::log(lmax), std::log(lmin));
-        lambda = lambda.exp();
-        nlambda = lambda.size();
+        
+        lambda_base.setLinSpaced(nl, std::log(lmax), std::log(lmin));
+        lambda_base = lambda_base.array().exp();
+        nlambda = lambda_base.size();
+        
+        lambda_tmp.resize(nlambda);
+    } else
+    {
+        provided_lambda = true;
     }
     
     
@@ -182,12 +200,30 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     IntegerVector niter(nlambda);
     int nlambda_store = nlambda;
     double ilambda = 0.0;
-
+    
+    std::string elasticnettxt(".net");
+    
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
         if (penalty[pp] == "ols")
         {
             nlambda = 1L;
+        }
+        
+        bool is_net_pen = penalty[pp].find(elasticnettxt) != std::string::npos;
+        
+        if (provided_lambda)
+        {
+            lambda_tmp = lambda[pp];
+        } else 
+        {
+            if (is_net_pen)
+            {
+                lambda_tmp = (lambda_base.array() / alpha).matrix(); // * n; // 
+            } else
+            {
+                lambda_tmp = lambda_base; // * n; // 
+            }
         }
         
         VectorXd loss(nlambda);
@@ -201,7 +237,9 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
                 Rcpp::checkUserInterrupt();
             }
             
-            ilambda = lambda[i] / datstd.get_scaleY(); // * n; //     
+            
+            ilambda = lambda_tmp(i) / datstd.get_scaleY();
+                
             if(i == 0)
                 solver->init(ilambda, penalty[pp], alpha, gamma, tau);
             else
@@ -238,6 +276,8 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
             */
             
         } //end loop over lambda values
+        
+        lambda[pp] = lambda_tmp;
         
         if (penalty[pp] == "ols")
         {

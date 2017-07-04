@@ -109,11 +109,13 @@
 #' 
 #' system.time(fit <- oem(x = x.dense, y = ys, 
 #'                        penalty = c("lasso", "grp.lasso"), 
-#'                        groups = rep(1:20, each = 5), intercept = TRUE))
+#'                        groups = rep(1:20, each = 5), intercept = FALSE,
+#'                        standardize = FALSE))
 #' 
 #' system.time(fits <- oem(x = xs, y = ys, 
 #'                         penalty = c("lasso", "grp.lasso"), 
-#'                         groups = rep(1:20, each = 5), intercept = TRUE, lambda = fit$lambda))
+#'                         groups = rep(1:20, each = 5), intercept = FALSE, 
+#'                         standardize = FALSE, lambda = fit$lambda))
 #'                         
 #' max(abs(fit$beta[[1]] - fits$beta[[1]]))
 #' max(abs(fit$beta[[2]] - fits$beta[[2]]))
@@ -218,7 +220,8 @@ oem <- function(x,
     y <- drop(y)
     y.vals <- unique(y)
     is.sparse <- FALSE
-    if(inherits(x, "sparseMatrix")){
+    if(inherits(x, "sparseMatrix"))
+    {
         ##Sparse case
         is.sparse <- TRUE
         x <- as(x,"CsparseMatrix")
@@ -329,9 +332,11 @@ oem <- function(x,
     }
     
     
-    if (is.null(lambda.min.ratio)) {
+    if (is.null(lambda.min.ratio)) 
+    {
         lambda.min.ratio <- ifelse(nrow(x) < ncol(x), 0.01, 0.0001)
-    } else {
+    } else 
+    {
         lambda.min.ratio <- as.numeric(lambda.min.ratio)
     }
     
@@ -345,17 +350,51 @@ oem <- function(x,
         stop("nlambda must be a positive integer")
     }
     
-    lambda <- sort(as.numeric(lambda), decreasing = TRUE)
+    if (!is.list(lambda))
+    {
+        lambda <- sort(as.numeric(lambda), decreasing = TRUE)
+        
+        ## ensure is double type
+        if (length(lambda) > 0)
+        {
+            lambda    <- as.double(lambda)
+        }
+        
+        lambda <- rep(list(lambda), length(penalty))
+        
+    } else 
+    {
+        if (length(lambda) != length(penalty))
+        {
+            stop("If list of lambda vectors is provided, it must be 
+                  the same length as the number of penalties fit")
+        }
+        nlambda.tmp <- length(lambda[[1]])
+        for (l in 1:length(lambda))
+        {
+            
+            ## check to make sure all things in the list are actually vectors
+            if ( is.null(lambda[[l]]) || length(lambda[[l]]) < 1 )
+            {
+                stop("Provided lambda vector must have at least one value")
+            }
+            
+            if (length(lambda[[l]]) != nlambda.tmp)
+            {
+                stop("All provided lambda vectors must have same length")
+            }
+            
+            ## ensure is double type
+            lambda[[l]] <- as.double(sort(as.numeric(lambda[[l]]), decreasing = TRUE))
+            
+        }
+    }
     
 
         
     ##    ensure types are correct
     ##    before sending to c++
     
-    if (length(lambda) > 0)
-    {
-        lambda    <- as.double(lambda)
-    }
     groups        <- as.integer(groups)
     unique.groups <- as.integer(unique.groups)
     nlambda       <- as.integer(nlambda)
@@ -380,6 +419,7 @@ oem <- function(x,
     {
         stop("tol and irls.tol should be nonnegative")
     }
+    
     
     
     options <- list(maxit        = maxit,

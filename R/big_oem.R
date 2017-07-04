@@ -266,17 +266,49 @@ big.oem <- function(x,
         stop("nlambda must be a positive integer")
     }
     
-    lambda <- sort(as.numeric(lambda), decreasing = TRUE)
-    
-    
+    if (!is.list(lambda))
+    {
+        lambda <- sort(as.numeric(lambda), decreasing = TRUE)
+        
+        ## ensure is double type
+        if (length(lambda) > 0)
+        {
+            lambda    <- as.double(lambda)
+        }
+        
+        lambda <- rep(list(lambda), length(penalty))
+        
+    } else 
+    {
+        if (length(lambda) != length(penalty))
+        {
+            stop("If list of lambda vectors is provided, it must be 
+                 the same length as the number of penalties fit")
+        }
+        nlambda.tmp <- length(lambda[[1]])
+        for (l in 1:length(lambda))
+        {
+            
+            ## check to make sure all things in the list are actually vectors
+            if ( is.null(lambda[[l]]) || length(lambda[[l]]) < 1 )
+            {
+                stop("Provided lambda vector must have at least one value")
+            }
+            
+            if (length(lambda[[l]]) != nlambda.tmp)
+            {
+                stop("All provided lambda vectors must have same length")
+            }
+            
+            ## ensure is double type
+            lambda[[l]] <- as.double(sort(as.numeric(lambda[[l]]), decreasing = TRUE))
+            
+        }
+    }
     
     ##    ensure types are correct
     ##    before sending to c++
     
-    if (length(lambda) > 0)
-    {
-        lambda    <- as.double(lambda)
-    }
     groups        <- as.integer(groups)
     unique.groups <- as.integer(unique.groups)
     nlambda       <- as.integer(nlambda)
