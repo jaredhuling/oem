@@ -167,5 +167,5 @@ R_CallMethodDef callMethods[] = {
 void R_init_oem(DllInfo *info)
 {
     R_registerRoutines(info, NULL, NULL, NULL, NULL);
-    R_useDynamicSymbols(info, FALSE);
+    R_useDynamicSymbols(info, TRUE);
 }
