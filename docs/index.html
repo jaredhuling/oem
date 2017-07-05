@@ -105,7 +105,7 @@ b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">
 x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
 y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
 
-lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">penalty =</span> <span class="st">"elastic.net"</span>)$lambda
+lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">penalty =</span> <span class="st">"elastic.net"</span>)$lambda[[<span class="dv">1</span>]]
 
 <span class="kw">microbenchmark</span>(
     <span class="st">"glmnet[lasso]"</span> =<span class="st"> </span>{res1 &lt;-<span class="st"> </span><span class="kw">glmnet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-10</span>, 
@@ -122,8 +122,8 @@ lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">
 )</code></pre></div>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.938060 8.138273 8.358889 8.357559 8.395648 8.964907     5
-##     oem[lasso] 2.128907 2.191268 2.430306 2.449499 2.454517 2.927340     5</code></pre>
+##  glmnet[lasso] 7.368960 7.489544 7.529856 7.560239 7.598115 7.632423     5
+##     oem[lasso] 1.951555 1.953015 2.022862 1.961522 1.966490 2.281728     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># difference of results</span>
 <span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) -<span class="st"> </span>res2$beta[[<span class="dv">1</span>]]))</code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -133,7 +133,7 @@ lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">
                                       <span class="dt">lambda =</span> lambdas)
 
 <span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) -<span class="st"> </span>res2$beta[[<span class="dv">1</span>]]))</code></pre></div>
-<pre><code>## [1] 3.763398e-09</code></pre>
+<pre><code>## [1] 3.763397e-09</code></pre>
 </div>
 <div id="nonconvex-penalties" class="section level3">
 <h3 class="hasAnchor">
@@ -153,12 +153,12 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 mcp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"mcp"</span>,
                <span class="dt">gamma =</span> <span class="dv">2</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, 
                <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
-               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda
+               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
 
 scad.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"scad"</span>,
                <span class="dt">gamma =</span> <span class="dv">4</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, 
                <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
-               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda
+               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
 
 <span class="kw">microbenchmark</span>(
     <span class="st">"sparsenet[mcp]"</span> =<span class="st"> </span>{res1 &lt;-<span class="st"> </span><span class="kw">sparsenet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-10</span>, 
@@ -199,33 +199,23 @@ scad.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.h
                                    <span class="dt">lam =</span> scad.lam)}, 
     <span class="dt">times =</span> <span class="dv">5</span>
 )</code></pre></div>
-<pre><code>## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1826.6230 1832.1815 1882.6305 1848.6586 1906.9917
-##        oem[mcp]  155.9794  156.4010  191.4032  157.1186  202.6081
-##     ncvreg[mcp] 7166.5206 7250.1052 7935.0528 7318.2200 8420.2316
-##       plus[mcp] 1638.5337 1708.5294 1725.0798 1712.0745 1743.7789
-##       oem[scad]  132.8986  133.3667  133.8485  133.6422  134.0330
-##    ncvreg[scad] 7615.0100 7721.4982 8210.5580 8063.8088 8351.3625
-##      plus[scad] 1782.9623 1841.1951 2007.2924 1940.2403 2098.3529
+##  sparsenet[mcp] 1754.0406 1791.8499 1868.5572 1849.6512 1873.3422
+##        oem[mcp]  156.6582  157.7271  162.7641  158.1538  162.0984
+##     ncvreg[mcp] 7164.6251 7276.9431 7284.4850 7307.1294 7328.8396
+##       plus[mcp] 1620.5563 1622.9369 1645.5945 1629.7649 1676.9993
+##       oem[scad]  132.8851  133.8530  134.9374  135.0723  136.4207
+##    ncvreg[scad] 7404.2984 7416.8157 7534.4692 7487.9925 7532.4957
+##      plus[scad] 1742.3384 1791.0293 1981.8237 1857.7633 2113.2796
 ##        max neval
-##  1998.6978     5
-##   284.9086     5
-##  9520.1863     5
-##  1822.4823     5
-##   135.3021     5
-##  9301.1106     5
-##  2373.7115     5</code></pre>
+##  2073.9020     5
+##   179.1827     5
+##  7344.8878     5
+##  1677.7149     5
+##   136.4558     5
+##  7830.7440     5
+##  2404.7081     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,
@@ -237,8 +227,8 @@ diffs</code></pre></div>
 <pre><code>##                          abs diff
 ## MCP:  oem and ncvreg 1.725859e-07
 ## SCAD: oem and ncvreg 5.094648e-08
-## MCP:  oem and plus   2.684108e-11
-## SCAD: oem and plus   1.732414e-11</code></pre>
+## MCP:  oem and plus   2.684136e-11
+## SCAD: oem and plus   1.732409e-11</code></pre>
 </div>
 <div id="group-lasso" class="section level3">
 <h3 class="hasAnchor">
@@ -258,7 +248,7 @@ groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv
 
 grp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"grp.lasso"</span>,
                <span class="dt">groups =</span> groups,
-               <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda
+               <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
 
 
 <span class="kw">microbenchmark</span>(
@@ -284,16 +274,16 @@ grp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.ht
     <span class="dt">times =</span> <span class="dv">5</span>
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr        min         lq       mean    median         uq
-##   gglasso[grp.lasso] 1845.71946 1951.62624 2062.28094 1984.9100 1989.83776
-##       oem[grp.lasso]   83.49379   84.27574   90.68919   84.3093   88.62129
-##  grplasso[grp.lasso] 4330.15263 4373.55362 5009.09593 4530.1962 5226.72671
-##    grpreg[grp.lasso] 1093.06789 1126.79137 1201.43302 1178.0597 1240.50702
-##        max neval
-##  2539.3112     5
-##   112.7458     5
-##  6584.8505     5
-##  1368.7391     5</code></pre>
+##                 expr        min         lq       mean     median        uq
+##   gglasso[grp.lasso] 1856.26847 1858.21805 1888.41634 1866.34991 1877.3290
+##       oem[grp.lasso]   84.29724   84.66157   85.08457   84.66473   85.0117
+##  grplasso[grp.lasso] 4379.08019 4381.82989 4535.14676 4437.95989 4709.2473
+##    grpreg[grp.lasso] 1101.11871 1104.97800 1154.13878 1108.27203 1115.0855
+##         max neval
+##  1983.91628     5
+##    86.78759     5
+##  4767.61656     5
+##  1341.23967     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)
@@ -320,13 +310,13 @@ groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv
                        <span class="dt">intercept =</span> <span class="ot">TRUE</span>,
                        <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.04    0.17    3.21</code></pre>
+##    2.96    0.18    3.17</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># memory usage is out of control here.</span>
 <span class="co"># oem uses approximately 1/3 of the memory</span>
 <span class="kw">system.time</span>(res2 &lt;-<span class="st"> </span><span class="kw">grpreg</span>(x, y, <span class="dt">group =</span> groups, 
-                           <span class="dt">eps =</span> <span class="fl">1e-10</span>, <span class="dt">lambda =</span> res$lambda))</code></pre></div>
+                           <span class="dt">eps =</span> <span class="fl">1e-10</span>, <span class="dt">lambda =</span> res$lambda[[<span class="dv">1</span>]]))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##   64.17    1.15   65.75</code></pre>
+##   65.69    1.25   67.61</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># I think the standardization is done</span>
 <span class="co"># differently for grpreg</span>
 <span class="kw">max</span>(<span class="kw">abs</span>(res$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res2$beta))</code></pre></div>
@@ -364,11 +354,11 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 220.0712 220.5291 228.8863 222.2841 226.6679
-##  oem[lasso/mcp/scad/ols] 239.3659 240.8303 255.4489 241.3245 265.1960
+##               oem[lasso] 215.9081 216.9893 221.9438 218.2509 220.7203
+##  oem[lasso/mcp/scad/ols] 229.2544 230.4643 242.1192 240.6767 251.0890
 ##       max neval
-##  254.8794     5
-##  290.5280     5</code></pre>
+##  237.8505     5
+##  259.1119     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span>
 <span class="co">#</span>
 

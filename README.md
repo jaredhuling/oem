@@ -47,7 +47,7 @@ b <- matrix(c(runif(m), rep(0, p - m)))
 x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 
-lambdas = oem(x, y, intercept = TRUE, standardize = FALSE, penalty = "elastic.net")$lambda
+lambdas = oem(x, y, intercept = TRUE, standardize = FALSE, penalty = "elastic.net")$lambda[[1]]
 
 microbenchmark(
     "glmnet[lasso]" = {res1 <- glmnet(x, y, thresh = 1e-10, 
@@ -67,8 +67,8 @@ microbenchmark(
 ```
 ## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.575130 7.647406 8.185526 8.134984 8.448356 9.121753     5
-##     oem[lasso] 2.048697 2.237141 2.296096 2.245134 2.273289 2.676219     5
+##  glmnet[lasso] 7.441984 7.516914 7.557393 7.557205 7.607268 7.663593     5
+##     oem[lasso] 1.972346 1.981441 2.011556 1.983256 1.984705 2.136033     5
 ```
 
 ```r
@@ -90,7 +90,7 @@ max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
 ```
-## [1] 3.763398e-09
+## [1] 3.763397e-09
 ```
 
 ### Nonconvex Penalties
@@ -112,12 +112,12 @@ y <- drop(x %*% b) + rnorm(n)
 mcp.lam <- oem(x, y, penalty = "mcp",
                gamma = 2, intercept = TRUE, 
                standardize = TRUE,
-               nlambda = 200, tol = 1e-10)$lambda
+               nlambda = 200, tol = 1e-10)$lambda[[1]]
 
 scad.lam <- oem(x, y, penalty = "scad",
                gamma = 4, intercept = TRUE, 
                standardize = TRUE,
-               nlambda = 200, tol = 1e-10)$lambda
+               nlambda = 200, tol = 1e-10)$lambda[[1]]
 
 microbenchmark(
     "sparsenet[mcp]" = {res1 <- sparsenet(x, y, thresh = 1e-10, 
@@ -160,37 +160,25 @@ microbenchmark(
 )
 ```
 
-```
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-```
 
 ```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1772.2340 1783.1975 1857.9591 1835.0776 1904.5578
-##        oem[mcp]  156.1389  156.6702  172.6061  157.2951  159.4313
-##     ncvreg[mcp] 7053.6730 7127.6700 7184.7262 7156.3276 7206.7456
-##       plus[mcp] 1600.8701 1708.5586 1759.7027 1778.9716 1837.7239
-##       oem[scad]  131.9789  133.0584  141.9454  137.8785  140.9257
-##    ncvreg[scad] 7583.0249 7632.4411 7727.6092 7641.8928 7802.3927
-##      plus[scad] 1750.1372 1757.9950 1999.7647 2043.7093 2101.0122
+##  sparsenet[mcp] 1770.7480 1805.7322 1869.5562 1851.2909 1897.7480
+##        oem[mcp]  155.7779  157.1737  157.7012  158.2347  158.4791
+##     ncvreg[mcp] 7113.0889 7148.7115 7322.1983 7166.6196 7315.6137
+##       plus[mcp] 1612.1931 1632.7685 1709.5157 1678.3785 1764.2566
+##       oem[scad]  132.7268  133.0813  134.3816  134.6030  134.9752
+##    ncvreg[scad] 7480.6702 7508.0669 7596.8968 7535.5959 7574.6581
+##      plus[scad] 1782.6602 1785.3546 1969.5278 1874.2982 2095.9051
 ##        max neval
-##  1994.7284     5
-##   233.4951     5
-##  7379.2148     5
-##  1872.3896     5
-##   165.8855     5
-##  7978.2944     5
-##  2345.9697     5
+##  2022.2617     5
+##   158.8407     5
+##  7866.9578     5
+##  1859.9821     5
+##   136.5218     5
+##  7885.4928     5
+##  2309.4208     5
 ```
 
 ```r
@@ -208,8 +196,8 @@ diffs
 ##                          abs diff
 ## MCP:  oem and ncvreg 1.725859e-07
 ## SCAD: oem and ncvreg 5.094648e-08
-## MCP:  oem and plus   2.684108e-11
-## SCAD: oem and plus   1.732414e-11
+## MCP:  oem and plus   2.684136e-11
+## SCAD: oem and plus   1.732409e-11
 ```
 
 
@@ -233,7 +221,7 @@ groups <- rep(1:floor(p/10), each = 10)
 
 grp.lam <- oem(x, y, penalty = "grp.lasso",
                groups = groups,
-               nlambda = 100, tol = 1e-10)$lambda
+               nlambda = 100, tol = 1e-10)$lambda[[1]]
 
 
 microbenchmark(
@@ -262,16 +250,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr        min         lq       mean     median
-##   gglasso[grp.lasso] 1871.23145 1947.55818 2011.37105 1981.32627
-##       oem[grp.lasso]   84.79955   85.49979   92.73577   91.10412
-##  grplasso[grp.lasso] 4319.38172 4683.59374 4885.40948 5011.62115
-##    grpreg[grp.lasso] 1161.21075 1181.88023 1283.63716 1307.33189
-##          uq       max neval
-##  2055.28069 2201.4587     5
-##    98.26249  104.0129     5
-##  5162.37125 5250.0795     5
-##  1332.52493 1435.2380     5
+##                 expr       min        lq       mean     median         uq
+##   gglasso[grp.lasso] 1878.0888 1878.4255 1907.79330 1887.57500 1903.50004
+##       oem[grp.lasso]   83.7454   84.9888   85.94121   85.87616   86.13313
+##  grplasso[grp.lasso] 4357.3873 4387.2949 4518.83527 4414.99837 4710.61381
+##    grpreg[grp.lasso] 1104.2351 1110.6527 1160.32216 1114.22221 1127.73386
+##         max neval
+##  1991.37710     5
+##    88.96256     5
+##  4723.88191     5
+##  1344.76699     5
 ```
 
 ```r
@@ -310,19 +298,19 @@ system.time(res <- oem(x, y, penalty = "grp.lasso",
 
 ```
 ##    user  system elapsed 
-##    3.29    0.16    3.48
+##    2.99    0.22    3.26
 ```
 
 ```r
 # memory usage is out of control here.
 # oem uses approximately 1/3 of the memory
 system.time(res2 <- grpreg(x, y, group = groups, 
-                           eps = 1e-10, lambda = res$lambda))
+                           eps = 1e-10, lambda = res$lambda[[1]]))
 ```
 
 ```
 ##    user  system elapsed 
-##   71.49    2.03   80.37
+##   65.59    1.46   67.91
 ```
 
 ```r
@@ -376,12 +364,12 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                     expr      min       lq     mean  median       uq
-##               oem[lasso] 258.9629 272.3903 317.1007 300.378 363.5564
-##  oem[lasso/mcp/scad/ols] 260.3768 267.3488 279.7942 281.632 287.8948
+##                     expr      min       lq     mean   median       uq
+##               oem[lasso] 211.9786 212.5340 214.4036 213.6061 215.9812
+##  oem[lasso/mcp/scad/ols] 228.7243 231.1298 234.7131 231.8281 234.1716
 ##       max neval
-##  390.2162     5
-##  301.7185     5
+##  217.9181     5
+##  247.7116     5
 ```
 
 ```r
