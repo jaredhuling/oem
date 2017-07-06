@@ -9,7 +9,12 @@ Authors@R: c(
     person("Yixuan", "Qiu", , , c("ctb"))
     )
 Maintainer: Jared Huling <jaredhuling@gmail.com>
-Description: Solves penalized least squares problems for big tall data using the orthogonalizing EM algorithm of Xiong et al. (2016) <doi:10.1080/00401706.2015.1054436>. The main fitting function is oem() and the functions cv.oem() and xval.oem() are for cross validation, the latter being an accelerated cross validation function for linear models. The big.oem() function allows for out of memory fitting.
+Description: Solves penalized least squares problems for big tall data
+    using the orthogonalizing EM algorithm of Xiong et al. (2016) <doi:
+    10.1080/00401706.2015.1054436>. The main fitting function is oem() and the
+    functions cv.oem() and xval.oem() are for cross validation, the latter being an
+    accelerated cross validation function for linear models. The big.oem() function
+    allows for out of memory fitting.
 URL: https://github.com/jaredhuling/oem
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
@@ -17,18 +22,18 @@ LazyData: TRUE
 Depends:
     R (>= 3.2.0),
     bigmemory
-Imports: 
-    Rcpp (>= 0.11.0), 
-    Matrix, 
-    foreach, 
+Imports:
+    Rcpp (>= 0.11.0),
+    Matrix,
+    foreach,
     methods
-LinkingTo: 
-    Rcpp, 
-    RcppEigen, 
-    BH, 
-    bigmemory, 
+LinkingTo: Rcpp,
+    RcppEigen,
+    BH,
+    bigmemory,
     RcppArmadillo
 RoxygenNote: 6.0.1
-Suggests: knitr,
+Suggests:
+    knitr,
     rmarkdown
 VignetteBuilder: knitr
