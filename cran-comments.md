@@ -1,7 +1,7 @@
 
 ## Update for 'oem'
 
-* Added more flexible specification of lambda.
+* Added more flexible specification of lambda tuning parameter.
 * Version change: 2.0.5 -> 2.0.6
 
 ## Test environments
