@@ -308,7 +308,7 @@ plot.cv.oem <- function(x, which.model = 1, sign.lambda = 1, ...)
     
     main.txt <- x$oem.fit$penalty[which.model]
     
-    xlab=expression(log(lambda))
+    xlab <- expression(log(lambda))
     if(sign.lambda<0)xlab=paste("-",xlab,sep="")
     plot.args=list(x    = sign.lambda * log(object$lambda[[which.model]]),
                    y    = object$cvm[[which.model]],
