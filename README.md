@@ -66,9 +66,12 @@ microbenchmark(
 
 ```
 ## Unit: seconds
-##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.441984 7.516914 7.557393 7.557205 7.607268 7.663593     5
-##     oem[lasso] 1.972346 1.981441 2.011556 1.983256 1.984705 2.136033     5
+##           expr      min       lq     mean   median       uq       max
+##  glmnet[lasso] 8.833903 9.183343 9.389654 9.320551 9.544755 10.065720
+##     oem[lasso] 2.442387 2.465268 2.788550 2.512572 2.589450  3.933071
+##  neval
+##      5
+##      5
 ```
 
 ```r
@@ -81,11 +84,12 @@ max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
 ```r
-res1 <- glmnet(x, y, thresh = 1e-12, # thresh must be very low for glmnet to be accurate
-                                      standardize = FALSE,
-                                      intercept = TRUE,
-                                      lambda = lambdas)
+res1 <- glmnet(x, y, thresh = 1e-12, 
+               standardize = FALSE,
+               intercept = TRUE,
+               lambda = lambdas)
 
+# answers are now more close once we require more precise glmnet solutions
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
@@ -160,25 +164,24 @@ microbenchmark(
 )
 ```
 
-
 ```
 ## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1770.7480 1805.7322 1869.5562 1851.2909 1897.7480
-##        oem[mcp]  155.7779  157.1737  157.7012  158.2347  158.4791
-##     ncvreg[mcp] 7113.0889 7148.7115 7322.1983 7166.6196 7315.6137
-##       plus[mcp] 1612.1931 1632.7685 1709.5157 1678.3785 1764.2566
-##       oem[scad]  132.7268  133.0813  134.3816  134.6030  134.9752
-##    ncvreg[scad] 7480.6702 7508.0669 7596.8968 7535.5959 7574.6581
-##      plus[scad] 1782.6602 1785.3546 1969.5278 1874.2982 2095.9051
+##  sparsenet[mcp] 2054.4334 2122.5534 2274.3683 2340.3278 2422.9139
+##        oem[mcp]  195.7824  197.5895  219.2504  205.1142  212.9871
+##     ncvreg[mcp] 8369.8845 8492.1912 8785.6864 8550.9797 8978.4623
+##       plus[mcp] 1991.5855 2111.7105 2265.8972 2184.3521 2194.6665
+##       oem[scad]  166.6919  184.1331  248.8763  252.6000  290.2139
+##    ncvreg[scad] 8805.7614 8846.4476 9065.0837 8874.1861 8996.8070
+##      plus[scad] 2296.1831 2511.2433 2747.7085 2610.2044 2958.5915
 ##        max neval
-##  2022.2617     5
-##   158.8407     5
-##  7866.9578     5
-##  1859.9821     5
-##   136.5218     5
-##  7885.4928     5
-##  2309.4208     5
+##  2431.6130     5
+##   284.7789     5
+##  9536.9143     5
+##  2847.1715     5
+##   350.7428     5
+##  9802.2163     5
+##  3362.3203     5
 ```
 
 ```r
@@ -211,7 +214,7 @@ library(grpreg)
 library(grplasso)
 # compute the full solution path, n > p
 set.seed(123)
-n <- 5000
+n <- 10000
 p <- 200
 m <- 25
 b <- matrix(c(runif(m, -0.5, 0.5), rep(0, p - m)))
@@ -250,16 +253,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr       min        lq       mean     median         uq
-##   gglasso[grp.lasso] 1878.0888 1878.4255 1907.79330 1887.57500 1903.50004
-##       oem[grp.lasso]   83.7454   84.9888   85.94121   85.87616   86.13313
-##  grplasso[grp.lasso] 4357.3873 4387.2949 4518.83527 4414.99837 4710.61381
-##    grpreg[grp.lasso] 1104.2351 1110.6527 1160.32216 1114.22221 1127.73386
+##                 expr       min        lq      mean    median         uq
+##   gglasso[grp.lasso] 3673.9697 3696.0798 3864.3264 3721.6209  3940.9336
+##       oem[grp.lasso]  111.0805  118.1991  127.0424  128.1041   128.6354
+##  grplasso[grp.lasso] 8064.6128 8481.2110 9321.8691 8640.0793 10368.1730
+##    grpreg[grp.lasso] 2109.4914 2133.7164 2801.5398 2173.8997  2619.8730
 ##         max neval
-##  1991.37710     5
-##    88.96256     5
-##  4723.88191     5
-##  1344.76699     5
+##   4289.0282     5
+##    149.1926     5
+##  11055.2695     5
+##   4970.7184     5
 ```
 
 ```r
@@ -272,8 +275,8 @@ diffs
 
 ```
 ##                      abs diff
-## oem and gglasso  1.729379e-06
-## oem and grplasso 4.828369e-08
+## oem and gglasso  1.303906e-06
+## oem and grplasso 1.645871e-08
 ```
 
 #### Bigger Group Lasso Example
@@ -289,46 +292,19 @@ x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 groups <- rep(1:floor(p/10), each = 10)
 
-system.time(res <- oem(x, y, penalty = "grp.lasso",
-                       groups = groups,
-                       standardize = TRUE,
-                       intercept = TRUE,
-                       nlambda = 100, tol = 1e-10))
+grp.penalties <- c("grp.lasso", "grp.mcp", "grp.scad", 
+                   "grp.mcp.net", "grp.scad.net",
+                   "sparse.group.lasso")
+system.time(res <- oem(x, y, 
+                       penalty = grp.penalties,
+                       groups  = groups,
+                       alpha   = 0.25, # mixing param for l2 penalties
+                       tau     = 0.5)) # mixing param for sparse grp lasso 
 ```
 
 ```
 ##    user  system elapsed 
-##    2.99    0.22    3.26
-```
-
-```r
-# memory usage is out of control here.
-# oem uses approximately 1/3 of the memory
-system.time(res2 <- grpreg(x, y, group = groups, 
-                           eps = 1e-10, lambda = res$lambda[[1]]))
-```
-
-```
-##    user  system elapsed 
-##   65.59    1.46   67.91
-```
-
-```r
-# I think the standardization is done
-# differently for grpreg
-max(abs(res$beta[[1]] - res2$beta))
-```
-
-```
-## [1] 0.0007842304
-```
-
-```r
-mean(abs(res$beta[[1]] - res2$beta))
-```
-
-```
-## [1] 8.363514e-06
+##    4.03    0.22    4.49
 ```
 
 ### Fitting Multiple Penalties
@@ -352,8 +328,13 @@ microbenchmark(
                                    standardize = TRUE,
                                    tol = 1e-10)},
     "oem[lasso/mcp/scad/ols]"    = {res2 <- oem(x, y,
-                                   penalty = c("elastic.net", "mcp", "scad", "grp.lasso"),
+                                   penalty = c("elastic.net", "mcp", 
+                                               "scad", "grp.lasso", 
+                                               "grp.mcp", "sparse.grp.lasso",
+                                               "grp.mcp.net", "mcp.net"),
                                    gamma = 4,
+                                   tau = 0.5,
+                                   alpha = 0.25,
                                    groups = rep(1:10, each = 10),
                                    intercept = TRUE, 
                                    standardize = TRUE,
@@ -365,11 +346,11 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 211.9786 212.5340 214.4036 213.6061 215.9812
-##  oem[lasso/mcp/scad/ols] 228.7243 231.1298 234.7131 231.8281 234.1716
+##               oem[lasso] 234.2884 319.8251 352.8868 381.2856 391.7862
+##  oem[lasso/mcp/scad/ols] 288.3188 298.5905 376.7296 314.5128 388.8857
 ##       max neval
-##  217.9181     5
-##  247.7116     5
+##  437.2486     5
+##  593.3399     5
 ```
 
 ```r
@@ -381,9 +362,9 @@ plot(res2, which.model = 1, lwd = 2,
      xvar = "lambda")
 plot(res2, which.model = 2, lwd = 2,
      xvar = "lambda")
-plot(res2, which.model = 3, lwd = 2,
-     xvar = "lambda")
 plot(res2, which.model = 4, lwd = 2,
+     xvar = "lambda")
+plot(res2, which.model = 7, lwd = 2,
      xvar = "lambda")
 ```
 
