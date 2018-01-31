@@ -23,7 +23,8 @@
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-
+  
+  
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -105,7 +106,7 @@ This argument is not used for type=c("coefficients","nonzero")</p></td>
       <td><p>If multiple penalties are fit and returned in the same <code>oem</code> object, the <code>which.model</code> argument is used to 
 specify which model to make predictions for. For example, if the oem object "oemobj" was fit with argument 
 <code>penalty = c("lasso", "grp.lasso")</code>, then <code>which.model = 2</code> provides predictions for the group lasso model. For 
-<code>predict.cv.oem()</code>, can specify
+<code><a href='predict.cv.oem.html'>predict.cv.oem()</a></code>, can specify
 <code>"best.model"</code> to use the best model as estimated by cross-validation</p></td>
     </tr>
     <tr>
@@ -115,7 +116,7 @@ the model. For predict.cv.oem, can also specify <code>"lambda.1se"</code> or <co
     </tr>
     <tr>
       <th>...</th>
-      <td><p>used to pass the other arguments for <code>predict.oem()</code></p></td>
+      <td><p>used to pass the other arguments for <code><a href='predict.oem.html'>predict.oem()</a></code></p></td>
     </tr>
     </table>
     
@@ -171,7 +172,7 @@ the model. For predict.cv.oem, can also specify <code>"lambda.1se"</code> or <co
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

@@ -84,7 +84,7 @@
 <a href="#introduction" class="anchor"></a>Introduction</h2>
 <p>The oem package provides estimaton for various penalized linear models using the <a href="http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436">Orthogonalizing EM algorithm</a>. Documentation for the package can be found here: <a href="http://casualinference.org/oem">oem site</a> (still under construction).</p>
 <p>Install using the <strong>devtools</strong> package (RcppEigen must be installed first as well):</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools::<span class="kw">install_github</span>(<span class="st">"jaredhuling/oem"</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">devtools<span class="op">::</span><span class="kw"><a href="http://www.rdocumentation.org/packages/devtools/topics/install_github">install_github</a></span>(<span class="st">"jaredhuling/oem"</span>)</code></pre></div>
 <p>or by cloning and building using <code>R CMD INSTALL</code></p>
 </div>
 <div id="models" class="section level2">
@@ -101,11 +101,11 @@
 n &lt;-<span class="st"> </span><span class="dv">1000000</span>
 p &lt;-<span class="st"> </span><span class="dv">100</span>
 m &lt;-<span class="st"> </span><span class="dv">25</span>
-b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m), <span class="kw">rep</span>(<span class="dv">0</span>, p -<span class="st"> </span>m)))
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
+b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m), <span class="kw">rep</span>(<span class="dv">0</span>, p <span class="op">-</span><span class="st"> </span>m)))
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
 
-lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">penalty =</span> <span class="st">"elastic.net"</span>)$lambda[[<span class="dv">1</span>]]
+lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">penalty =</span> <span class="st">"elastic.net"</span>)<span class="op">$</span>lambda[[<span class="dv">1</span>]]
 
 <span class="kw">microbenchmark</span>(
     <span class="st">"glmnet[lasso]"</span> =<span class="st"> </span>{res1 &lt;-<span class="st"> </span><span class="kw">glmnet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-10</span>, 
@@ -122,17 +122,18 @@ lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">
 )</code></pre></div>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.368960 7.489544 7.529856 7.560239 7.598115 7.632423     5
-##     oem[lasso] 1.951555 1.953015 2.022862 1.961522 1.966490 2.281728     5</code></pre>
+##  glmnet[lasso] 7.568786 7.682571 7.868538 7.804442 8.002525 8.284365     5
+##     oem[lasso] 1.988946 2.020569 2.144351 2.130597 2.261201 2.320442     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># difference of results</span>
-<span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) -<span class="st"> </span>res2$beta[[<span class="dv">1</span>]]))</code></pre></div>
+<span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) <span class="op">-</span><span class="st"> </span>res2<span class="op">$</span>beta[[<span class="dv">1</span>]]))</code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res1 &lt;-<span class="st"> </span><span class="kw">glmnet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-12</span>, <span class="co"># thresh must be very low for glmnet to be accurate</span>
-                                      <span class="dt">standardize =</span> <span class="ot">FALSE</span>,
-                                      <span class="dt">intercept =</span> <span class="ot">TRUE</span>,
-                                      <span class="dt">lambda =</span> lambdas)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">res1 &lt;-<span class="st"> </span><span class="kw">glmnet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-12</span>, 
+               <span class="dt">standardize =</span> <span class="ot">FALSE</span>,
+               <span class="dt">intercept =</span> <span class="ot">TRUE</span>,
+               <span class="dt">lambda =</span> lambdas)
 
-<span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) -<span class="st"> </span>res2$beta[[<span class="dv">1</span>]]))</code></pre></div>
+<span class="co"># answers are now more close once we require more precise glmnet solutions</span>
+<span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) <span class="op">-</span><span class="st"> </span>res2<span class="op">$</span>beta[[<span class="dv">1</span>]]))</code></pre></div>
 <pre><code>## [1] 3.763397e-09</code></pre>
 </div>
 <div id="nonconvex-penalties" class="section level3">
@@ -146,19 +147,19 @@ lambdas =<span class="st"> </span><span class="kw"><a href="reference/oem.html">
 n &lt;-<span class="st"> </span><span class="dv">5000</span>
 p &lt;-<span class="st"> </span><span class="dv">200</span>
 m &lt;-<span class="st"> </span><span class="dv">25</span>
-b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, -<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p -<span class="st"> </span>m)))
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
+b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p <span class="op">-</span><span class="st"> </span>m)))
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
 
 mcp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"mcp"</span>,
                <span class="dt">gamma =</span> <span class="dv">2</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, 
                <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
-               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
+               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)<span class="op">$</span>lambda[[<span class="dv">1</span>]]
 
 scad.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"scad"</span>,
                <span class="dt">gamma =</span> <span class="dv">4</span>, <span class="dt">intercept =</span> <span class="ot">TRUE</span>, 
                <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
-               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
+               <span class="dt">nlambda =</span> <span class="dv">200</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)<span class="op">$</span>lambda[[<span class="dv">1</span>]]
 
 <span class="kw">microbenchmark</span>(
     <span class="st">"sparsenet[mcp]"</span> =<span class="st"> </span>{res1 &lt;-<span class="st"> </span><span class="kw">sparsenet</span>(x, y, <span class="dt">thresh =</span> <span class="fl">1e-10</span>, 
@@ -199,30 +200,40 @@ scad.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.h
                                    <span class="dt">lam =</span> scad.lam)}, 
     <span class="dt">times =</span> <span class="dv">5</span>
 )</code></pre></div>
+<pre><code>## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1754.0406 1791.8499 1868.5572 1849.6512 1873.3422
-##        oem[mcp]  156.6582  157.7271  162.7641  158.1538  162.0984
-##     ncvreg[mcp] 7164.6251 7276.9431 7284.4850 7307.1294 7328.8396
-##       plus[mcp] 1620.5563 1622.9369 1645.5945 1629.7649 1676.9993
-##       oem[scad]  132.8851  133.8530  134.9374  135.0723  136.4207
-##    ncvreg[scad] 7404.2984 7416.8157 7534.4692 7487.9925 7532.4957
-##      plus[scad] 1742.3384 1791.0293 1981.8237 1857.7633 2113.2796
-##        max neval
-##  2073.9020     5
-##   179.1827     5
-##  7344.8878     5
-##  1677.7149     5
-##   136.4558     5
-##  7830.7440     5
-##  2404.7081     5</code></pre>
+##  sparsenet[mcp] 1875.2452 1884.3615 1951.6725 1911.5395 1965.9868
+##        oem[mcp]  159.7789  165.8270  168.1560  167.9728  172.5197
+##     ncvreg[mcp] 7315.2545 7713.0761 8139.2804 8106.4046 8174.1345
+##       plus[mcp] 1672.3138 1782.7750 1811.6840 1842.9139 1872.5081
+##       oem[scad]  138.7133  140.0483  153.2491  147.7870  151.2243
+##    ncvreg[scad] 7951.6813 8002.6719 8772.1703 8112.8205 8360.5586
+##      plus[scad] 1926.4920 1970.5033 2210.5158 2196.7534 2355.7689
+##         max neval
+##   2121.2295     5
+##    174.6816     5
+##   9387.5322     5
+##   1887.9093     5
+##    188.4727     5
+##  11433.1193     5
+##   2603.0614     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,
                      <span class="st">"MCP:  oem and plus"</span>, <span class="st">"SCAD: oem and plus"</span>)
-diffs[,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">max</span>(<span class="kw">abs</span>(res2$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res3$beta)), <span class="kw">max</span>(<span class="kw">abs</span>(res5$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res6$beta)),
-               <span class="kw">max</span>(<span class="kw">abs</span>(res2$beta[[<span class="dv">1</span>]][-<span class="dv">1</span>,<span class="dv">1</span>:<span class="kw">nrow</span>(res4$beta)] -<span class="st"> </span><span class="kw">t</span>(res4$beta))),
-               <span class="kw">max</span>(<span class="kw">abs</span>(res5$beta[[<span class="dv">1</span>]][-<span class="dv">1</span>,<span class="dv">1</span>:<span class="kw">nrow</span>(res7$beta)] -<span class="st"> </span><span class="kw">t</span>(res7$beta))))
+diffs[,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">max</span>(<span class="kw">abs</span>(res2<span class="op">$</span>beta[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>res3<span class="op">$</span>beta)), <span class="kw">max</span>(<span class="kw">abs</span>(res5<span class="op">$</span>beta[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>res6<span class="op">$</span>beta)),
+               <span class="kw">max</span>(<span class="kw">abs</span>(res2<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(res4<span class="op">$</span>beta)] <span class="op">-</span><span class="st"> </span><span class="kw">t</span>(res4<span class="op">$</span>beta))),
+               <span class="kw">max</span>(<span class="kw">abs</span>(res5<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(res7<span class="op">$</span>beta)] <span class="op">-</span><span class="st"> </span><span class="kw">t</span>(res7<span class="op">$</span>beta))))
 diffs</code></pre></div>
 <pre><code>##                          abs diff
 ## MCP:  oem and ncvreg 1.725859e-07
@@ -238,17 +249,17 @@ diffs</code></pre></div>
 <span class="kw">library</span>(grplasso)
 <span class="co"># compute the full solution path, n &gt; p</span>
 <span class="kw">set.seed</span>(<span class="dv">123</span>)
-n &lt;-<span class="st"> </span><span class="dv">5000</span>
+n &lt;-<span class="st"> </span><span class="dv">10000</span>
 p &lt;-<span class="st"> </span><span class="dv">200</span>
 m &lt;-<span class="st"> </span><span class="dv">25</span>
-b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, -<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p -<span class="st"> </span>m)))
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
-groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>:<span class="kw">floor</span>(p/<span class="dv">10</span>), <span class="dt">each =</span> <span class="dv">10</span>)
+b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p <span class="op">-</span><span class="st"> </span>m)))
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
+groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">floor</span>(p<span class="op">/</span><span class="dv">10</span>), <span class="dt">each =</span> <span class="dv">10</span>)
 
 grp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"grp.lasso"</span>,
                <span class="dt">groups =</span> groups,
-               <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)$lambda[[<span class="dv">1</span>]]
+               <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>)<span class="op">$</span>lambda[[<span class="dv">1</span>]]
 
 
 <span class="kw">microbenchmark</span>(
@@ -267,31 +278,31 @@ grp.lam &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.ht
                                                  <span class="dt">index =</span> groups,
                                                  <span class="dt">standardize =</span> <span class="ot">FALSE</span>, 
                                                  <span class="dt">center =</span> <span class="ot">FALSE</span>, <span class="dt">model =</span> <span class="kw">LinReg</span>(), 
-                                                 <span class="dt">lambda =</span> grp.lam *<span class="st"> </span>n *<span class="st"> </span><span class="dv">2</span>, 
+                                                 <span class="dt">lambda =</span> grp.lam <span class="op">*</span><span class="st"> </span>n <span class="op">*</span><span class="st"> </span><span class="dv">2</span>, 
                                                  <span class="dt">control =</span> <span class="kw">grpl.control</span>(<span class="dt">trace =</span> <span class="dv">0</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>))}, 
     <span class="st">"grpreg[grp.lasso]"</span>    =<span class="st"> </span>{res4 &lt;-<span class="st"> </span><span class="kw">grpreg</span>(x, y, <span class="dt">group =</span> groups, 
                                              <span class="dt">eps =</span> <span class="fl">1e-10</span>, <span class="dt">lambda =</span> grp.lam)},
     <span class="dt">times =</span> <span class="dv">5</span>
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr        min         lq       mean     median        uq
-##   gglasso[grp.lasso] 1856.26847 1858.21805 1888.41634 1866.34991 1877.3290
-##       oem[grp.lasso]   84.29724   84.66157   85.08457   84.66473   85.0117
-##  grplasso[grp.lasso] 4379.08019 4381.82989 4535.14676 4437.95989 4709.2473
-##    grpreg[grp.lasso] 1101.11871 1104.97800 1154.13878 1108.27203 1115.0855
+##                 expr       min        lq      mean    median         uq
+##   gglasso[grp.lasso] 3774.1569 3876.1610 4558.0958 3881.6797  5080.7715
+##       oem[grp.lasso]  103.6529  117.1045  129.0256  117.2699   143.8689
+##  grplasso[grp.lasso] 7836.8351 9834.3802 9782.8884 9879.5035 10593.6439
+##    grpreg[grp.lasso] 1919.0754 2143.1892 2356.5680 2196.0299  2575.1049
 ##         max neval
-##  1983.91628     5
-##    86.78759     5
-##  4767.61656     5
-##  1341.23967     5</code></pre>
+##   6177.7100     5
+##    163.2316     5
+##  10770.0793     5
+##   2949.4408     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))
 <span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span>
 <span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)
-diffs[,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(  <span class="kw">max</span>(<span class="kw">abs</span>(res2$beta[[<span class="dv">1</span>]][-<span class="dv">1</span>,] -<span class="st"> </span>res1$beta)), <span class="kw">max</span>(<span class="kw">abs</span>(res2$beta[[<span class="dv">1</span>]][-<span class="dv">1</span>,] -<span class="st"> </span>res3$coefficients))  )
+diffs[,<span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">c</span>(  <span class="kw">max</span>(<span class="kw">abs</span>(res2<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>res1<span class="op">$</span>beta)), <span class="kw">max</span>(<span class="kw">abs</span>(res2<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>res3<span class="op">$</span>coefficients))  )
 diffs</code></pre></div>
 <pre><code>##                      abs diff
-## oem and gglasso  1.729379e-06
-## oem and grplasso 4.828369e-08</code></pre>
+## oem and gglasso  1.303906e-06
+## oem and grplasso 1.645871e-08</code></pre>
 <div id="bigger-group-lasso-example" class="section level4">
 <h4 class="hasAnchor">
 <a href="#bigger-group-lasso-example" class="anchor"></a>Bigger Group Lasso Example</h4>
@@ -299,30 +310,21 @@ diffs</code></pre></div>
 n &lt;-<span class="st"> </span><span class="dv">500000</span>
 p &lt;-<span class="st"> </span><span class="dv">200</span>
 m &lt;-<span class="st"> </span><span class="dv">25</span>
-b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, -<span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p -<span class="st"> </span>m)))
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
-groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>:<span class="kw">floor</span>(p/<span class="dv">10</span>), <span class="dt">each =</span> <span class="dv">10</span>)
+b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, <span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p <span class="op">-</span><span class="st"> </span>m)))
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
+groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">floor</span>(p<span class="op">/</span><span class="dv">10</span>), <span class="dt">each =</span> <span class="dv">10</span>)
 
-<span class="kw">system.time</span>(res &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, <span class="dt">penalty =</span> <span class="st">"grp.lasso"</span>,
-                       <span class="dt">groups =</span> groups,
-                       <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
-                       <span class="dt">intercept =</span> <span class="ot">TRUE</span>,
-                       <span class="dt">nlambda =</span> <span class="dv">100</span>, <span class="dt">tol =</span> <span class="fl">1e-10</span>))</code></pre></div>
+grp.penalties &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>, <span class="st">"grp.scad"</span>, 
+                   <span class="st">"grp.mcp.net"</span>, <span class="st">"grp.scad.net"</span>,
+                   <span class="st">"sparse.group.lasso"</span>)
+<span class="kw">system.time</span>(res &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, 
+                       <span class="dt">penalty =</span> grp.penalties,
+                       <span class="dt">groups  =</span> groups,
+                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span>
+                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    2.96    0.18    3.17</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># memory usage is out of control here.</span>
-<span class="co"># oem uses approximately 1/3 of the memory</span>
-<span class="kw">system.time</span>(res2 &lt;-<span class="st"> </span><span class="kw">grpreg</span>(x, y, <span class="dt">group =</span> groups, 
-                           <span class="dt">eps =</span> <span class="fl">1e-10</span>, <span class="dt">lambda =</span> res$lambda[[<span class="dv">1</span>]]))</code></pre></div>
-<pre><code>##    user  system elapsed 
-##   65.69    1.25   67.61</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># I think the standardization is done</span>
-<span class="co"># differently for grpreg</span>
-<span class="kw">max</span>(<span class="kw">abs</span>(res$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res2$beta))</code></pre></div>
-<pre><code>## [1] 0.0007842304</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">abs</span>(res$beta[[<span class="dv">1</span>]] -<span class="st"> </span>res2$beta))</code></pre></div>
-<pre><code>## [1] 8.363514e-06</code></pre>
+##    3.87    0.22    4.68</code></pre>
 </div>
 </div>
 <div id="fitting-multiple-penalties" class="section level3">
@@ -333,9 +335,9 @@ groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv
 n &lt;-<span class="st"> </span><span class="dv">100000</span>
 p &lt;-<span class="st"> </span><span class="dv">100</span>
 m &lt;-<span class="st"> </span><span class="dv">15</span>
-b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, -<span class="fl">0.25</span>, <span class="fl">0.25</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p -<span class="st"> </span>m)))
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n *<span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span>b) +<span class="st"> </span><span class="kw">rnorm</span>(n)
+b &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="kw">runif</span>(m, <span class="op">-</span><span class="fl">0.25</span>, <span class="fl">0.25</span>), <span class="kw">rep</span>(<span class="dv">0</span>, p <span class="op">-</span><span class="st"> </span>m)))
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(n <span class="op">*</span><span class="st"> </span>p, <span class="dt">sd =</span> <span class="dv">3</span>), n, p)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
 
 <span class="kw">microbenchmark</span>(
     <span class="st">"oem[lasso]"</span>    =<span class="st"> </span>{res1 &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y,
@@ -344,9 +346,14 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
                                    <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
                                    <span class="dt">tol =</span> <span class="fl">1e-10</span>)},
     <span class="st">"oem[lasso/mcp/scad/ols]"</span>    =<span class="st"> </span>{res2 &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y,
-                                   <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"elastic.net"</span>, <span class="st">"mcp"</span>, <span class="st">"scad"</span>, <span class="st">"grp.lasso"</span>),
+                                   <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"elastic.net"</span>, <span class="st">"mcp"</span>, 
+                                               <span class="st">"scad"</span>, <span class="st">"grp.lasso"</span>, 
+                                               <span class="st">"grp.mcp"</span>, <span class="st">"sparse.grp.lasso"</span>,
+                                               <span class="st">"grp.mcp.net"</span>, <span class="st">"mcp.net"</span>),
                                    <span class="dt">gamma =</span> <span class="dv">4</span>,
-                                   <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">10</span>),
+                                   <span class="dt">tau =</span> <span class="fl">0.5</span>,
+                                   <span class="dt">alpha =</span> <span class="fl">0.25</span>,
+                                   <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">10</span>),
                                    <span class="dt">intercept =</span> <span class="ot">TRUE</span>, 
                                    <span class="dt">standardize =</span> <span class="ot">TRUE</span>,
                                    <span class="dt">tol =</span> <span class="fl">1e-10</span>)},
@@ -354,22 +361,22 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 )</code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 215.9081 216.9893 221.9438 218.2509 220.7203
-##  oem[lasso/mcp/scad/ols] 229.2544 230.4643 242.1192 240.6767 251.0890
+##               oem[lasso] 216.5322 222.2787 224.1913 222.6778 228.1274
+##  oem[lasso/mcp/scad/ols] 253.4806 270.0290 293.5199 273.7876 299.7562
 ##       max neval
-##  237.8505     5
-##  259.1119     5</code></pre>
+##  231.3402     5
+##  370.5461     5</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span>
 <span class="co">#</span>
 
-<span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span>:<span class="dv">4</span>, <span class="dt">ncol=</span><span class="dv">2</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>))
+<span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">ncol=</span><span class="dv">2</span>, <span class="dt">byrow =</span> <span class="ot">TRUE</span>))
 <span class="kw">plot</span>(res2, <span class="dt">which.model =</span> <span class="dv">1</span>, <span class="dt">lwd =</span> <span class="dv">2</span>,
      <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
 <span class="kw">plot</span>(res2, <span class="dt">which.model =</span> <span class="dv">2</span>, <span class="dt">lwd =</span> <span class="dv">2</span>,
      <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
-<span class="kw">plot</span>(res2, <span class="dt">which.model =</span> <span class="dv">3</span>, <span class="dt">lwd =</span> <span class="dv">2</span>,
-     <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
 <span class="kw">plot</span>(res2, <span class="dt">which.model =</span> <span class="dv">4</span>, <span class="dt">lwd =</span> <span class="dv">2</span>,
+     <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
+<span class="kw">plot</span>(res2, <span class="dt">which.model =</span> <span class="dv">7</span>, <span class="dt">lwd =</span> <span class="dv">2</span>,
      <span class="dt">xvar =</span> <span class="st">"lambda"</span>)</code></pre></div>
 <p><img src="articles/mult-1.png" width="768" style="display: block; margin: auto;"></p>
 </div>
@@ -378,7 +385,8 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Links</h2>
+    <h2 class="hasAnchor">
+<a href="#sidebar" class="anchor"></a>Links</h2>
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cran.r-project.org/package=oem">https://​cran.r-project.org/​package=oem</a>
 </li>
@@ -409,7 +417,7 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>

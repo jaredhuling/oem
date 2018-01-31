@@ -1,3 +1,9 @@
+---
+output:
+  html_document:
+    keep_md: yes
+    self_contained: true
+---
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
 
@@ -66,12 +72,9 @@ microbenchmark(
 
 ```
 ## Unit: seconds
-##           expr      min       lq     mean   median       uq       max
-##  glmnet[lasso] 8.833903 9.183343 9.389654 9.320551 9.544755 10.065720
-##     oem[lasso] 2.442387 2.465268 2.788550 2.512572 2.589450  3.933071
-##  neval
-##      5
-##      5
+##           expr      min       lq     mean   median       uq      max neval
+##  glmnet[lasso] 7.616984 7.670183 8.514817 7.898470 9.637024 9.751421     5
+##     oem[lasso] 1.996244 2.003222 2.324996 2.476883 2.481595 2.667038     5
 ```
 
 ```r
@@ -165,23 +168,36 @@ microbenchmark(
 ```
 
 ```
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+## Warning message: some lam not reached by the plus path and dropped
+```
+
+```
 ## Unit: milliseconds
-##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 2054.4334 2122.5534 2274.3683 2340.3278 2422.9139
-##        oem[mcp]  195.7824  197.5895  219.2504  205.1142  212.9871
-##     ncvreg[mcp] 8369.8845 8492.1912 8785.6864 8550.9797 8978.4623
-##       plus[mcp] 1991.5855 2111.7105 2265.8972 2184.3521 2194.6665
-##       oem[scad]  166.6919  184.1331  248.8763  252.6000  290.2139
-##    ncvreg[scad] 8805.7614 8846.4476 9065.0837 8874.1861 8996.8070
-##      plus[scad] 2296.1831 2511.2433 2747.7085 2610.2044 2958.5915
-##        max neval
-##  2431.6130     5
-##   284.7789     5
-##  9536.9143     5
-##  2847.1715     5
-##   350.7428     5
-##  9802.2163     5
-##  3362.3203     5
+##            expr       min        lq      mean    median         uq
+##  sparsenet[mcp] 1870.3825 1897.3016 1992.7424 1971.0109  2103.2617
+##        oem[mcp]  164.4379  170.4252  192.3027  183.4806   193.1937
+##     ncvreg[mcp] 7671.8966 7740.8084 9051.8629 8876.4065 10325.8459
+##       plus[mcp] 1776.5154 1790.0231 1860.0176 1892.0244  1897.6557
+##       oem[scad]  143.2219  145.5737  183.6470  162.3336   223.1467
+##    ncvreg[scad] 8294.6156 8382.9892 8876.6335 8569.4307  8929.7007
+##      plus[scad] 1967.3340 2002.2385 2197.8126 2040.8034  2265.3013
+##         max neval
+##   2121.7553     5
+##    249.9762     5
+##  10644.3570     5
+##   1943.8696     5
+##    243.9589     5
+##  10206.4314     5
+##   2713.3860     5
 ```
 
 ```r
@@ -253,16 +269,16 @@ microbenchmark(
 
 ```
 ## Unit: milliseconds
-##                 expr       min        lq      mean    median         uq
-##   gglasso[grp.lasso] 3673.9697 3696.0798 3864.3264 3721.6209  3940.9336
-##       oem[grp.lasso]  111.0805  118.1991  127.0424  128.1041   128.6354
-##  grplasso[grp.lasso] 8064.6128 8481.2110 9321.8691 8640.0793 10368.1730
-##    grpreg[grp.lasso] 2109.4914 2133.7164 2801.5398 2173.8997  2619.8730
-##         max neval
-##   4289.0282     5
-##    149.1926     5
-##  11055.2695     5
-##   4970.7184     5
+##                 expr       min        lq      mean    median        uq
+##   gglasso[grp.lasso] 3451.9361 3527.1668 3725.9058 3567.4282 3788.6514
+##       oem[grp.lasso]  102.4715  102.9479  109.6887  106.1223  112.7925
+##  grplasso[grp.lasso] 7283.1936 7288.3713 7583.3184 7462.9057 7813.2570
+##    grpreg[grp.lasso] 2102.5228 2203.5969 2364.4391 2411.9645 2456.5509
+##        max neval
+##  4294.3464     5
+##   124.1094     5
+##  8068.8644     5
+##  2647.5606     5
 ```
 
 ```r
@@ -304,7 +320,7 @@ system.time(res <- oem(x, y,
 
 ```
 ##    user  system elapsed 
-##    4.03    0.22    4.49
+##    3.27    0.15    3.54
 ```
 
 ### Fitting Multiple Penalties
@@ -346,11 +362,11 @@ microbenchmark(
 ```
 ## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 234.2884 319.8251 352.8868 381.2856 391.7862
-##  oem[lasso/mcp/scad/ols] 288.3188 298.5905 376.7296 314.5128 388.8857
+##               oem[lasso] 210.8358 211.8771 216.7132 212.0374 216.3045
+##  oem[lasso/mcp/scad/ols] 253.4266 255.4275 260.8576 262.4604 263.0718
 ##       max neval
-##  437.2486     5
-##  593.3399     5
+##  232.5109     5
+##  269.9019     5
 ```
 
 ```r

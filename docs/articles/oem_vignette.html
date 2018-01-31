@@ -57,7 +57,7 @@
       <h1>Usage of the oem Package</h1>
                         <h4 class="author">Jared Huling</h4>
             
-            <h4 class="date">2017-07-04</h4>
+            <h4 class="date">2018-01-30</h4>
           </div>
 
     
@@ -91,8 +91,8 @@
 <p>Simulate data</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobs  &lt;-<span class="st"> </span><span class="fl">1e4</span>
 nvars &lt;-<span class="st"> </span><span class="dv">100</span>
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs *<span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars -<span class="st"> </span><span class="dv">5</span>))) +<span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)</code></pre></div>
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)</code></pre></div>
 <p>Fit a penalized regression model using the <code>oem</code> function</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="st">"lasso"</span>)</code></pre></div>
 <p>Plot the solution path</p>
@@ -153,60 +153,7 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 <div id="available-penalties" class="section level2">
 <h2 class="hasAnchor">
 <a href="#available-penalties" class="anchor"></a>Available Penalties</h2>
-<table style="width:96%;" class="table">
-<colgroup>
-<col width="29%">
-<col width="29%">
-<col width="37%">
-</colgroup>
-<thead><tr class="header">
-<th>Penalty</th>
-<th>Option Name</th>
-<th>Penalty Form</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><p>Lasso</p></td>
-<td><p><code>lasso</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{j = 1}^pd_j|\beta_j|\)</span></p></td>
-</tr>
-<tr class="even">
-<td><p>Elastic Net</p></td>
-<td><p><code>elastic.net</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + (1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span></p></td>
-</tr>
-<tr class="odd">
-<td><p>MCP</p></td>
-<td><p><code>mcp</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x\)</span></p></td>
-</tr>
-<tr class="even">
-<td><p>SCAD</p></td>
-<td><p><code>scad</code></p></td>
-<td><p><span class="math inline">\(\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)\)</span></p></td>
-</tr>
-<tr class="odd">
-<td><p>Group Lasso</p></td>
-<td><p><code>grp.lasso</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span></p></td>
-</tr>
-<tr class="even">
-<td><p>Group MCP</p></td>
-<td><p><code>grp.mcp</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{k = 1}^Gp^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span></p></td>
-</tr>
-<tr class="odd">
-<td><p>Group SCAD</p></td>
-<td><p><code>grp.scad</code></p></td>
-<td><p><span class="math inline">\(\lambda \sum_{k = 1}^Gp^{SCAD}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span></p></td>
-</tr>
-<tr class="even">
-<td><p>Sparse Group Lasso</p></td>
-<td><p><code>sparse.grp.lasso</code></p></td>
-<td><p><span class="math inline">\(\lambda \alpha\sum_{j = 1}^pd_j|\beta_j| + \lambda (1-\alpha)\sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span></p></td>
-</tr>
-</tbody>
-</table>
+<p>+——————–+——————–+————————–+ | Penalty | Option Name | Penalty Form | +====================+===============================================+ | Lasso | <code>lasso</code> | <span class="math inline">\(\lambda \sum_{j = 1}^pd_j|\beta_j|\)</span> | +——————–+——————–+————————–+ | Elastic Net | <code>elastic.net</code> | <span class="math inline">\(\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span> | +——————–+——————–+————————–+ | MCP | <code>mcp</code> | <span class="math inline">\(\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x\)</span> | +——————–+——————–+————————–+ | SCAD | <code>scad</code> | <span class="math inline">\(\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)\)</span> | +——————–+——————–+————————–+ | Group Lasso | <code>grp.lasso</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span> | +——————–+——————–+————————–+ | Group MCP | <code>grp.mcp</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gp^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span> | +——————–+——————–+————————–+ | Group SCAD | <code>grp.scad</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gp^{SCAD}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span> | +——————–+——————–+————————–+ | Sparse Group Lasso | <code>sparse.grp.lasso</code> | <span class="math inline">\(\lambda \alpha\sum_{j = 1}^pd_j|\beta_j| + \lambda (1-\alpha)\sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span> | +——————–+——————–+————————–+</p>
 <p>where <span class="math inline">\(||\boldsymbol\beta_{g_k}||_2 = \sqrt{\sum_{j \in g_k}\beta_j^2}\)</span>, <span class="math display">\[ p_{\lambda, \gamma}^{SCAD}(\beta) =   \left\{
 \begin{array}{ll}
       \lambda|\beta| &amp; |\beta| \leq \lambda ; \\
@@ -221,38 +168,15 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
       \frac{ \lambda^2\gamma}{2} &amp; |\beta| &gt; \gamma\lambda. \\
 \end{array} 
 \right. \]</span></p>
-<p>Any penalty with <code>.net</code> at the end of its name has a ridge term of <span class="math inline">\((1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span> added to it and the original penalty multiplied by <span class="math inline">\(\alpha\)</span>. For example, <code>grp.mcp.net</code> is the penalty</p>
-<p><span class="math display">\[\lambda \sum_{k = 1}^G\alpha p^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2) + (1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2.
+<p>Any penalty with <code>.net</code> at the end of its name has a ridge term of <span class="math inline">\(\frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span> added to it and the original penalty multiplied by <span class="math inline">\(\alpha\)</span>. For example, <code>grp.mcp.net</code> is the penalty</p>
+<p><span class="math display">\[\lambda \sum_{k = 1}^G\alpha p^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2) + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2.
 \]</span></p>
 </div>
 <div id="available-model-families" class="section level2">
 <h2 class="hasAnchor">
 <a href="#available-model-families" class="anchor"></a>Available Model Families</h2>
 <p>The following models are available currently.</p>
-<table style="width:97%;" class="table">
-<colgroup>
-<col width="30%">
-<col width="29%">
-<col width="37%">
-</colgroup>
-<thead><tr class="header">
-<th>Model</th>
-<th>Option Name</th>
-<th>Loss Form</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><p>Linear Regression</p></td>
-<td><p><code>gaussian</code></p></td>
-<td><p><span class="math inline">\(\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2\)</span></p></td>
-</tr>
-<tr class="even">
-<td><p>Logistic Regression</p></td>
-<td><p><code>binomial</code></p></td>
-<td><p><span class="math inline">\(-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]\)</span></p></td>
-</tr>
-</tbody>
-</table>
+<p>+———————+——————–+————————–+ | Model | Option Name | Loss Form | +=====================+===============================================+ | Linear Regression | <code>gaussian</code> | <span class="math inline">\(\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2\)</span> | +———————+——————–+————————–+ | Logistic Regression | <code>binomial</code> | <span class="math inline">\(-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]\)</span>| +———————+——————–+————————–+</p>
 <p>There are plans to include support for multiple responses, binomial models (not just logistic regression), Cox’s proportional hazards model, and more if requested.</p>
 </div>
 </div>
@@ -262,9 +186,9 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 <p>The oem algorithm is well-suited to quickly estimate a solution path for multiple penalties simultaneously if the number of variables is not too large. The oem algorithm is only efficient for multiple penalties for linear models.</p>
 <p>For the group lasso penalty, the <code>groups</code> argument must be used. <code>groups</code> should be a vector which indicates the group number for each variable.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>),
-            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))</code></pre></div>
+            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))</code></pre></div>
 <p>Plot the solution paths for all models</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span>:<span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))
 <span class="kw">plot</span>(fit2, <span class="dt">which.model =</span> <span class="dv">1</span>, <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
 <span class="kw">plot</span>(fit2, <span class="dt">which.model =</span> <span class="dv">2</span>, <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
 <span class="kw">plot</span>(fit2, <span class="dt">which.model =</span> <span class="dv">3</span>, <span class="dt">xvar =</span> <span class="st">"lambda"</span>)
@@ -280,27 +204,27 @@ y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="s
 <p>The efficiency oem for fitting multiple penalties at once only applies to linear models. However, for linear models it is quite efficient, even for a high number of tuning parameters for many different penalties.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobs  &lt;-<span class="st"> </span><span class="fl">1e5</span>
 nvars &lt;-<span class="st"> </span><span class="dv">100</span>
-x2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs *<span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
-y2 &lt;-<span class="st"> </span><span class="kw">drop</span>(x2 %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars -<span class="st"> </span><span class="dv">5</span>))) +<span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)
+x2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
+y2 &lt;-<span class="st"> </span><span class="kw">drop</span>(x2 <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)
 
 <span class="kw">system.time</span>(fit2a &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.19    0.03    0.22</code></pre>
+##    0.21    0.00    0.22</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(fit2b &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, 
                          <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, 
                                      <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>, <span class="st">"grp.mcp"</span>,
                                      <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.21    0.02    0.24</code></pre>
+##    0.19    0.03    0.26</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(fit2c &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, 
                          <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, 
                                      <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>, <span class="st">"grp.mcp"</span>,
                                      <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 500L))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 500L))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.31    0.03    0.36</code></pre>
+##    0.33    0.04    0.38</code></pre>
 </div>
 <div id="logistic-regression" class="section level3">
 <h3 class="hasAnchor">
@@ -308,21 +232,21 @@ y2 &lt;-<span class="st"> </span><span class="kw">drop</span>(x2 %*%<span class=
 <p>It is still more efficient to fit multiple penalties at once instead of individually for logistic regression, but the benefit is not as dramatic as for linear models.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobs  &lt;-<span class="st"> </span><span class="fl">5e4</span>
 nvars &lt;-<span class="st"> </span><span class="dv">100</span>
-x2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs *<span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
+x2 &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
 
-y2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> /<span class="st"> </span>(<span class="dv">1</span> +<span class="st"> </span><span class="kw">exp</span>(-<span class="kw">drop</span>(x2 %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.15</span>, <span class="fl">0.15</span>, -<span class="fl">0.15</span>, -<span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars -<span class="st"> </span><span class="dv">5</span>))))))
+y2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span><span class="kw">drop</span>(x2 <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.15</span>, <span class="fl">0.15</span>, <span class="op">-</span><span class="fl">0.15</span>, <span class="op">-</span><span class="fl">0.15</span>, <span class="fl">0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))))))
 
 
 <span class="kw">system.time</span>(fit2a &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),
                          <span class="dt">family =</span> <span class="st">"binomial"</span>,
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    2.05    0.02   20.87</code></pre>
+##    1.85    0.00    1.87</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(fit2b &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>),
                          <span class="dt">family =</span> <span class="st">"binomial"</span>,
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##   10.11    0.01   10.19</code></pre>
+##    9.61    0.06    9.84</code></pre>
 </div>
 </div>
 </div>
@@ -334,12 +258,12 @@ y2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span clas
                              <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, 
                                          <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>), 
                              <span class="dt">gamma =</span> <span class="dv">2</span>,
-                             <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
+                             <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
                              <span class="dt">nfolds =</span> <span class="dv">10</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.30    0.16    1.47</code></pre>
+##    2.09    0.14    2.85</code></pre>
 <p>Plot the cross validation mean squared error results for each model</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span>:<span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))
 <span class="kw">plot</span>(cvfit1, <span class="dt">which.model =</span> <span class="dv">1</span>)
 <span class="kw">plot</span>(cvfit1, <span class="dt">which.model =</span> <span class="dv">2</span>)
 <span class="kw">plot</span>(cvfit1, <span class="dt">which.model =</span> <span class="dv">3</span>)
@@ -351,28 +275,28 @@ y2 &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span clas
 <p>The function <code>xval.oem</code> offers accelerated cross validation for penalized linear models. In many cases is is orders of magnitude faster than cv.oem. It is only recommended for scenarios where the number of observations is larger than the number of variables. In addition to the computational gains in single-core usage, it also benefits from parallelizaton using OpenMP (instead of using foreach, as used by cv.oem). For large enough problems, it has on a similar order of computation time as just fitting one OEM model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobsc  &lt;-<span class="st"> </span><span class="fl">1e5</span>
 nvarsc &lt;-<span class="st"> </span><span class="dv">100</span>
-xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc *<span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)
-yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc -<span class="st"> </span><span class="dv">5</span>))) +<span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)
+xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc <span class="op">*</span><span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)
+yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)
 
 <span class="kw">system.time</span>(cvalfit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cv.oem.html">cv.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>, 
-                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
+                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
                                <span class="dt">nfolds =</span> <span class="dv">10</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    5.60    0.60    6.21</code></pre>
+##    7.33    0.81    9.33</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(xvalfit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,
-                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
+                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
                                  <span class="dt">nfolds =</span> <span class="dv">10</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.84    0.01    0.90</code></pre>
+##    1.17    0.03    1.26</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(xvalfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,
-                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
+                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), 
                                  <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">ncores =</span> <span class="dv">2</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.15    0.08    0.79</code></pre>
+##    1.23    0.09    0.89</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(ofit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,
-                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</code></pre></div>
+                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.22    0.00    0.22</code></pre>
+##    0.26    0.02    0.40</code></pre>
 </div>
 <div id="evaluation-metrics" class="section level2">
 <h2 class="hasAnchor">
@@ -430,9 +354,9 @@ yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc %*%<span class=
 <p>Consider a binary outcome setting with logistic regression.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobs  &lt;-<span class="st"> </span><span class="fl">2e3</span>
 nvars &lt;-<span class="st"> </span><span class="dv">20</span>
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(nobs *<span class="st"> </span>nvars, <span class="dt">max =</span> <span class="dv">2</span>), <span class="dt">ncol =</span> nvars)
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(nobs <span class="op">*</span><span class="st"> </span>nvars, <span class="dt">max =</span> <span class="dv">2</span>), <span class="dt">ncol =</span> nvars)
 
-y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> /<span class="st"> </span>(<span class="dv">1</span> +<span class="st"> </span><span class="kw">exp</span>(-<span class="kw">drop</span>(x %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.25</span>, -<span class="dv">1</span>, -<span class="dv">1</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars -<span class="st"> </span><span class="dv">6</span>))))))</code></pre></div>
+y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.25</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))))))</code></pre></div>
 <div id="misclassification-rate" class="section level3">
 <h3 class="hasAnchor">
 <a href="#misclassification-rate" class="anchor"></a>Misclassification Rate</h3>
@@ -441,12 +365,12 @@ y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class
                  <span class="dt">family =</span> <span class="st">"binomial"</span>,
                  <span class="dt">type.measure =</span> <span class="st">"class"</span>,
                  <span class="dt">gamma =</span> <span class="dv">2</span>,
-                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), 
+                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), 
                  <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-17-1.png" width="686.4"></p>
 <p>In this case, misclassification rate is not the best indicator of performance. The classes here are imbalanced:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(y)</code></pre></div>
-<pre><code>## [1] 0.0595</code></pre>
+<pre><code>## [1] 0.075</code></pre>
 </div>
 <div id="area-under-the-roc-curve" class="section level3">
 <h3 class="hasAnchor">
@@ -457,7 +381,7 @@ y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class
                  <span class="dt">family =</span> <span class="st">"binomial"</span>,
                  <span class="dt">type.measure =</span> <span class="st">"auc"</span>,
                  <span class="dt">gamma =</span> <span class="dv">2</span>,
-                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), 
+                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), 
                  <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-20-1.png" width="686.4"></p>
 </div>
@@ -470,30 +394,30 @@ y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class
 <h2 class="hasAnchor">
 <a href="#oem-with-precomputed-xtx-xty-for-linear-models" class="anchor"></a>OEM with Precomputed <span class="math inline">\(X^TX\)</span>, <span class="math inline">\(X^TY\)</span> for Linear Models</h2>
 <p>With a very large dataset and computing cluster, the total size of a dataset may be very large, but if the number of variables is only moderately large (on the order of a few thousands) <span class="math inline">\(X^TX\)</span> and <span class="math inline">\(X^TY\)</span> may not be large and may already be available from other computations or can be computed trivially in parallel. The function <code>oem.xtx</code> computes penalized linear regression models using the OEM algorithm only using <span class="math inline">\(X^TX\)</span> and <span class="math inline">\(X^TY\)</span>. Standardization can be achieved by providing a vector of scaling factors (usually the standard deviations of the columns of x). The function is used like the following:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xtx &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc) /<span class="st"> </span><span class="kw">nrow</span>(xc)
-xty &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc, yc) /<span class="st"> </span><span class="kw">nrow</span>(xc)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">xtx &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)
+xty &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc, yc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)
 
 
 <span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, 
                        <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
                        <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,
-                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</code></pre></div>
+                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.16    0.03    0.18</code></pre>
+##    0.17    0.04    0.21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(fit.xtx &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, 
                                <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
-                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  )  </code></pre></div>
+                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  )  </code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.02    0.00    0.05</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(<span class="kw">abs</span>(fit$beta[[<span class="dv">1</span>]][-<span class="dv">1</span>,] -<span class="st"> </span>fit.xtx$beta[[<span class="dv">1</span>]]))</code></pre></div>
-<pre><code>## [1] 1.254552e-14</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(<span class="kw">abs</span>(fit$beta[[<span class="dv">2</span>]][-<span class="dv">1</span>,] -<span class="st"> </span>fit.xtx$beta[[<span class="dv">2</span>]])) </code></pre></div>
-<pre><code>## [1] 1.249001e-14</code></pre>
+##    0.02    0.00    0.02</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">1</span>]]))</code></pre></div>
+<pre><code>## [1] 1.376677e-14</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">2</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">2</span>]])) </code></pre></div>
+<pre><code>## [1] 1.376677e-14</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">col.std &lt;-<span class="st"> </span><span class="kw">apply</span>(xc, <span class="dv">2</span>, sd)
 fit.xtx.s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, 
                      <span class="dt">scale.factor =</span> col.std,
                      <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
-                     <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  </code></pre></div>
+                     <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  </code></pre></div>
 </div>
 <div id="out-of-memory-computation" class="section level2">
 <h2 class="hasAnchor">
@@ -512,21 +436,21 @@ bigmat &lt;-<span class="st"> </span><span class="kw">filebacked.big.matrix</spa
 <span class="co"># Each column value with be the column number multiplied by</span>
 <span class="co"># samples from a standard normal distribution.</span>
 <span class="kw">set.seed</span>(<span class="dv">123</span>)
-for (i in <span class="dv">1</span>:ncols) bigmat[,i] =<span class="st"> </span><span class="kw">rnorm</span>(nrows)*i
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>ncols) bigmat[,i] =<span class="st"> </span><span class="kw">rnorm</span>(nrows)<span class="op">*</span>i
 
-yb &lt;-<span class="st"> </span><span class="kw">rnorm</span>(nrows) +<span class="st"> </span>bigmat[,<span class="dv">1</span>] -<span class="st"> </span>bigmat[,<span class="dv">2</span>]
+yb &lt;-<span class="st"> </span><span class="kw">rnorm</span>(nrows) <span class="op">+</span><span class="st"> </span>bigmat[,<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>bigmat[,<span class="dv">2</span>]
 
 ## out-of-memory computation
 fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/big.oem.html">big.oem</a></span>(<span class="dt">x =</span> bigmat, <span class="dt">y =</span> yb, 
                <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
-               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))
+               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))
 
 ## fitting with in-memory computation
 fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> bigmat[,], <span class="dt">y =</span> yb, 
             <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
-            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))   
+            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))   
            
-<span class="kw">max</span>(<span class="kw">abs</span>(fit$beta[[<span class="dv">1</span>]] -<span class="st"> </span>fit2$beta[[<span class="dv">1</span>]]))            </code></pre></div>
+<span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>fit2<span class="op">$</span>beta[[<span class="dv">1</span>]]))            </code></pre></div>
 <pre><code>## [1] 1.534783e-05</code></pre>
 </div>
 </div>
@@ -539,22 +463,22 @@ fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.ht
 <p>Computational time can be reduced a little via OpenMP parallelization of the key computational steps of the OEM algorithm. Simply use the <code>ncores</code> argument to access parallelization. There is no need for the foreach package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobsc  &lt;-<span class="st"> </span><span class="fl">1e5</span>
 nvarsc &lt;-<span class="st"> </span><span class="dv">500</span>
-xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc *<span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)
-yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc -<span class="st"> </span><span class="dv">5</span>))) +<span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)
+xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc <span class="op">*</span><span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)
+yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)
 
 
 <span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, 
                        <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
                        <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,
-                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>)))</code></pre></div>
+                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>)))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.25    0.08    3.32</code></pre>
+##    3.65    0.14    3.97</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(fitp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, 
                         <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), 
                         <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,
-                        <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>), <span class="dt">ncores =</span> <span class="dv">2</span>))</code></pre></div>
+                        <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>), <span class="dt">ncores =</span> <span class="dv">2</span>))</code></pre></div>
 <pre><code>##    user  system elapsed 
-##    4.52    0.09    2.53</code></pre>
+##    4.18    0.11    2.39</code></pre>
 </div>
 <div id="penalty-adjustment" class="section level2">
 <h2 class="hasAnchor">
@@ -563,23 +487,23 @@ yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc %*%<span class=
 <p>The following example shows how to fit an adaptive lasso using <code>oem</code></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">nobs  &lt;-<span class="st"> </span><span class="fl">1e4</span>
 nvars &lt;-<span class="st"> </span><span class="dv">102</span>
-x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs *<span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
-y &lt;-<span class="st"> </span><span class="kw">drop</span>(x %*%<span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, -<span class="fl">0.5</span>, -<span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">0.5</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars -<span class="st"> </span><span class="dv">6</span>))) +<span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)
+x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)
+y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="op">-</span><span class="fl">0.5</span>, <span class="dv">1</span>, <span class="fl">0.5</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)
 
 lams &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">seq</span>(<span class="kw">log</span>(<span class="fl">2.5</span>), <span class="kw">log</span>(<span class="fl">5e-5</span>), <span class="dt">length.out =</span> 100L))
 
-ols.estimates &lt;-<span class="st"> </span><span class="kw">coef</span>(<span class="kw">lm.fit</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> <span class="kw">cbind</span>(<span class="dv">1</span>, x)))[-<span class="dv">1</span>]
+ols.estimates &lt;-<span class="st"> </span><span class="kw">coef</span>(<span class="kw">lm.fit</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> <span class="kw">cbind</span>(<span class="dv">1</span>, x)))[<span class="op">-</span><span class="dv">1</span>]
 
 fit.adaptive &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>),
-                    <span class="dt">penalty.factor =</span> <span class="dv">1</span> /<span class="st"> </span><span class="kw">abs</span>(ols.estimates),
+                    <span class="dt">penalty.factor =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">abs</span>(ols.estimates),
                     <span class="dt">lambda =</span> lams)
 
-group.indicators &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span>:<span class="dv">34</span>, <span class="dt">each =</span> <span class="dv">3</span>)
+group.indicators &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="dt">each =</span> <span class="dv">3</span>)
 
 ## norms of OLS estimates for each group
-group.norms      &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">34</span>, function(idx) <span class="kw">sqrt</span>(<span class="kw">sum</span>((ols.estimates[group.indicators ==<span class="st"> </span>idx]) ^<span class="st"> </span><span class="dv">2</span>)))
+group.norms      &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="cf">function</span>(idx) <span class="kw">sqrt</span>(<span class="kw">sum</span>((ols.estimates[group.indicators <span class="op">==</span><span class="st"> </span>idx]) <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)))
 fit.adaptive.grp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),
-                        <span class="dt">group.weights =</span> <span class="dv">1</span> /<span class="st"> </span>group.norms,
+                        <span class="dt">group.weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>group.norms,
                         <span class="dt">groups =</span> group.indicators, 
                         <span class="dt">lambda =</span> lams)</code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-25-1.png" width="686.4"></p>
@@ -612,7 +536,8 @@ fit.adaptive.grp &lt;-<span class="st"> </span><span class="kw"><a href="../refe
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
         <div id="tocnav">
-      <h2>Contents</h2>
+      <h2 class="hasAnchor">
+<a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
 <li><a href="#introduction">Introduction</a></li>
       <li><a href="#installation">Installation</a></li>
@@ -661,7 +586,7 @@ fit.adaptive.grp &lt;-<span class="st"> </span><span class="kw"><a href="../refe
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="http://hadley.github.io/pkgdown/">pkgdown</a>.</p>
+  <p>Site built with <a href="http://pkgdown.r-lib.org/">pkgdown</a>.</p>
 </div>
 
       </footer>
