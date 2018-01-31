@@ -120,7 +120,7 @@ plot(fit1)
 +====================+===============================================+
 | Lasso              | `lasso`            | $\lambda \sum_{j = 1}^pd_j|\beta_j|$ |
 +--------------------+--------------------+--------------------------+
-| Elastic Net        | `elastic.net`      | $\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + (1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ |
+| Elastic Net        | `elastic.net`      | $\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ |
 +--------------------+--------------------+--------------------------+
 | MCP                | `mcp`              | $\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x$ |
 +--------------------+--------------------+--------------------------+
@@ -153,9 +153,9 @@ and
 \end{array} 
 \right. \]
 
-Any penalty with `.net` at the end of its name has a ridge term of $(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ added to it and the original penalty multiplied by $\alpha$. For example, `grp.mcp.net` is the penalty 
+Any penalty with `.net` at the end of its name has a ridge term of $\frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ added to it and the original penalty multiplied by $\alpha$. For example, `grp.mcp.net` is the penalty 
 
-$$\lambda \sum_{k = 1}^G\alpha p^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2) + (1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2.
+$$\lambda \sum_{k = 1}^G\alpha p^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2) + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2.
 $$
 
 
