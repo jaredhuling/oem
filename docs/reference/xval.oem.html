@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Orthogonalizing EM — xval.oem â€¢ oem</title>
+<title>Fast cross validation for Orthogonalizing EM — xval.oem â€¢ oem</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -77,11 +77,11 @@
       <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Orthogonalizing EM</h1>
+    <h1>Fast cross validation for Orthogonalizing EM</h1>
     </div>
 
     
-    <p>Orthogonalizing EM</p>
+    <p>Fast cross validation for Orthogonalizing EM</p>
     
 
     <pre class="usage"><span class='fu'>xval.oem</span>(<span class='no'>x</span>, <span class='no'>y</span>, <span class='kw'>nfolds</span> <span class='kw'>=</span> <span class='fl'>10L</span>, <span class='kw'>foldid</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>type.measure</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"mse"</span>,
@@ -260,11 +260,11 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
 <span class='fu'>system.time</span>(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='oem.html'>oem</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                        <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.05    0.00    0.05 </div><div class='input'>
+#&gt;    0.04    0.00    0.05 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                              <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                              <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.34    0.00    0.36 </div><div class='input'>
+#&gt;    0.45    0.02    0.48 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit2</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                               <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>,
                                           <span class='st'>"mcp"</span>,       <span class='st'>"scad"</span>,
@@ -273,7 +273,7 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
                                           <span class='st'>"grp.mcp"</span>,   <span class='st'>"grp.scad"</span>,
                                           <span class='st'>"sparse.grp.lasso"</span>),
                               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    1.94    0.00    2.20 </div><div class='input'>
+#&gt;    2.39    0.00    2.45 </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

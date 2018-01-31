@@ -1,5 +1,5 @@
 
-#' Orthogonalizing EM
+#' Fast cross validation for Orthogonalizing EM
 #'
 #' @param x input matrix of dimension n x p (sparse matrices not yet implemented). 
 #' Each row is an observation, each column corresponds to a covariate. The xval.oem() function

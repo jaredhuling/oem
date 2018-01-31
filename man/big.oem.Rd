@@ -2,7 +2,7 @@
 % Please edit documentation in R/big_oem.R
 \name{big.oem}
 \alias{big.oem}
-\title{Orthogonalizing EM}
+\title{Orthogonalizing EM for big.matrix objects}
 \usage{
 big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
   "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
@@ -111,7 +111,7 @@ faster in certain situations, ie when n >> p}
 An object with S3 class "oem"
 }
 \description{
-Orthogonalizing EM
+Orthogonalizing EM for big.matrix objects
 }
 \examples{
 set.seed(123)

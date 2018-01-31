@@ -2,7 +2,7 @@
 % Please edit documentation in R/oem_xtx.R
 \name{oem.xtx}
 \alias{oem.xtx}
-\title{Orthogonalizing EM}
+\title{Orthogonalizing EM with precomputed XtX}
 \usage{
 oem.xtx(xtx, xty, family = c("gaussian", "binomial"),
   penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "mcp.net",
@@ -93,7 +93,7 @@ groups.}
 An object with S3 class \code{"oem"}
 }
 \description{
-Orthogonalizing EM
+Orthogonalizing EM with precomputed XtX
 }
 \examples{
 set.seed(123)

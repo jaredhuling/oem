@@ -1,7 +1,7 @@
 
 
 
-#' Orthogonalizing EM
+#' Cross validation for Orthogonalizing EM 
 #'
 #' @param x input matrix of dimension n x p or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 
 #' Each row is an observation, each column corresponds to a covariate. The cv.oem() function

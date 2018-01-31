@@ -1,5 +1,5 @@
 
-#' Orthogonalizing EM
+#' Orthogonalizing EM with precomputed XtX
 #'
 #' @param xtx input matrix equal to \code{crossprod(x) / nrow(x)}. 
 #' where \code{x} is the design matrix.

@@ -2,7 +2,7 @@
 % Please edit documentation in R/cv_oem.R
 \name{cv.oem}
 \alias{cv.oem}
-\title{Orthogonalizing EM}
+\title{Cross validation for Orthogonalizing EM}
 \usage{
 cv.oem(x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
   "mcp.net", "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
@@ -58,7 +58,7 @@ fold omitted. The folid vector is also returned. Default is \code{keep = FALSE}}
 An object with S3 class \code{"cv.oem"}
 }
 \description{
-Orthogonalizing EM
+Cross validation for Orthogonalizing EM
 }
 \examples{
 set.seed(123)

@@ -1,5 +1,5 @@
 
-#' Orthogonalizing EM
+#' Orthogonalizing EM for big.matrix objects
 #'
 #' @param x input big.matrix object pointing to design matrix 
 #' Each row is an observation, each column corresponds to a covariate

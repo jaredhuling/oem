@@ -2,7 +2,7 @@
 % Please edit documentation in R/oem_xval.R
 \name{xval.oem}
 \alias{xval.oem}
-\title{Orthogonalizing EM}
+\title{Fast cross validation for Orthogonalizing EM}
 \usage{
 xval.oem(x, y, nfolds = 10L, foldid = NULL, type.measure = c("mse",
   "deviance", "class", "auc", "mae"), ncores = -1, family = c("gaussian",
@@ -114,7 +114,7 @@ to \code{TRUE} will dramatically increase computational time}
 An object with S3 class \code{"xval.oem"}
 }
 \description{
-Orthogonalizing EM
+Fast cross validation for Orthogonalizing EM
 }
 \examples{
 set.seed(123)
