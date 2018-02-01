@@ -10,6 +10,8 @@ revdep/.cache.rds
 src-i386
 src-x64
 
+*.DS_Store
+
 *.bk
 *.desc
 
