@@ -5,7 +5,9 @@ Version: 2.0.7
 Authors@R: c(
     person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
     person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre")),
-    person("Yixuan", "Qiu", , , c("ctb"))
+    person("Yixuan", "Qiu", , , c("ctb")),
+    person("Gael", "Guennebaud", , , c("cph")),
+    person("Jitse", "Niesen", , , c("cph"))
     )
 Maintainer: Jared Huling <jaredhuling@gmail.com>
 Description: Solves penalized least squares problems for big tall data
