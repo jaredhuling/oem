@@ -2,6 +2,7 @@
 ## Update for 'oem'
 
 * Vignette update
+* Fixes gcc / clang errors arising from BigMatrix/FileBackedBigMatrix pointer confusion issues
 
 ## Test environments
 
