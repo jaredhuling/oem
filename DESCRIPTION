@@ -1,6 +1,6 @@
 Package: oem
 Type: Package
-Title: Orthogonalizing EM
+Title: Orthogonalizing EM: Penalized Regression Problems for Big Tall Data
 Version: 2.0.7
 Authors@R: c(
     person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
