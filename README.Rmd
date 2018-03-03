@@ -1,9 +1,8 @@
 ---
-output:
-  html_document:
-    keep_md: yes
-    self_contained: true
+output: github_document
 ---
+
+
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
 
