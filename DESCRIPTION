@@ -16,7 +16,9 @@ Description: Solves penalized least squares problems for big tall data
     functions cv.oem() and xval.oem() are for cross validation, the latter being an
     accelerated cross validation function for linear models. The big.oem() function
     allows for out of memory fitting.
-URL: https://github.com/jaredhuling/oem
+URL: 
+    https://github.com/jaredhuling/oem,
+    https://arxiv.org/abs/1801.09661
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
 LazyData: TRUE

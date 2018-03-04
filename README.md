@@ -14,7 +14,7 @@ The oem package provides estimaton for various penalized linear models
 using the [Orthogonalizing EM
 algorithm](http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436).
 Documentation for the package can be found here: [oem
-site](http://casualinference.org/oem) (still under construction).
+site](http://jaredhuling.org/oem).
 
 Install using the **devtools** package (RcppEigen must be installed
 first as well):
@@ -61,8 +61,8 @@ microbenchmark(
 
     ## Unit: seconds
     ##           expr      min       lq     mean   median       uq      max neval
-    ##  glmnet[lasso] 8.368234 8.436548 8.770274 8.463856 9.096998 9.485735     5
-    ##     oem[lasso] 2.037046 2.095733 2.286728 2.256506 2.507405 2.536950     5
+    ##  glmnet[lasso] 7.440743 7.447395 7.747722 7.551486 7.613698 8.685287     5
+    ##     oem[lasso] 1.958371 1.958397 2.030689 1.961159 1.975121 2.300396     5
 
 ``` r
 # difference of results
@@ -151,21 +151,21 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##            expr       min        lq      mean    median        uq
-    ##  sparsenet[mcp] 1864.6086 1936.7661 1967.3467 1950.7359 1966.3668
-    ##        oem[mcp]  167.6447  170.1603  205.6869  181.9338  190.2152
-    ##     ncvreg[mcp] 7711.4615 7719.9505 8471.2386 7793.1576 8086.4313
-    ##       plus[mcp] 1785.2623 1915.2297 1920.1796 1927.4513 1985.8707
-    ##       oem[scad]  143.6152  192.7806  271.5987  199.4317  379.2325
-    ##    ncvreg[scad] 7831.2663 7897.9706 8273.9272 7930.8819 8162.0683
-    ##      plus[scad] 1922.3190 2016.3623 2116.3379 2023.3237 2119.4645
+    ##  sparsenet[mcp] 1781.3474 1795.5607 1972.0889 1898.6168 2091.9188
+    ##        oem[mcp]  161.5994  162.6565  165.3022  165.5735  166.0121
+    ##     ncvreg[mcp] 7170.5933 8386.3088 8605.6697 8511.9816 8557.9524
+    ##       plus[mcp] 1661.7881 1672.9392 1740.7073 1678.9892 1817.3182
+    ##       oem[scad]  136.5101  137.3331  139.6136  137.3635  137.5628
+    ##    ncvreg[scad] 8052.8620 8162.1654 8247.8753 8222.6007 8317.8704
+    ##      plus[scad] 1782.0859 1806.7236 2162.2228 2041.9774 2329.9171
     ##         max neval
-    ##   2118.2559     5
-    ##    318.4802     5
-    ##  11045.1921     5
-    ##   1987.0841     5
-    ##    442.9337     5
-    ##   9547.4487     5
-    ##   2500.2199     5
+    ##   2293.0009     5
+    ##    170.6695     5
+    ##  10401.5125     5
+    ##   1872.5020     5
+    ##    149.2985     5
+    ##   8483.8781     5
+    ##   2850.4098     5
 
 ``` r
 diffs <- array(NA, dim = c(4, 1))
@@ -230,16 +230,16 @@ microbenchmark(
 ```
 
     ## Unit: milliseconds
-    ##                 expr       min       lq      mean    median        uq
-    ##   gglasso[grp.lasso] 3446.8435 3455.845 3607.6615 3573.4092 3759.6831
-    ##       oem[grp.lasso]  102.2481  103.214  105.3014  104.7941  106.8691
-    ##  grplasso[grp.lasso] 6782.3136 7254.427 7362.1943 7376.0000 7592.2527
-    ##    grpreg[grp.lasso] 1911.0365 2007.286 2084.6440 2014.7881 2112.4620
-    ##        max neval
-    ##  3802.5273     5
-    ##   109.3816     5
-    ##  7805.9780     5
-    ##  2377.6469     5
+    ##                 expr       min        lq      mean    median        uq
+    ##   gglasso[grp.lasso] 3584.7379 3631.2507 4129.3979 3942.3034 4511.4096
+    ##       oem[grp.lasso]  110.0432  113.5345  122.9799  115.4253  132.8513
+    ##  grplasso[grp.lasso] 7528.9735 7678.8419 8652.0709 7840.2965 8539.7128
+    ##    grpreg[grp.lasso] 1915.9051 2013.3947 2313.3978 2208.1039 2452.0606
+    ##         max neval
+    ##   4977.2881     5
+    ##    143.0452     5
+    ##  11672.5298     5
+    ##   2977.5246     5
 
 ``` r
 diffs <- array(NA, dim = c(2, 1))
@@ -276,7 +276,7 @@ system.time(res <- oem(x, y,
 ```
 
     ##    user  system elapsed 
-    ##    2.93    0.22    3.17
+    ##    3.26    0.22    3.54
 
 ### Fitting Multiple Penalties
 
@@ -316,11 +316,11 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##                     expr      min       lq     mean   median       uq
-    ##               oem[lasso] 207.5943 208.3945 209.2124 209.1693 209.3651
-    ##  oem[lasso/mcp/scad/ols] 247.3644 250.2242 251.4625 250.9896 251.7242
+    ##               oem[lasso] 209.7527 209.8486 225.8205 215.7640 216.5487
+    ##  oem[lasso/mcp/scad/ols] 259.0799 263.1141 274.3198 265.2685 286.3861
     ##       max neval
-    ##  211.5389     5
-    ##  257.0104     5
+    ##  277.1885     5
+    ##  297.7507     5
 
 ``` r
 #png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()
