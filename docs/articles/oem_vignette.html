@@ -115,11 +115,7 @@
 <div id="available-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#available-functions" class="anchor"></a>Available functions</h2>
-<table style="width:79%;" class="table">
-<colgroup>
-<col width="29%">
-<col width="50%">
-</colgroup>
+<table class="table">
 <thead><tr class="header">
 <th>Function Name</th>
 <th>Functionality</th>
@@ -163,7 +159,60 @@
 <div id="available-penalties" class="section level2">
 <h2 class="hasAnchor">
 <a href="#available-penalties" class="anchor"></a>Available Penalties</h2>
-<p>+——————–+——————–+————————–+ | Penalty | Option Name | Penalty Form | +====================+===============================================+ | Lasso | <code>lasso</code> | <span class="math inline">\(\lambda \sum_{j = 1}^pd_j|\beta_j|\)</span> | +——————–+——————–+————————–+ | Elastic Net | <code>elastic.net</code> | <span class="math inline">\(\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span> | +——————–+——————–+————————–+ | MCP | <code>mcp</code> | <span class="math inline">\(\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x\)</span> | +——————–+——————–+————————–+ | SCAD | <code>scad</code> | <span class="math inline">\(\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)\)</span> | +——————–+——————–+————————–+ | Group Lasso | <code>grp.lasso</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span> | +——————–+——————–+————————–+ | Group MCP | <code>grp.mcp</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gp^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span> | +——————–+——————–+————————–+ | Group SCAD | <code>grp.scad</code> | <span class="math inline">\(\lambda \sum_{k = 1}^Gp^{SCAD}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span> | +——————–+——————–+————————–+ | Sparse Group Lasso | <code>sparse.grp.lasso</code> | <span class="math inline">\(\lambda \alpha\sum_{j = 1}^pd_j|\beta_j| + \lambda (1-\alpha)\sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span> | +——————–+——————–+————————–+</p>
+<table class="table">
+<colgroup>
+<col width="30%">
+<col width="30%">
+<col width="40%">
+</colgroup>
+<thead><tr class="header">
+<th>Penalty</th>
+<th>Option Name</th>
+<th>Penalty Form</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Lasso</td>
+<td><code>lasso</code></td>
+<td><span class="math inline">\(\lambda \sum_{j = 1}^pd_j|\beta_j|\)</span></td>
+</tr>
+<tr class="even">
+<td>Elastic Net</td>
+<td><code>elastic.net</code></td>
+<td><span class="math inline">\(\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2\)</span></td>
+</tr>
+<tr class="odd">
+<td>MCP</td>
+<td><code>mcp</code></td>
+<td><span class="math inline">\(\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x\)</span></td>
+</tr>
+<tr class="even">
+<td>SCAD</td>
+<td><code>scad</code></td>
+<td><span class="math inline">\(\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Group Lasso</td>
+<td><code>grp.lasso</code></td>
+<td><span class="math inline">\(\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span></td>
+</tr>
+<tr class="even">
+<td>Group MCP</td>
+<td><code>grp.mcp</code></td>
+<td><span class="math inline">\(\lambda \sum_{k = 1}^Gp^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span></td>
+</tr>
+<tr class="odd">
+<td>Group SCAD</td>
+<td><code>grp.scad</code></td>
+<td><span class="math inline">\(\lambda \sum_{k = 1}^Gp^{SCAD}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)\)</span></td>
+</tr>
+<tr class="even">
+<td>Sparse Group Lasso</td>
+<td><code>sparse.grp.lasso</code></td>
+<td><span class="math inline">\(\lambda \alpha\sum_{j = 1}^pd_j|\beta_j| + \lambda (1-\alpha)\sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}\)</span></td>
+</tr>
+</tbody>
+</table>
 <p>where <span class="math inline">\(||\boldsymbol\beta_{g_k}||_2 = \sqrt{\sum_{j \in g_k}\beta_j^2}\)</span>, <span class="math display">\[ p_{\lambda, \gamma}^{SCAD}(\beta) =   \left\{
 \begin{array}{ll}
       \lambda|\beta| &amp; |\beta| \leq \lambda ; \\
@@ -186,7 +235,30 @@
 <h2 class="hasAnchor">
 <a href="#available-model-families" class="anchor"></a>Available Model Families</h2>
 <p>The following models are available currently.</p>
-<p>+———————+——————–+————————–+ | Model | Option Name | Loss Form | +=====================+===============================================+ | Linear Regression | <code>gaussian</code> | <span class="math inline">\(\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2\)</span> | +———————+——————–+————————–+ | Logistic Regression | <code>binomial</code> | <span class="math inline">\(-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]\)</span>| +———————+——————–+————————–+</p>
+<table class="table">
+<colgroup>
+<col width="31%">
+<col width="29%">
+<col width="39%">
+</colgroup>
+<thead><tr class="header">
+<th>Model</th>
+<th>Option Name</th>
+<th>Loss Form</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Linear Regression</td>
+<td><code>gaussian</code></td>
+<td><span class="math inline">\(\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2\)</span></td>
+</tr>
+<tr class="even">
+<td>Logistic Regression</td>
+<td><code>binomial</code></td>
+<td><span class="math inline">\(-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]\)</span></td>
+</tr>
+</tbody>
+</table>
 <p>There are plans to include support for multiple responses, binomial models (not just logistic regression), Cox’s proportional hazards model, and more if requested.</p>
 </div>
 </div>
@@ -227,14 +299,14 @@
 <a class="sourceLine" id="cb11-4" data-line-number="4">                                     <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),</a>
 <a class="sourceLine" id="cb11-5" data-line-number="5">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.37    0.03    0.48</code></pre>
+##    0.29    0.04    0.32</code></pre>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">system.time</span>(fit2c &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, </a>
 <a class="sourceLine" id="cb13-2" data-line-number="2">                         <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
 <a class="sourceLine" id="cb13-3" data-line-number="3">                                     <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>, <span class="st">"grp.mcp"</span>,</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4">                                     <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),</a>
 <a class="sourceLine" id="cb13-5" data-line-number="5">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 500L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.42    0.01    0.47</code></pre>
+##    0.45    0.00    0.47</code></pre>
 </div>
 <div id="logistic-regression" class="section level3">
 <h3 class="hasAnchor">
@@ -251,12 +323,12 @@
 <a class="sourceLine" id="cb15-9" data-line-number="9">                         <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
 <a class="sourceLine" id="cb15-10" data-line-number="10">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    2.63    0.03    3.69</code></pre>
+##    2.66    0.02    2.84</code></pre>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">system.time</span>(fit2b &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>),</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">                         <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   13.16    0.07   15.99</code></pre>
+##   13.04    0.11   13.74</code></pre>
 </div>
 </div>
 </div>
@@ -271,7 +343,7 @@
 <a class="sourceLine" id="cb19-5" data-line-number="5">                             <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb19-6" data-line-number="6">                             <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    2.15    0.11    2.55</code></pre>
+##    1.84    0.11    2.04</code></pre>
 <p>Plot the cross validation mean squared error results for each model</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">plot</span>(cvfit1, <span class="dt">which.model =</span> <span class="dv">1</span>)</a>
@@ -292,32 +364,27 @@
 <a class="sourceLine" id="cb22-7" data-line-number="7">                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb22-8" data-line-number="8">                               <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    7.13    0.92    8.76</code></pre>
+##    6.92    0.76    8.20</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">system.time</span>(xvalfit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb24-2" data-line-number="2">                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">                                 <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.17    0.03    1.45</code></pre>
+##    1.09    0.02    1.14</code></pre>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">system.time</span>(xvalfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb26-2" data-line-number="2">                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">                                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">ncores =</span> <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.46    0.02    1.08</code></pre>
+##    1.45    0.05    1.03</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">system.time</span>(ofit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb28-2" data-line-number="2">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.36    0.01    0.46</code></pre>
+##    0.20    0.03    0.26</code></pre>
 </div>
 <div id="evaluation-metrics" class="section level2">
 <h2 class="hasAnchor">
 <a href="#evaluation-metrics" class="anchor"></a>Evaluation Metrics</h2>
 <p>A variety of evaluation metrics can be used for cross validation. The available metrics can be found in the table below</p>
 <table class="table">
-<colgroup>
-<col width="27%">
-<col width="42%">
-<col width="30%">
-</colgroup>
 <thead><tr class="header">
 <th>Model</th>
 <th>Metric</th>
@@ -327,72 +394,79 @@
 <tr class="odd">
 <td><strong>Linear Regression</strong></td>
 <td>Mean squared error</td>
-<td><pre><code>`mse` or `deviance`</code></pre></td>
+<td>
+<code>mse</code> or <code>deviance</code>
+</td>
 </tr>
 <tr class="even">
 <td></td>
 <td>Mean absolute error</td>
-<td><pre><code>`mae`</code></pre></td>
+<td><code>mae</code></td>
 </tr>
 <tr class="odd">
+<td>———————</td>
+<td>———————————-</td>
+<td>————————</td>
+</tr>
+<tr class="even">
 <td><strong>Logistic Regression</strong></td>
 <td>Deviance</td>
-<td><pre><code>`deviance`</code></pre></td>
+<td><code>deviance</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td></td>
 <td>Area under the ROC curve</td>
-<td><pre><code>`auc`</code></pre></td>
-</tr>
-<tr class="odd">
-<td></td>
-<td>Misclassification Rate</td>
-<td><pre><code>`class`</code></pre></td>
+<td><code>auc</code></td>
 </tr>
 <tr class="even">
 <td></td>
-<td>Mean squared error of fitted mean</td>
-<td><pre><code>`mse`</code></pre></td>
+<td>Misclassification Rate</td>
+<td><code>class</code></td>
 </tr>
 <tr class="odd">
 <td></td>
+<td>Mean squared error of fitted mean</td>
+<td><code>mse</code></td>
+</tr>
+<tr class="even">
+<td></td>
 <td>Mean absolute error of fitted mean</td>
-<td><pre><code>`mae`</code></pre></td>
+<td><code>mae</code></td>
 </tr>
 </tbody>
 </table>
 <p>Consider a binary outcome setting with logistic regression.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">nobs  &lt;-<span class="st"> </span><span class="fl">2e3</span></a>
-<a class="sourceLine" id="cb37-2" data-line-number="2">nvars &lt;-<span class="st"> </span><span class="dv">20</span></a>
-<a class="sourceLine" id="cb37-3" data-line-number="3">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(nobs <span class="op">*</span><span class="st"> </span>nvars, <span class="dt">max =</span> <span class="dv">2</span>), <span class="dt">ncol =</span> nvars)</a>
-<a class="sourceLine" id="cb37-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb37-5" data-line-number="5">y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.25</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))))))</a></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1">nobs  &lt;-<span class="st"> </span><span class="fl">2e3</span></a>
+<a class="sourceLine" id="cb30-2" data-line-number="2">nvars &lt;-<span class="st"> </span><span class="dv">20</span></a>
+<a class="sourceLine" id="cb30-3" data-line-number="3">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">runif</span>(nobs <span class="op">*</span><span class="st"> </span>nvars, <span class="dt">max =</span> <span class="dv">2</span>), <span class="dt">ncol =</span> nvars)</a>
+<a class="sourceLine" id="cb30-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb30-5" data-line-number="5">y &lt;-<span class="st"> </span><span class="kw">rbinom</span>(nobs, <span class="dv">1</span>, <span class="dt">prob =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="op">-</span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.25</span>, <span class="dv">-1</span>, <span class="dv">-1</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.25</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))))))</a></code></pre></div>
 <div id="misclassification-rate" class="section level3">
 <h3 class="hasAnchor">
 <a href="#misclassification-rate" class="anchor"></a>Misclassification Rate</h3>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb38-1" data-line-number="1">cvfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cv.oem.html">cv.oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
-<a class="sourceLine" id="cb38-2" data-line-number="2">                                           <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>), </a>
-<a class="sourceLine" id="cb38-3" data-line-number="3">                 <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
-<a class="sourceLine" id="cb38-4" data-line-number="4">                 <span class="dt">type.measure =</span> <span class="st">"class"</span>,</a>
-<a class="sourceLine" id="cb38-5" data-line-number="5">                 <span class="dt">gamma =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb38-6" data-line-number="6">                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb38-7" data-line-number="7">                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1">cvfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cv.oem.html">cv.oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
+<a class="sourceLine" id="cb31-2" data-line-number="2">                                           <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>), </a>
+<a class="sourceLine" id="cb31-3" data-line-number="3">                 <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
+<a class="sourceLine" id="cb31-4" data-line-number="4">                 <span class="dt">type.measure =</span> <span class="st">"class"</span>,</a>
+<a class="sourceLine" id="cb31-5" data-line-number="5">                 <span class="dt">gamma =</span> <span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb31-6" data-line-number="6">                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb31-7" data-line-number="7">                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-17-1.png" width="686.4"></p>
 <p>In this case, misclassification rate is not the best indicator of performance. The classes here are imbalanced:</p>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">mean</span>(y)</a></code></pre></div>
-<pre><code>## [1] 0.0605</code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">mean</span>(y)</a></code></pre></div>
+<pre><code>## [1] 0.07</code></pre>
 </div>
 <div id="area-under-the-roc-curve" class="section level3">
 <h3 class="hasAnchor">
 <a href="#area-under-the-roc-curve" class="anchor"></a>Area Under the ROC Curve</h3>
 <p>Area under the ROC curve is an alternative classification metric to misclassification rate. It is available by setting <code>type.measure = "auc"</code>.</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">cvfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cv.oem.html">cv.oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
-<a class="sourceLine" id="cb41-2" data-line-number="2">                                           <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>), </a>
-<a class="sourceLine" id="cb41-3" data-line-number="3">                 <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
-<a class="sourceLine" id="cb41-4" data-line-number="4">                 <span class="dt">type.measure =</span> <span class="st">"auc"</span>,</a>
-<a class="sourceLine" id="cb41-5" data-line-number="5">                 <span class="dt">gamma =</span> <span class="dv">2</span>,</a>
-<a class="sourceLine" id="cb41-6" data-line-number="6">                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), </a>
-<a class="sourceLine" id="cb41-7" data-line-number="7">                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb34-1" data-line-number="1">cvfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/cv.oem.html">cv.oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
+<a class="sourceLine" id="cb34-2" data-line-number="2">                                           <span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>), </a>
+<a class="sourceLine" id="cb34-3" data-line-number="3">                 <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
+<a class="sourceLine" id="cb34-4" data-line-number="4">                 <span class="dt">type.measure =</span> <span class="st">"auc"</span>,</a>
+<a class="sourceLine" id="cb34-5" data-line-number="5">                 <span class="dt">gamma =</span> <span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb34-6" data-line-number="6">                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>, <span class="dt">each =</span> <span class="dv">2</span>), </a>
+<a class="sourceLine" id="cb34-7" data-line-number="7">                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">standardize =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-20-1.png" width="686.4"></p>
 </div>
 </div>
@@ -404,63 +478,63 @@
 <h2 class="hasAnchor">
 <a href="#oem-with-precomputed-xtx-xty-for-linear-models" class="anchor"></a>OEM with Precomputed <span class="math inline">\(X^TX\)</span>, <span class="math inline">\(X^TY\)</span> for Linear Models</h2>
 <p>With a very large dataset and computing cluster, the total size of a dataset may be very large, but if the number of variables is only moderately large (on the order of a few thousands) <span class="math inline">\(X^TX\)</span> and <span class="math inline">\(X^TY\)</span> may not be large and may already be available from other computations or can be computed trivially in parallel. The function <code>oem.xtx</code> computes penalized linear regression models using the OEM algorithm only using <span class="math inline">\(X^TX\)</span> and <span class="math inline">\(X^TY\)</span>. Standardization can be achieved by providing a vector of scaling factors (usually the standard deviations of the columns of x). The function is used like the following:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" data-line-number="1">xtx &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)</a>
-<a class="sourceLine" id="cb42-2" data-line-number="2">xty &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc, yc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)</a>
-<a class="sourceLine" id="cb42-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb42-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb42-5" data-line-number="5"><span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
-<a class="sourceLine" id="cb42-6" data-line-number="6">                       <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb42-7" data-line-number="7">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb42-8" data-line-number="8">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">xtx &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">xty &lt;-<span class="st"> </span><span class="kw">crossprod</span>(xc, yc) <span class="op">/</span><span class="st"> </span><span class="kw">nrow</span>(xc)</a>
+<a class="sourceLine" id="cb35-3" data-line-number="3"></a>
+<a class="sourceLine" id="cb35-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb35-5" data-line-number="5"><span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
+<a class="sourceLine" id="cb35-6" data-line-number="6">                       <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb35-7" data-line-number="7">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb35-8" data-line-number="8">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.26    0.01    0.29</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw">system.time</span>(fit.xtx &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
-<a class="sourceLine" id="cb44-2" data-line-number="2">                               <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb44-3" data-line-number="3">                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  )  </a></code></pre></div>
+##    0.22    0.02    0.24</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">system.time</span>(fit.xtx &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
+<a class="sourceLine" id="cb37-2" data-line-number="2">                               <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb37-3" data-line-number="3">                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  )  </a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.03    0.00    0.05</code></pre>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
-<pre><code>## [1] 7.438494e-15</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">2</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">2</span>]])) </a></code></pre></div>
-<pre><code>## [1] 7.438494e-15</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">col.std &lt;-<span class="st"> </span><span class="kw">apply</span>(xc, <span class="dv">2</span>, sd)</a>
-<a class="sourceLine" id="cb50-2" data-line-number="2">fit.xtx.s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
-<a class="sourceLine" id="cb50-3" data-line-number="3">                     <span class="dt">scale.factor =</span> col.std,</a>
-<a class="sourceLine" id="cb50-4" data-line-number="4">                     <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb50-5" data-line-number="5">                     <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  </a></code></pre></div>
+##    0.02    0.00    0.01</code></pre>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
+<pre><code>## [1] 1.521006e-14</code></pre>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">2</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">2</span>]])) </a></code></pre></div>
+<pre><code>## [1] 1.521006e-14</code></pre>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">col.std &lt;-<span class="st"> </span><span class="kw">apply</span>(xc, <span class="dv">2</span>, sd)</a>
+<a class="sourceLine" id="cb43-2" data-line-number="2">fit.xtx.s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
+<a class="sourceLine" id="cb43-3" data-line-number="3">                     <span class="dt">scale.factor =</span> col.std,</a>
+<a class="sourceLine" id="cb43-4" data-line-number="4">                     <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb43-5" data-line-number="5">                     <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  </a></code></pre></div>
 </div>
 <div id="out-of-memory-computation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#out-of-memory-computation" class="anchor"></a>Out-of-memory Computation</h2>
 <p>The OEM package also provides functionality for on-disk computation with the <code>big.oem</code> function, allowing for fitting penalized regression models on datasets too large to fit in memory. The <code>big.oem</code> function uses the tools provided by the <code>bigmemory</code> package, so a big.matrix object must be used for the design matrix.</p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb51-2" data-line-number="2">nrows &lt;-<span class="st"> </span><span class="dv">50000</span></a>
-<a class="sourceLine" id="cb51-3" data-line-number="3">ncols &lt;-<span class="st"> </span><span class="dv">100</span></a>
-<a class="sourceLine" id="cb51-4" data-line-number="4">bkFile &lt;-<span class="st"> "bigmat.bk"</span></a>
-<a class="sourceLine" id="cb51-5" data-line-number="5">descFile &lt;-<span class="st"> "bigmatk.desc"</span></a>
-<a class="sourceLine" id="cb51-6" data-line-number="6">bigmat &lt;-<span class="st"> </span><span class="kw">filebacked.big.matrix</span>(<span class="dt">nrow=</span>nrows, <span class="dt">ncol=</span>ncols, <span class="dt">type=</span><span class="st">"double"</span>,</a>
-<a class="sourceLine" id="cb51-7" data-line-number="7">                                <span class="dt">backingfile=</span>bkFile, <span class="dt">backingpath=</span><span class="st">"."</span>,</a>
-<a class="sourceLine" id="cb51-8" data-line-number="8">                                <span class="dt">descriptorfile=</span>descFile,</a>
-<a class="sourceLine" id="cb51-9" data-line-number="9">                                <span class="dt">dimnames=</span><span class="kw">c</span>(<span class="ot">NULL</span>,<span class="ot">NULL</span>))</a>
-<a class="sourceLine" id="cb51-10" data-line-number="10"></a>
-<a class="sourceLine" id="cb51-11" data-line-number="11"><span class="co"># Each column value with be the column number multiplied by</span></a>
-<a class="sourceLine" id="cb51-12" data-line-number="12"><span class="co"># samples from a standard normal distribution.</span></a>
-<a class="sourceLine" id="cb51-13" data-line-number="13"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
-<a class="sourceLine" id="cb51-14" data-line-number="14"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>ncols) bigmat[,i] =<span class="st"> </span><span class="kw">rnorm</span>(nrows)<span class="op">*</span>i</a>
-<a class="sourceLine" id="cb51-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb51-16" data-line-number="16">yb &lt;-<span class="st"> </span><span class="kw">rnorm</span>(nrows) <span class="op">+</span><span class="st"> </span>bigmat[,<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>bigmat[,<span class="dv">2</span>]</a>
-<a class="sourceLine" id="cb51-17" data-line-number="17"></a>
-<a class="sourceLine" id="cb51-18" data-line-number="18">## out-of-memory computation</a>
-<a class="sourceLine" id="cb51-19" data-line-number="19">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/big.oem.html">big.oem</a></span>(<span class="dt">x =</span> bigmat, <span class="dt">y =</span> yb, </a>
-<a class="sourceLine" id="cb51-20" data-line-number="20">               <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb51-21" data-line-number="21">               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))</a>
-<a class="sourceLine" id="cb51-22" data-line-number="22"></a>
-<a class="sourceLine" id="cb51-23" data-line-number="23">## fitting with in-memory computation</a>
-<a class="sourceLine" id="cb51-24" data-line-number="24">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> bigmat[,], <span class="dt">y =</span> yb, </a>
-<a class="sourceLine" id="cb51-25" data-line-number="25">            <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb51-26" data-line-number="26">            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))   </a>
-<a class="sourceLine" id="cb51-27" data-line-number="27">           </a>
-<a class="sourceLine" id="cb51-28" data-line-number="28"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>fit2<span class="op">$</span>beta[[<span class="dv">1</span>]]))            </a></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" data-line-number="1"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb44-2" data-line-number="2">nrows &lt;-<span class="st"> </span><span class="dv">50000</span></a>
+<a class="sourceLine" id="cb44-3" data-line-number="3">ncols &lt;-<span class="st"> </span><span class="dv">100</span></a>
+<a class="sourceLine" id="cb44-4" data-line-number="4">bkFile &lt;-<span class="st"> "bigmat.bk"</span></a>
+<a class="sourceLine" id="cb44-5" data-line-number="5">descFile &lt;-<span class="st"> "bigmatk.desc"</span></a>
+<a class="sourceLine" id="cb44-6" data-line-number="6">bigmat &lt;-<span class="st"> </span><span class="kw">filebacked.big.matrix</span>(<span class="dt">nrow=</span>nrows, <span class="dt">ncol=</span>ncols, <span class="dt">type=</span><span class="st">"double"</span>,</a>
+<a class="sourceLine" id="cb44-7" data-line-number="7">                                <span class="dt">backingfile=</span>bkFile, <span class="dt">backingpath=</span><span class="st">"."</span>,</a>
+<a class="sourceLine" id="cb44-8" data-line-number="8">                                <span class="dt">descriptorfile=</span>descFile,</a>
+<a class="sourceLine" id="cb44-9" data-line-number="9">                                <span class="dt">dimnames=</span><span class="kw">c</span>(<span class="ot">NULL</span>,<span class="ot">NULL</span>))</a>
+<a class="sourceLine" id="cb44-10" data-line-number="10"></a>
+<a class="sourceLine" id="cb44-11" data-line-number="11"><span class="co"># Each column value with be the column number multiplied by</span></a>
+<a class="sourceLine" id="cb44-12" data-line-number="12"><span class="co"># samples from a standard normal distribution.</span></a>
+<a class="sourceLine" id="cb44-13" data-line-number="13"><span class="kw">set.seed</span>(<span class="dv">123</span>)</a>
+<a class="sourceLine" id="cb44-14" data-line-number="14"><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>ncols) bigmat[,i] =<span class="st"> </span><span class="kw">rnorm</span>(nrows)<span class="op">*</span>i</a>
+<a class="sourceLine" id="cb44-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb44-16" data-line-number="16">yb &lt;-<span class="st"> </span><span class="kw">rnorm</span>(nrows) <span class="op">+</span><span class="st"> </span>bigmat[,<span class="dv">1</span>] <span class="op">-</span><span class="st"> </span>bigmat[,<span class="dv">2</span>]</a>
+<a class="sourceLine" id="cb44-17" data-line-number="17"></a>
+<a class="sourceLine" id="cb44-18" data-line-number="18">## out-of-memory computation</a>
+<a class="sourceLine" id="cb44-19" data-line-number="19">fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/big.oem.html">big.oem</a></span>(<span class="dt">x =</span> bigmat, <span class="dt">y =</span> yb, </a>
+<a class="sourceLine" id="cb44-20" data-line-number="20">               <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb44-21" data-line-number="21">               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))</a>
+<a class="sourceLine" id="cb44-22" data-line-number="22"></a>
+<a class="sourceLine" id="cb44-23" data-line-number="23">## fitting with in-memory computation</a>
+<a class="sourceLine" id="cb44-24" data-line-number="24">fit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> bigmat[,], <span class="dt">y =</span> yb, </a>
+<a class="sourceLine" id="cb44-25" data-line-number="25">            <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb44-26" data-line-number="26">            <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))   </a>
+<a class="sourceLine" id="cb44-27" data-line-number="27">           </a>
+<a class="sourceLine" id="cb44-28" data-line-number="28"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]] <span class="op">-</span><span class="st"> </span>fit2<span class="op">$</span>beta[[<span class="dv">1</span>]]))            </a></code></pre></div>
 <pre><code>## [1] 1.534783e-05</code></pre>
 </div>
 </div>
@@ -471,51 +545,51 @@
 <h2 class="hasAnchor">
 <a href="#parallelization-via-openmp" class="anchor"></a>Parallelization via OpenMP</h2>
 <p>Computational time can be reduced a little via OpenMP parallelization of the key computational steps of the OEM algorithm. Simply use the <code>ncores</code> argument to access parallelization. There is no need for the foreach package.</p>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1">nobsc  &lt;-<span class="st"> </span><span class="fl">1e5</span></a>
-<a class="sourceLine" id="cb53-2" data-line-number="2">nvarsc &lt;-<span class="st"> </span><span class="dv">500</span></a>
-<a class="sourceLine" id="cb53-3" data-line-number="3">xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc <span class="op">*</span><span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)</a>
-<a class="sourceLine" id="cb53-4" data-line-number="4">yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb53-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb53-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb53-7" data-line-number="7"><span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
-<a class="sourceLine" id="cb53-8" data-line-number="8">                       <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb53-9" data-line-number="9">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb53-10" data-line-number="10">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1">nobsc  &lt;-<span class="st"> </span><span class="fl">1e5</span></a>
+<a class="sourceLine" id="cb46-2" data-line-number="2">nvarsc &lt;-<span class="st"> </span><span class="dv">500</span></a>
+<a class="sourceLine" id="cb46-3" data-line-number="3">xc &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobsc <span class="op">*</span><span class="st"> </span>nvarsc), <span class="dt">ncol =</span> nvarsc)</a>
+<a class="sourceLine" id="cb46-4" data-line-number="4">yc &lt;-<span class="st"> </span><span class="kw">drop</span>(xc <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="dv">1</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvarsc <span class="op">-</span><span class="st"> </span><span class="dv">5</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobsc, <span class="dt">sd =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb46-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb46-6" data-line-number="6"></a>
+<a class="sourceLine" id="cb46-7" data-line-number="7"><span class="kw">system.time</span>(fit &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
+<a class="sourceLine" id="cb46-8" data-line-number="8">                       <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb46-9" data-line-number="9">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb46-10" data-line-number="10">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    5.39    0.14    7.02</code></pre>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw">system.time</span>(fitp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
-<a class="sourceLine" id="cb55-2" data-line-number="2">                        <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
-<a class="sourceLine" id="cb55-3" data-line-number="3">                        <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb55-4" data-line-number="4">                        <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>), <span class="dt">ncores =</span> <span class="dv">2</span>))</a></code></pre></div>
+##    4.28    0.13    4.66</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">system.time</span>(fitp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">                        <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
+<a class="sourceLine" id="cb48-3" data-line-number="3">                        <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb48-4" data-line-number="4">                        <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>), <span class="dt">ncores =</span> <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    5.80    0.07    5.57</code></pre>
+##    5.57    0.09    3.56</code></pre>
 </div>
 <div id="penalty-adjustment" class="section level2">
 <h2 class="hasAnchor">
 <a href="#penalty-adjustment" class="anchor"></a>Penalty Adjustment</h2>
 <p>If some variables should not be penalized, this can be specified through the use of the <code>penalty.factor</code> argument for all penalties other than the group lasso. For the group lasso, the group-specific weights can be modified by the <code>group.weights</code> argument. <code>penalty.factor</code> should be a vector of length equal to the number of columns in <code>x</code>. Each element in <code>penalty.factor</code> will be multiplied to the applied tuning parameter for each corresponding variable. For example, for a problem with 5 variables (<code>ncol(x) = 5</code>), setting <code>penalty.factor = c(1, 1, 1, 0, 0)</code> will effectively only allow penalization for the first three variables. The <code>group.weights</code> argument should be a vector with length equal to the number of groups. Similarly to <code>penalty.factor</code>, these weights will be multiplied to the penalty applied to each group. <code>penalty.factor</code> and <code>group.weights</code> can also be used to fit the adaptive lasso and adaptive group lasso, respectively.</p>
 <p>The following example shows how to fit an adaptive lasso using <code>oem</code></p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">nobs  &lt;-<span class="st"> </span><span class="fl">1e4</span></a>
-<a class="sourceLine" id="cb57-2" data-line-number="2">nvars &lt;-<span class="st"> </span><span class="dv">102</span></a>
-<a class="sourceLine" id="cb57-3" data-line-number="3">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)</a>
-<a class="sourceLine" id="cb57-4" data-line-number="4">y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="dv">1</span>, <span class="fl">0.5</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb57-5" data-line-number="5"></a>
-<a class="sourceLine" id="cb57-6" data-line-number="6">lams &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">seq</span>(<span class="kw">log</span>(<span class="fl">2.5</span>), <span class="kw">log</span>(<span class="fl">5e-5</span>), <span class="dt">length.out =</span> 100L))</a>
-<a class="sourceLine" id="cb57-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb57-8" data-line-number="8">ols.estimates &lt;-<span class="st"> </span><span class="kw">coef</span>(<span class="kw">lm.fit</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> <span class="kw">cbind</span>(<span class="dv">1</span>, x)))[<span class="op">-</span><span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb57-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb57-10" data-line-number="10">fit.adaptive &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>),</a>
-<a class="sourceLine" id="cb57-11" data-line-number="11">                    <span class="dt">penalty.factor =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">abs</span>(ols.estimates),</a>
-<a class="sourceLine" id="cb57-12" data-line-number="12">                    <span class="dt">lambda =</span> lams)</a>
-<a class="sourceLine" id="cb57-13" data-line-number="13"></a>
-<a class="sourceLine" id="cb57-14" data-line-number="14">group.indicators &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="dt">each =</span> <span class="dv">3</span>)</a>
-<a class="sourceLine" id="cb57-15" data-line-number="15"></a>
-<a class="sourceLine" id="cb57-16" data-line-number="16">## norms of OLS estimates for each group</a>
-<a class="sourceLine" id="cb57-17" data-line-number="17">group.norms      &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="cf">function</span>(idx) <span class="kw">sqrt</span>(<span class="kw">sum</span>((ols.estimates[group.indicators <span class="op">==</span><span class="st"> </span>idx]) <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)))</a>
-<a class="sourceLine" id="cb57-18" data-line-number="18">fit.adaptive.grp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),</a>
-<a class="sourceLine" id="cb57-19" data-line-number="19">                        <span class="dt">group.weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>group.norms,</a>
-<a class="sourceLine" id="cb57-20" data-line-number="20">                        <span class="dt">groups =</span> group.indicators, </a>
-<a class="sourceLine" id="cb57-21" data-line-number="21">                        <span class="dt">lambda =</span> lams)</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">nobs  &lt;-<span class="st"> </span><span class="fl">1e4</span></a>
+<a class="sourceLine" id="cb50-2" data-line-number="2">nvars &lt;-<span class="st"> </span><span class="dv">102</span></a>
+<a class="sourceLine" id="cb50-3" data-line-number="3">x &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(nobs <span class="op">*</span><span class="st"> </span>nvars), <span class="dt">ncol =</span> nvars)</a>
+<a class="sourceLine" id="cb50-4" data-line-number="4">y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span><span class="kw">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">-0.5</span>, <span class="fl">-0.5</span>, <span class="dv">1</span>, <span class="fl">0.5</span>, <span class="kw">rep</span>(<span class="dv">0</span>, nvars <span class="op">-</span><span class="st"> </span><span class="dv">6</span>))) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(nobs, <span class="dt">sd =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb50-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb50-6" data-line-number="6">lams &lt;-<span class="st"> </span><span class="kw">exp</span>(<span class="kw">seq</span>(<span class="kw">log</span>(<span class="fl">2.5</span>), <span class="kw">log</span>(<span class="fl">5e-5</span>), <span class="dt">length.out =</span> 100L))</a>
+<a class="sourceLine" id="cb50-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb50-8" data-line-number="8">ols.estimates &lt;-<span class="st"> </span><span class="kw">coef</span>(<span class="kw">lm.fit</span>(<span class="dt">y =</span> y, <span class="dt">x =</span> <span class="kw">cbind</span>(<span class="dv">1</span>, x)))[<span class="op">-</span><span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb50-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb50-10" data-line-number="10">fit.adaptive &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>),</a>
+<a class="sourceLine" id="cb50-11" data-line-number="11">                    <span class="dt">penalty.factor =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span><span class="kw">abs</span>(ols.estimates),</a>
+<a class="sourceLine" id="cb50-12" data-line-number="12">                    <span class="dt">lambda =</span> lams)</a>
+<a class="sourceLine" id="cb50-13" data-line-number="13"></a>
+<a class="sourceLine" id="cb50-14" data-line-number="14">group.indicators &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="dt">each =</span> <span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb50-15" data-line-number="15"></a>
+<a class="sourceLine" id="cb50-16" data-line-number="16">## norms of OLS estimates for each group</a>
+<a class="sourceLine" id="cb50-17" data-line-number="17">group.norms      &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">34</span>, <span class="cf">function</span>(idx) <span class="kw">sqrt</span>(<span class="kw">sum</span>((ols.estimates[group.indicators <span class="op">==</span><span class="st"> </span>idx]) <span class="op">^</span><span class="st"> </span><span class="dv">2</span>)))</a>
+<a class="sourceLine" id="cb50-18" data-line-number="18">fit.adaptive.grp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x, <span class="dt">y =</span> y, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),</a>
+<a class="sourceLine" id="cb50-19" data-line-number="19">                        <span class="dt">group.weights =</span> <span class="dv">1</span> <span class="op">/</span><span class="st"> </span>group.norms,</a>
+<a class="sourceLine" id="cb50-20" data-line-number="20">                        <span class="dt">groups =</span> group.indicators, </a>
+<a class="sourceLine" id="cb50-21" data-line-number="21">                        <span class="dt">lambda =</span> lams)</a></code></pre></div>
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-25-1.png" width="686.4"></p>
 </div>
 </div>
