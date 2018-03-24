@@ -2,7 +2,7 @@
 ## Update for 'oem'
 
 * Vignette update
-* The clang-UBSAN gcc-UBSAN warnings appear to be not due to any issue with bigmemory, but with the tests not allowing inheritance of classes
+* The clang-UBSAN gcc-UBSAN warnings appear to be not due to any issue with bigmemory, but with the tests not allowing inheritance of classes 
 
 ## Test environments
 

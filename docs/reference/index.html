@@ -18,13 +18,16 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Function reference" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,8 +50,12 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">oem</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">oem</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.8</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
@@ -77,10 +84,7 @@
       <div class="row">
   <div class="col-md-9">
     <div class="page-header">
-      <h1>
-        Reference
-        <small>version&nbsp;2.0.7</small>
-      </h1>
+      <h1>Reference</h1>
     </div>
 
     <div class="contents">
@@ -101,79 +105,79 @@
         <tr>
           <!--  -->
           <td>
-            <p><code><a href="big.oem.html">big.oem</a></code> </p>
+            <p><code><a href="big.oem.html">big.oem()</a></code> </p>
           </td>
           <td><p>Orthogonalizing EM for big.matrix objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="cv.oem.html">cv.oem</a></code> </p>
+            <p><code><a href="cv.oem.html">cv.oem()</a></code> </p>
           </td>
           <td><p>Cross validation for Orthogonalizing EM</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="deprecated.html">oemfit</a></code> <code><a href="deprecated.html">cv.oemfit</a></code> <code><a href="deprecated.html">plot</a></code> <code><a href="deprecated.html">predict</a></code> <code><a href="deprecated.html">print</a></code> </p>
+            <p><code><a href="deprecated.html">oemfit()</a></code> <code><a href="deprecated.html">cv.oemfit()</a></code> <code><a href="deprecated.html">plot(<i>&lt;oemfit&gt;</i>)</a></code> <code><a href="deprecated.html">predict(<i>&lt;oemfit&gt;</i>)</a></code> <code><a href="deprecated.html">print(<i>&lt;oemfit&gt;</i>)</a></code> </p>
           </td>
           <td><p>Deprecated functions</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="logLik.html">logLik</a></code> </p>
+            <p><code><a href="logLik.html">logLik(<i>&lt;oem&gt;</i>)</a></code> <code><a href="logLik.html">logLik(<i>&lt;cv.oem&gt;</i>)</a></code> <code><a href="logLik.html">logLik(<i>&lt;xval.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>log likelihood function for fitted oem objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="oem.html">oem</a></code> </p>
+            <p><code><a href="oem.html">oem()</a></code> </p>
           </td>
           <td><p>Orthogonalizing EM</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="oem.xtx.html">oem.xtx</a></code> </p>
+            <p><code><a href="oem.xtx.html">oem.xtx()</a></code> </p>
           </td>
           <td><p>Orthogonalizing EM with precomputed XtX</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="plot.html">plot</a></code> </p>
+            <p><code><a href="plot.html">plot(<i>&lt;oem&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;cv.oem&gt;</i>)</a></code> <code><a href="plot.html">plot(<i>&lt;xval.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>Plot method for Orthogonalizing EM fitted objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="predict.cv.oem.html">predict</a></code> </p>
+            <p><code><a href="predict.cv.oem.html">predict(<i>&lt;cv.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>Prediction function for fitted cross validation oem objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="predict.oem.html">predict</a></code> </p>
+            <p><code><a href="predict.oem.html">predict(<i>&lt;oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>Prediction method for Orthogonalizing EM fitted objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="predict.xval.oem.html">predict</a></code> </p>
+            <p><code><a href="predict.xval.oem.html">predict(<i>&lt;xval.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>Prediction function for fitted cross validation oem objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="print.html">print</a></code> </p>
+            <p><code><a href="print.html">print(<i>&lt;summary.cv.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>print method for <code>summary.cv.oem</code> objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="summary.html">summary</a></code> </p>
+            <p><code><a href="summary.html">summary(<i>&lt;cv.oem&gt;</i>)</a></code> <code><a href="summary.html">summary(<i>&lt;xval.oem&gt;</i>)</a></code> </p>
           </td>
           <td><p>summary method for cross validation Orthogonalizing EM fitted objects</p></td>
         </tr><tr>
           <!--  -->
           <td>
-            <p><code><a href="xval.oem.html">xval.oem</a></code> </p>
+            <p><code><a href="xval.oem.html">xval.oem()</a></code> </p>
           </td>
           <td><p>Fast cross validation for Orthogonalizing EM</p></td>
         </tr>
@@ -204,3 +208,4 @@
 
   </body>
 </html>
+
