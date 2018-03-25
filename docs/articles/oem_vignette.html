@@ -64,7 +64,7 @@
       <h1>Usage of the oem Package</h1>
                         <h4 class="author">Jared Huling</h4>
             
-            <h4 class="date">2018-03-24</h4>
+            <h4 class="date">2018-03-25</h4>
       
       <small>Source: <a href="https://github.com/jaredhuling/oem/blob/master/vignettes/oem_vignette.Rmd"><code>vignettes/oem_vignette.Rmd</code></a></small>
 
@@ -292,21 +292,21 @@
 <a class="sourceLine" id="cb9-6" data-line-number="6"><span class="kw">system.time</span>(fit2a &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>),</a>
 <a class="sourceLine" id="cb9-7" data-line-number="7">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.25    0.03    0.28</code></pre>
+##    0.21    0.02    0.21</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">system.time</span>(fit2b &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, </a>
 <a class="sourceLine" id="cb11-2" data-line-number="2">                         <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
 <a class="sourceLine" id="cb11-3" data-line-number="3">                                     <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>, <span class="st">"grp.mcp"</span>,</a>
 <a class="sourceLine" id="cb11-4" data-line-number="4">                                     <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),</a>
 <a class="sourceLine" id="cb11-5" data-line-number="5">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.29    0.04    0.32</code></pre>
+##    0.23    0.03    0.27</code></pre>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">system.time</span>(fit2c &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, </a>
 <a class="sourceLine" id="cb13-2" data-line-number="2">                         <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, </a>
 <a class="sourceLine" id="cb13-3" data-line-number="3">                                     <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>, <span class="st">"grp.mcp"</span>,</a>
 <a class="sourceLine" id="cb13-4" data-line-number="4">                                     <span class="st">"grp.scad"</span>, <span class="st">"sparse.grp.lasso"</span>),</a>
 <a class="sourceLine" id="cb13-5" data-line-number="5">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 500L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.45    0.00    0.47</code></pre>
+##    0.33    0.03    0.36</code></pre>
 </div>
 <div id="logistic-regression" class="section level3">
 <h3 class="hasAnchor">
@@ -323,12 +323,12 @@
 <a class="sourceLine" id="cb15-9" data-line-number="9">                         <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
 <a class="sourceLine" id="cb15-10" data-line-number="10">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    2.66    0.02    2.84</code></pre>
+##    2.09    0.02    2.12</code></pre>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">system.time</span>(fit2b &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> x2, <span class="dt">y =</span> y2, <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"lasso"</span>, <span class="st">"mcp"</span>, <span class="st">"scad"</span>, <span class="st">"elastic.net"</span>),</a>
 <a class="sourceLine" id="cb17-2" data-line-number="2">                         <span class="dt">family =</span> <span class="st">"binomial"</span>,</a>
 <a class="sourceLine" id="cb17-3" data-line-number="3">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), <span class="dt">nlambda =</span> 100L))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##   13.04    0.11   13.74</code></pre>
+##    9.78    0.06    9.97</code></pre>
 </div>
 </div>
 </div>
@@ -343,7 +343,7 @@
 <a class="sourceLine" id="cb19-5" data-line-number="5">                             <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb19-6" data-line-number="6">                             <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.84    0.11    2.04</code></pre>
+##    1.41    0.05    1.46</code></pre>
 <p>Plot the cross validation mean squared error results for each model</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">ncol =</span> <span class="dv">2</span>))</a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="kw">plot</span>(cvfit1, <span class="dt">which.model =</span> <span class="dv">1</span>)</a>
@@ -364,21 +364,21 @@
 <a class="sourceLine" id="cb22-7" data-line-number="7">                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb22-8" data-line-number="8">                               <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    6.92    0.76    8.20</code></pre>
+##    5.26    0.74    6.00</code></pre>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1"><span class="kw">system.time</span>(xvalfit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb24-2" data-line-number="2">                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb24-3" data-line-number="3">                                 <span class="dt">nfolds =</span> <span class="dv">10</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.09    0.02    1.14</code></pre>
+##    0.81    0.04    0.92</code></pre>
 <div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" data-line-number="1"><span class="kw">system.time</span>(xvalfit2 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/xval.oem.html">xval.oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb26-2" data-line-number="2">                                 <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>), </a>
 <a class="sourceLine" id="cb26-3" data-line-number="3">                                 <span class="dt">nfolds =</span> <span class="dv">10</span>, <span class="dt">ncores =</span> <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    1.45    0.05    1.03</code></pre>
+##    1.12    0.02    0.70</code></pre>
 <div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" data-line-number="1"><span class="kw">system.time</span>(ofit1 &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, <span class="dt">penalty =</span> <span class="st">"lasso"</span>,</a>
 <a class="sourceLine" id="cb28-2" data-line-number="2">                         <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.20    0.03    0.26</code></pre>
+##    0.18    0.05    0.22</code></pre>
 </div>
 <div id="evaluation-metrics" class="section level2">
 <h2 class="hasAnchor">
@@ -454,7 +454,7 @@
 <p><img src="oem_vignette_files/figure-html/unnamed-chunk-17-1.png" width="686.4"></p>
 <p>In this case, misclassification rate is not the best indicator of performance. The classes here are imbalanced:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1"><span class="kw">mean</span>(y)</a></code></pre></div>
-<pre><code>## [1] 0.07</code></pre>
+<pre><code>## [1] 0.064</code></pre>
 </div>
 <div id="area-under-the-roc-curve" class="section level3">
 <h3 class="hasAnchor">
@@ -487,16 +487,16 @@
 <a class="sourceLine" id="cb35-7" data-line-number="7">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb35-8" data-line-number="8">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.22    0.02    0.24</code></pre>
+##    0.19    0.01    0.28</code></pre>
 <div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1"><span class="kw">system.time</span>(fit.xtx &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
 <a class="sourceLine" id="cb37-2" data-line-number="2">                               <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
 <a class="sourceLine" id="cb37-3" data-line-number="3">                               <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">5</span>))  )  </a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    0.02    0.00    0.01</code></pre>
+##    0.02    0.00    0.05</code></pre>
 <div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">1</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
-<pre><code>## [1] 1.521006e-14</code></pre>
+<pre><code>## [1] 1.754152e-14</code></pre>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">max</span>(<span class="kw">abs</span>(fit<span class="op">$</span>beta[[<span class="dv">2</span>]][<span class="op">-</span><span class="dv">1</span>,] <span class="op">-</span><span class="st"> </span>fit.xtx<span class="op">$</span>beta[[<span class="dv">2</span>]])) </a></code></pre></div>
-<pre><code>## [1] 1.521006e-14</code></pre>
+<pre><code>## [1] 1.754152e-14</code></pre>
 <div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1">col.std &lt;-<span class="st"> </span><span class="kw">apply</span>(xc, <span class="dv">2</span>, sd)</a>
 <a class="sourceLine" id="cb43-2" data-line-number="2">fit.xtx.s &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.xtx.html">oem.xtx</a></span>(<span class="dt">xtx =</span> xtx, <span class="dt">xty =</span> xty, </a>
 <a class="sourceLine" id="cb43-3" data-line-number="3">                     <span class="dt">scale.factor =</span> col.std,</a>
@@ -556,13 +556,13 @@
 <a class="sourceLine" id="cb46-9" data-line-number="9">                       <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb46-10" data-line-number="10">                       <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>)))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    4.28    0.13    4.66</code></pre>
+##    3.58    0.09    3.80</code></pre>
 <div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1"><span class="kw">system.time</span>(fitp &lt;-<span class="st"> </span><span class="kw"><a href="../reference/oem.html">oem</a></span>(<span class="dt">x =</span> xc, <span class="dt">y =</span> yc, </a>
 <a class="sourceLine" id="cb48-2" data-line-number="2">                        <span class="dt">penalty =</span> <span class="kw">c</span>(<span class="st">"lasso"</span>, <span class="st">"grp.lasso"</span>), </a>
 <a class="sourceLine" id="cb48-3" data-line-number="3">                        <span class="dt">standardize =</span> <span class="ot">FALSE</span>, <span class="dt">intercept =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb48-4" data-line-number="4">                        <span class="dt">groups =</span> <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>, <span class="dt">each =</span> <span class="dv">25</span>), <span class="dt">ncores =</span> <span class="dv">2</span>))</a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    5.57    0.09    3.56</code></pre>
+##    4.69    0.17    2.84</code></pre>
 </div>
 <div id="penalty-adjustment" class="section level2">
 <h2 class="hasAnchor">

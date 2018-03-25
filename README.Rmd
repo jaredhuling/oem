@@ -5,13 +5,8 @@ output: github_document
 
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
-
-### Build Status
-|  OS             | Build           |
-|-----------------|-----------------|
-| Linux x86_64 / OSX   | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
-| Windows x86_64     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
-
+[![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)
+[![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)
 
 
 
@@ -20,8 +15,6 @@ output: github_document
 library(knitr)
 opts_chunk$set(message = FALSE)
 ```
-
-
 
 
 ## Introduction
@@ -35,6 +28,18 @@ devtools::install_github("jaredhuling/oem")
 ```
 
 or by cloning and building using `R CMD INSTALL`
+
+## Citation
+  
+To cite oem please use:
+
+Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) Orthogonalizing EM: A design-based least 
+    squares algorithm, Technometrics, Volume 58, Pages 285-293,              
+    http://dx.doi.org/10.1080/00401706.2015.1054436.  
+
+Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross Validation for Tall Data
+    with the OEM Package, Journal of Statistical Software, to appear, URL: 
+    https://arxiv.org/abs/1801.09661. 
 
 ## Models
 
