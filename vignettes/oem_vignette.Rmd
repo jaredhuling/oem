@@ -97,12 +97,17 @@ plot(fit1)
 | Function Name      | Functionality                     |
 | ------------------ | --------------------------------- |
 | `oem()`            | Main fitting function             |
-| `predict.oemfit()` | Prediction for oem objects        |
-| `plot.oemfit()`    | Plotting for oem objects          |
-| `logLik.oemfit()`  | log Likelihood for oem objects    |
+| `oem.xtx()`            | Fitting function for precomputed $X'X,X'y$            |
+| `big.oem()`            | Fitting function for `big.matrix()` objects            |
+| `summary.oemfit()` | Summary for `oem` objects        |
+| `predict.oemfit()` | Prediction for `oem` objects        |
+| `plot.oemfit()`    | Plotting for `oem` objects          |
+| `logLik.oemfit()`  | log Likelihood for `oem` objects    |
 | `cv.oem()`         | Cross-validation function         |
-| `predict.cv.oem()` | Prediction for cv.oem objects     |
-| `plot.cv.oem()`    | Plotting for cv.oem objects       |
+| `xval.oem()`       | Fast cross-validation for linear models         |
+| `summary.cv.oem()` | Summary for `cv.oem` objects        |
+| `predict.cv.oem()` | Prediction for `cv.oem` objects     |
+| `plot.cv.oem()`    | Plotting for `cv.oem` objects       |
 | `logLik.cv.oem()`  | log Likelihood for cv.oem objects |
 
 ## Available Penalties

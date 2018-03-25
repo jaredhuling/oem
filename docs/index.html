@@ -71,26 +71,6 @@
     
 <div class="contents">
 
-<div id="build-status" class="section level3">
-<h3 class="hasAnchor">
-<a href="#build-status" class="anchor"></a>Build Status</h3>
-<table class="table">
-<thead><tr class="header">
-<th>OS</th>
-<th>Build</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>Linux x86_64 / OSX</td>
-<td><a href="https://travis-ci.org/jaredhuling/oem"><img src="https://travis-ci.org/jaredhuling/oem.svg?branch=master" alt="Build Status"></a></td>
-</tr>
-<tr class="even">
-<td>Windows x86_64</td>
-<td><a href="https://ci.appveyor.com/project/jaredhuling/oem"><img src="https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&amp;svg=true" alt="Appveyor Build Status"></a></td>
-</tr>
-</tbody>
-</table>
-</div>
 <div id="introduction" class="section level2">
 <h2 class="hasAnchor">
 <a href="#introduction" class="anchor"></a>Introduction</h2>
@@ -141,8 +121,8 @@
 <a class="sourceLine" id="cb2-27" data-line-number="27">)</a></code></pre></div>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.404996 7.626360 7.613271 7.643734 7.664847 7.726419     5
-##     oem[lasso] 1.950725 1.950832 2.063677 1.986783 2.029415 2.400629     5</code></pre>
+##  glmnet[lasso] 7.429503 8.055928 8.815527 9.131126 9.711068 9.750009     5
+##     oem[lasso] 2.271290 2.280109 2.351006 2.307637 2.389022 2.506972     5</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># difference of results</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) <span class="op">-</span><span class="st"> </span>res2<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -231,21 +211,21 @@
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1755.8269 1772.4765 1837.3882 1821.1315 1889.0121
-##        oem[mcp]  157.4592  157.6999  167.1782  157.7497  166.2452
-##     ncvreg[mcp] 7245.5077 7271.4719 7283.3588 7278.7947 7305.6199
-##       plus[mcp] 1594.3395 1649.3974 1707.5828 1691.9616 1795.0026
-##       oem[scad]  134.8600  138.0594  146.7684  138.6697  151.7288
-##    ncvreg[scad] 7333.8266 7501.7850 7820.6758 7784.9163 7996.5003
-##      plus[scad] 1709.9537 1745.7256 1933.0473 1804.1325 2105.4075
+##  sparsenet[mcp] 1768.4332 1792.0756 1834.4874 1809.6884 1873.0690
+##        oem[mcp]  157.8511  160.5610  177.7539  163.5488  183.2020
+##     ncvreg[mcp] 7328.7665 7700.7153 8063.2957 8046.7787 8054.6920
+##       plus[mcp] 1727.1216 1750.2118 1871.0026 1832.1095 2007.7890
+##       oem[scad]  192.7649  201.5047  223.6131  213.9962  222.4511
+##    ncvreg[scad] 7624.0411 7712.9474 7998.7590 7734.3536 8251.6751
+##      plus[scad] 1737.7618 1750.0894 1943.2980 1787.6810 2172.4114
 ##        max neval
-##  1948.4939     5
-##   196.7371     5
-##  7315.3999     5
-##  1807.2130     5
-##   170.5242     5
-##  8486.3508     5
-##  2300.0174     5</code></pre>
+##  1929.1707     5
+##   223.6069     5
+##  9185.5262     5
+##  2037.7811     5
+##   287.3487     5
+##  8670.7780     5
+##  2268.5465     5</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,</a>
@@ -304,16 +284,16 @@
 <a class="sourceLine" id="cb13-39" data-line-number="39">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb13-40" data-line-number="40">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr        min         lq       mean    median        uq
-##   gglasso[grp.lasso] 3342.95729 3395.20868 3420.74834 3430.7749 3456.3803
-##       oem[grp.lasso]   98.82842   99.22237   99.73008  100.1034  100.2286
-##  grplasso[grp.lasso] 6711.16199 7177.38984 7314.51607 7251.8555 7298.9464
-##    grpreg[grp.lasso] 1864.67219 1867.60233 1986.29117 1906.5744 1974.0002
+##                 expr       min        lq      mean    median        uq
+##   gglasso[grp.lasso] 3558.2834 3592.1763 3880.8377 3742.4437 3811.5386
+##       oem[grp.lasso]  103.1705  114.7817  161.9626  173.2143  194.0857
+##  grplasso[grp.lasso] 6978.1904 7148.6798 7420.6973 7209.7607 7773.8033
+##    grpreg[grp.lasso] 1924.1875 2087.1979 2565.6125 2360.4532 2634.3086
 ##        max neval
-##  3478.4205     5
-##   100.2676     5
-##  8133.2266     5
-##  2318.6067     5</code></pre>
+##  4699.7466     5
+##   224.5606     5
+##  7993.0522     5
+##  3821.9150     5</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)</a>
@@ -343,7 +323,7 @@
 <a class="sourceLine" id="cb17-16" data-line-number="16">                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span></a>
 <a class="sourceLine" id="cb17-17" data-line-number="17">                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.55    0.20    3.79</code></pre>
+##    3.12    0.14    3.31</code></pre>
 </div>
 </div>
 <div id="fitting-multiple-penalties" class="section level3">
@@ -380,11 +360,11 @@
 <a class="sourceLine" id="cb19-28" data-line-number="28">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 254.0234 255.0651 271.1903 270.3075 283.6342
-##  oem[lasso/mcp/scad/ols] 253.2295 253.6945 290.0519 274.8375 329.9728
+##               oem[lasso] 207.7601 211.4083 211.7765 211.6586 213.5944
+##  oem[lasso/mcp/scad/ols] 249.9441 253.9290 256.7916 256.7530 261.5056
 ##       max neval
-##  292.9216     5
-##  338.5252     5</code></pre>
+##  214.4612     5
+##  261.8261     5</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co">#</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"></a>
@@ -421,6 +401,12 @@
 <li>GPL (&gt;= 2)</li>
 </ul>
 </div>
+<div class="citation">
+<h2>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html">Citing oem</a></li>
+</ul>
+</div>
 <div class="developers">
 <h2>Developers</h2>
 <ul class="list-unstyled">
@@ -434,6 +420,8 @@
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://cran.r-project.org/package=oem"><img src="http://www.r-pkg.org/badges/version/oem" alt="version"></a></li>
+<li><a href="https://travis-ci.org/jaredhuling/oem"><img src="https://travis-ci.org/jaredhuling/oem.svg?branch=master" alt="Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/jaredhuling/oem"><img src="https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&amp;svg=true" alt="Appveyor Build Status"></a></li>
 </ul>
 </div>
 </div>

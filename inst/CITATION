@@ -1,0 +1,31 @@
+citHeader("To cite oem in publications use:")
+
+citEntry(, 
+  entry        = "Article",
+  author       = "Shifeng Xiong and Bin Dai and Jared Huling and Peter Z. G. Qian",
+  title        = "Orthogonalizing EM: A design-based least squares algorithm",
+  journal      = "Technometrics",
+  year         = "2016",
+  volume       = "58",
+  pages        = "285--293",
+  doi          = "10.1080/00401706.2015.1054436",
+  url          = "https://doi.org/10.1080/00401706.2015.1054436",
+  textVersion  = paste("Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) ",
+      "Orthogonalizing EM: A design-based least squares algorithm, ",
+      "Technometrics, Volume 58, Pages 285-293,",
+      "http://dx.doi.org/10.1080/00401706.2015.1054436.")
+)
+
+citEntry(, 
+  entry        = "Article",
+  author       = "Jared D. Huling and Peter Chien",
+  title        = "Fast Penalized Regression and Cross Validation for Tall Data with the oem Package",
+  journal      = "Journal of Statistical Software",
+  year         = "2018",
+  note         = "To appear",
+  url          = "https://arxiv.org/abs/1801.09661",
+  textVersion  = paste("Huling, J.D., Chien, P. (2018) ",
+      "Fast Penalized Regression and Cross Validation for Tall Data with the oem Package, ",
+      "Journal of Statistical Software, to appear,",
+      "URL: https://arxiv.org/abs/1801.09661.")
+)
