@@ -86,9 +86,9 @@
 <p>Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) Orthogonalizing EM: A design-based least squares algorithm, Technometrics, Volume 58, Pages 285-293,<br><a href="http://dx.doi.org/10.1080/00401706.2015.1054436" class="uri">http://dx.doi.org/10.1080/00401706.2015.1054436</a>.</p>
 <p>Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross Validation for Tall Data with the OEM Package, Journal of Statistical Software, to appear, URL: <a href="https://arxiv.org/abs/1801.09661" class="uri">https://arxiv.org/abs/1801.09661</a>.</p>
 </div>
-<div id="models" class="section level2">
+<div id="penalties" class="section level2">
 <h2 class="hasAnchor">
-<a href="#models" class="anchor"></a>Models</h2>
+<a href="#penalties" class="anchor"></a>Penalties</h2>
 <div id="lasso" class="section level3">
 <h3 class="hasAnchor">
 <a href="#lasso" class="anchor"></a>Lasso</h3>
@@ -121,8 +121,8 @@
 <a class="sourceLine" id="cb2-27" data-line-number="27">)</a></code></pre></div>
 <pre><code>## Unit: seconds
 ##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.429503 8.055928 8.815527 9.131126 9.711068 9.750009     5
-##     oem[lasso] 2.271290 2.280109 2.351006 2.307637 2.389022 2.506972     5</code></pre>
+##  glmnet[lasso] 7.759672 8.161684 8.532638 8.409030 9.076335 9.256468     5
+##     oem[lasso] 2.303121 2.313267 2.395584 2.410177 2.448850 2.502506     5</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># difference of results</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) <span class="op">-</span><span class="st"> </span>res2<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -211,21 +211,21 @@
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1768.4332 1792.0756 1834.4874 1809.6884 1873.0690
-##        oem[mcp]  157.8511  160.5610  177.7539  163.5488  183.2020
-##     ncvreg[mcp] 7328.7665 7700.7153 8063.2957 8046.7787 8054.6920
-##       plus[mcp] 1727.1216 1750.2118 1871.0026 1832.1095 2007.7890
-##       oem[scad]  192.7649  201.5047  223.6131  213.9962  222.4511
-##    ncvreg[scad] 7624.0411 7712.9474 7998.7590 7734.3536 8251.6751
-##      plus[scad] 1737.7618 1750.0894 1943.2980 1787.6810 2172.4114
+##  sparsenet[mcp] 1873.0075 1935.2129 2040.9020 2018.9411 2133.2424
+##        oem[mcp]  173.7662  201.0871  204.0613  210.9544  216.0536
+##     ncvreg[mcp] 8114.2007 8622.6090 8802.2905 8935.7932 9098.8091
+##       plus[mcp] 1703.2846 1705.1565 2028.2589 1913.5869 2300.5436
+##       oem[scad]  137.7981  140.5439  165.5125  182.1263  182.4966
+##    ncvreg[scad] 8562.4897 8614.5552 9081.4637 9089.8884 9401.0993
+##      plus[scad] 1807.2932 1822.6552 2522.4374 2502.0830 3108.3029
 ##        max neval
-##  1929.1707     5
-##   223.6069     5
-##  9185.5262     5
-##  2037.7811     5
-##   287.3487     5
-##  8670.7780     5
-##  2268.5465     5</code></pre>
+##  2244.1060     5
+##   218.4453     5
+##  9240.0406     5
+##  2518.7228     5
+##   184.5977     5
+##  9739.2858     5
+##  3371.8529     5</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,</a>
@@ -240,9 +240,10 @@
 ## MCP:  oem and plus   2.684136e-11
 ## SCAD: oem and plus   1.732409e-11</code></pre>
 </div>
-<div id="group-lasso" class="section level3">
+<div id="group-penalties" class="section level3">
 <h3 class="hasAnchor">
-<a href="#group-lasso" class="anchor"></a>Group Lasso</h3>
+<a href="#group-penalties" class="anchor"></a>Group Penalties</h3>
+<p>In addition to the group lasso, the oem package offers computation for the group MCP, group SCAD, and group sparse lasso penalties. All aforementioned penalties can also be augmented with a ridge penalty.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">library</span>(gglasso)</a>
 <a class="sourceLine" id="cb13-2" data-line-number="2"><span class="kw">library</span>(grpreg)</a>
 <a class="sourceLine" id="cb13-3" data-line-number="3"><span class="kw">library</span>(grplasso)</a>
@@ -284,16 +285,16 @@
 <a class="sourceLine" id="cb13-39" data-line-number="39">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb13-40" data-line-number="40">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr       min        lq      mean    median        uq
-##   gglasso[grp.lasso] 3558.2834 3592.1763 3880.8377 3742.4437 3811.5386
-##       oem[grp.lasso]  103.1705  114.7817  161.9626  173.2143  194.0857
-##  grplasso[grp.lasso] 6978.1904 7148.6798 7420.6973 7209.7607 7773.8033
-##    grpreg[grp.lasso] 1924.1875 2087.1979 2565.6125 2360.4532 2634.3086
+##                 expr        min        lq      mean   median        uq
+##   gglasso[grp.lasso] 3336.06794 3372.6636 3459.1743 3483.110 3548.9352
+##       oem[grp.lasso]   98.64013  104.7013  105.6078  105.177  105.8579
+##  grplasso[grp.lasso] 6800.37421 6966.6782 7204.8363 7278.925 7478.6854
+##    grpreg[grp.lasso] 1885.03669 1972.2172 2045.1390 1992.293 2088.5747
 ##        max neval
-##  4699.7466     5
-##   224.5606     5
-##  7993.0522     5
-##  3821.9150     5</code></pre>
+##  3555.0943     5
+##   113.6626     5
+##  7499.5188     5
+##  2287.5733     5</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)</a>
@@ -314,16 +315,17 @@
 <a class="sourceLine" id="cb17-7" data-line-number="7">y &lt;-<span class="st"> </span><span class="kw">drop</span>(x <span class="op">%*%</span><span class="st"> </span>b) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)</a>
 <a class="sourceLine" id="cb17-8" data-line-number="8">groups &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">floor</span>(p<span class="op">/</span><span class="dv">10</span>), <span class="dt">each =</span> <span class="dv">10</span>)</a>
 <a class="sourceLine" id="cb17-9" data-line-number="9"></a>
-<a class="sourceLine" id="cb17-10" data-line-number="10">grp.penalties &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>, <span class="st">"grp.scad"</span>, </a>
-<a class="sourceLine" id="cb17-11" data-line-number="11">                   <span class="st">"grp.mcp.net"</span>, <span class="st">"grp.scad.net"</span>,</a>
-<a class="sourceLine" id="cb17-12" data-line-number="12">                   <span class="st">"sparse.group.lasso"</span>)</a>
-<a class="sourceLine" id="cb17-13" data-line-number="13"><span class="kw">system.time</span>(res &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, </a>
-<a class="sourceLine" id="cb17-14" data-line-number="14">                       <span class="dt">penalty =</span> grp.penalties,</a>
-<a class="sourceLine" id="cb17-15" data-line-number="15">                       <span class="dt">groups  =</span> groups,</a>
-<a class="sourceLine" id="cb17-16" data-line-number="16">                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span></a>
-<a class="sourceLine" id="cb17-17" data-line-number="17">                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></a></code></pre></div>
+<a class="sourceLine" id="cb17-10" data-line-number="10"><span class="co"># fit all group penalties at once</span></a>
+<a class="sourceLine" id="cb17-11" data-line-number="11">grp.penalties &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"grp.lasso"</span>, <span class="st">"grp.mcp"</span>, <span class="st">"grp.scad"</span>, </a>
+<a class="sourceLine" id="cb17-12" data-line-number="12">                   <span class="st">"grp.mcp.net"</span>, <span class="st">"grp.scad.net"</span>,</a>
+<a class="sourceLine" id="cb17-13" data-line-number="13">                   <span class="st">"sparse.group.lasso"</span>)</a>
+<a class="sourceLine" id="cb17-14" data-line-number="14"><span class="kw">system.time</span>(res &lt;-<span class="st"> </span><span class="kw"><a href="reference/oem.html">oem</a></span>(x, y, </a>
+<a class="sourceLine" id="cb17-15" data-line-number="15">                       <span class="dt">penalty =</span> grp.penalties,</a>
+<a class="sourceLine" id="cb17-16" data-line-number="16">                       <span class="dt">groups  =</span> groups,</a>
+<a class="sourceLine" id="cb17-17" data-line-number="17">                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span></a>
+<a class="sourceLine" id="cb17-18" data-line-number="18">                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.12    0.14    3.31</code></pre>
+##    3.29    0.17    3.54</code></pre>
 </div>
 </div>
 <div id="fitting-multiple-penalties" class="section level3">
@@ -360,11 +362,11 @@
 <a class="sourceLine" id="cb19-28" data-line-number="28">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 207.7601 211.4083 211.7765 211.6586 213.5944
-##  oem[lasso/mcp/scad/ols] 249.9441 253.9290 256.7916 256.7530 261.5056
+##               oem[lasso] 222.8869 224.8886 229.8559 227.4627 234.1854
+##  oem[lasso/mcp/scad/ols] 263.6928 270.2818 277.8220 272.5559 276.1437
 ##       max neval
-##  214.4612     5
-##  261.8261     5</code></pre>
+##  239.8558     5
+##  306.4358     5</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co">#</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"></a>
