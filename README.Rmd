@@ -41,7 +41,7 @@ Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross Validatio
     with the OEM Package, Journal of Statistical Software, to appear, URL: 
     https://arxiv.org/abs/1801.09661. 
 
-## Models
+## Penalties
 
 ### Lasso
 
@@ -165,7 +165,9 @@ diffs
 
 
 
-### Group Lasso
+### Group Penalties
+
+In addition to the group lasso, the oem package offers computation for the group MCP, group SCAD, and group sparse lasso penalties. All aforementioned penalties can also be augmented with a ridge penalty.
 
 ```{r group, message = FALSE, warning = FALSE}
 library(gglasso)
@@ -230,6 +232,7 @@ x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 groups <- rep(1:floor(p/10), each = 10)
 
+# fit all group penalties at once
 grp.penalties <- c("grp.lasso", "grp.mcp", "grp.scad", 
                    "grp.mcp.net", "grp.scad.net",
                    "sparse.group.lasso")

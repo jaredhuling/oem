@@ -1,12 +1,9 @@
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
-
-### Build Status
-
-| OS                  | Build                                                                                                                                                                  |
-| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Linux x86\_64 / OSX | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)                                                      |
-| Windows x86\_64     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem) |
+[![Build
+Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)
+[![Appveyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)
 
 ## Introduction
 
@@ -25,7 +22,20 @@ devtools::install_github("jaredhuling/oem")
 
 or by cloning and building using `R CMD INSTALL`
 
-## Models
+## Citation
+
+To cite oem please use:
+
+Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) Orthogonalizing
+EM: A design-based least squares algorithm, Technometrics, Volume 58,
+Pages 285-293,  
+<http://dx.doi.org/10.1080/00401706.2015.1054436>.
+
+Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross
+Validation for Tall Data with the OEM Package, Journal of Statistical
+Software, to appear, URL: <https://arxiv.org/abs/1801.09661>.
+
+## Penalties
 
 ### Lasso
 
@@ -61,8 +71,8 @@ microbenchmark(
 
     ## Unit: seconds
     ##           expr      min       lq     mean   median       uq      max neval
-    ##  glmnet[lasso] 7.440743 7.447395 7.747722 7.551486 7.613698 8.685287     5
-    ##     oem[lasso] 1.958371 1.958397 2.030689 1.961159 1.975121 2.300396     5
+    ##  glmnet[lasso] 7.610364 7.622585 7.879448 7.667767 7.945518 8.551005     5
+    ##     oem[lasso] 1.969916 2.027118 2.133341 2.089135 2.126875 2.453660     5
 
 ``` r
 # difference of results
@@ -150,22 +160,14 @@ microbenchmark(
 ```
 
     ## Unit: milliseconds
-    ##            expr       min        lq      mean    median        uq
-    ##  sparsenet[mcp] 1781.3474 1795.5607 1972.0889 1898.6168 2091.9188
-    ##        oem[mcp]  161.5994  162.6565  165.3022  165.5735  166.0121
-    ##     ncvreg[mcp] 7170.5933 8386.3088 8605.6697 8511.9816 8557.9524
-    ##       plus[mcp] 1661.7881 1672.9392 1740.7073 1678.9892 1817.3182
-    ##       oem[scad]  136.5101  137.3331  139.6136  137.3635  137.5628
-    ##    ncvreg[scad] 8052.8620 8162.1654 8247.8753 8222.6007 8317.8704
-    ##      plus[scad] 1782.0859 1806.7236 2162.2228 2041.9774 2329.9171
-    ##         max neval
-    ##   2293.0009     5
-    ##    170.6695     5
-    ##  10401.5125     5
-    ##   1872.5020     5
-    ##    149.2985     5
-    ##   8483.8781     5
-    ##   2850.4098     5
+    ##            expr       min        lq      mean    median        uq      max
+    ##  sparsenet[mcp] 1762.3026 1779.0533 1907.9942 1871.4751 1954.0494 2173.091
+    ##        oem[mcp]  159.3148  159.6247  194.6605  160.0044  238.3018  256.057
+    ##     ncvreg[mcp] 7566.5792 7636.3529 7900.8602 7681.1292 7907.0934 8713.146
+    ##       plus[mcp] 1625.3785 1692.9125 1703.2951 1694.1239 1711.7150 1792.346
+    ##       oem[scad]  136.1331  136.3932  138.6294  137.1140  138.2907  145.216
+    ##    ncvreg[scad] 7485.8139 8060.6739 8534.4502 8388.1125 8779.2423 9958.408
+    ##      plus[scad] 1765.2935 1873.8984 2009.8369 1878.5176 2097.5155 2433.959
 
 ``` r
 diffs <- array(NA, dim = c(4, 1))
@@ -184,7 +186,11 @@ diffs
     ## MCP:  oem and plus   2.684136e-11
     ## SCAD: oem and plus   1.732409e-11
 
-### Group Lasso
+### Group Penalties
+
+In addition to the group lasso, the oem package offers computation for
+the group MCP, group SCAD, and group sparse lasso penalties. All
+aforementioned penalties can also be augmented with a ridge penalty.
 
 ``` r
 library(gglasso)
@@ -230,16 +236,16 @@ microbenchmark(
 ```
 
     ## Unit: milliseconds
-    ##                 expr       min        lq      mean    median        uq
-    ##   gglasso[grp.lasso] 3584.7379 3631.2507 4129.3979 3942.3034 4511.4096
-    ##       oem[grp.lasso]  110.0432  113.5345  122.9799  115.4253  132.8513
-    ##  grplasso[grp.lasso] 7528.9735 7678.8419 8652.0709 7840.2965 8539.7128
-    ##    grpreg[grp.lasso] 1915.9051 2013.3947 2313.3978 2208.1039 2452.0606
-    ##         max neval
-    ##   4977.2881     5
-    ##    143.0452     5
-    ##  11672.5298     5
-    ##   2977.5246     5
+    ##                 expr        min       lq      mean    median        uq
+    ##   gglasso[grp.lasso] 3483.62353 3529.320 3601.1492 3600.3122 3675.7521
+    ##       oem[grp.lasso]   99.62382  100.823  107.9303  106.6158  114.8208
+    ##  grplasso[grp.lasso] 7105.62106 7409.959 7835.5972 7836.2535 7977.5347
+    ##    grpreg[grp.lasso] 1972.84562 2013.477 2132.7026 2015.0525 2149.0820
+    ##        max neval
+    ##  3716.7380     5
+    ##   117.7679     5
+    ##  8848.6178     5
+    ##  2513.0563     5
 
 ``` r
 diffs <- array(NA, dim = c(2, 1))
@@ -265,6 +271,7 @@ x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 groups <- rep(1:floor(p/10), each = 10)
 
+# fit all group penalties at once
 grp.penalties <- c("grp.lasso", "grp.mcp", "grp.scad", 
                    "grp.mcp.net", "grp.scad.net",
                    "sparse.group.lasso")
@@ -276,7 +283,7 @@ system.time(res <- oem(x, y,
 ```
 
     ##    user  system elapsed 
-    ##    3.26    0.22    3.54
+    ##    3.23    0.17    3.46
 
 ### Fitting Multiple Penalties
 
@@ -316,11 +323,11 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##                     expr      min       lq     mean   median       uq
-    ##               oem[lasso] 209.7527 209.8486 225.8205 215.7640 216.5487
-    ##  oem[lasso/mcp/scad/ols] 259.0799 263.1141 274.3198 265.2685 286.3861
+    ##               oem[lasso] 214.3171 218.2459 225.8759 219.6271 226.8682
+    ##  oem[lasso/mcp/scad/ols] 253.8738 255.8601 279.3674 272.4458 276.6489
     ##       max neval
-    ##  277.1885     5
-    ##  297.7507     5
+    ##  250.3211     5
+    ##  338.0085     5
 
 ``` r
 #png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()
