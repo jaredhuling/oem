@@ -31,17 +31,20 @@ reference:
 
   - title: Plotting
     contents:
-    - check.overlap
-    - starts_with("plot")
+    - plot.oem
+    - plot.cv.oem
+    - plot.xval.oem
 
   - title: Summarizing
     contents:
     - starts_with("summar")
-    - starts_with("print")
+    - print.summary.cv.oem
 
   - title: Predicting
     contents:
-    - starts_with("predict")
+    - predict.oem
+    - predict.cv.oem
+    - predict.xval.oem
 
   - title: Deprecated
     contents:
@@ -50,4 +53,4 @@ reference:
 
   - title: Utilities
     contents:
-    - logLik
+    - starts_with("logLik")

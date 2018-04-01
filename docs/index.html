@@ -135,9 +135,9 @@
 <a class="sourceLine" id="cb2-26" data-line-number="26">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb2-27" data-line-number="27">)</a></code></pre></div>
 <pre><code>## Unit: seconds
-##           expr      min       lq      mean    median       uq       max
-##  glmnet[lasso] 9.195956 9.408628 10.046357 10.169540 10.34893 11.108734
-##     oem[lasso] 2.429123 2.447966  2.596305  2.543138  2.68941  2.871887
+##           expr      min      lq      mean    median        uq      max
+##  glmnet[lasso] 9.348672 9.38828 11.638270 12.080791 13.265859 14.10775
+##     oem[lasso] 2.652288 3.10888  3.872852  3.451426  4.429786  5.72188
 ##  neval
 ##      5
 ##      5</code></pre>
@@ -229,21 +229,21 @@
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 2140.9757 2187.3806 2328.0461 2367.2423 2391.8542
-##        oem[mcp]  194.4682  203.6908  211.7043  209.5416  217.5449
-##     ncvreg[mcp] 8668.2675 8743.1243 8917.3225 8937.6722 9102.4979
-##       plus[mcp] 2087.8867 2093.8887 2210.6794 2241.2011 2295.9101
-##       oem[scad]  169.9534  175.9625  178.5809  176.0848  183.5387
-##    ncvreg[scad] 9071.9152 9169.9700 9316.9526 9182.1433 9299.7695
-##      plus[scad] 2317.6977 2386.1783 2723.2890 2541.7474 2906.2526
+##  sparsenet[mcp] 2190.2603 2229.8939 2352.8026 2257.4280 2464.9714
+##        oem[mcp]  189.4601  200.9284  208.1295  207.6121  212.3561
+##     ncvreg[mcp] 8678.2871 9032.7411 9155.7129 9057.6076 9260.1797
+##       plus[mcp] 2147.4707 2149.8849 2183.5159 2169.1367 2187.5362
+##       oem[scad]  159.3547  167.8190  181.3854  171.0642  182.4713
+##    ncvreg[scad] 9079.8976 9269.4556 9311.4232 9332.3771 9405.5469
+##      plus[scad] 2611.3499 2790.3159 2934.2532 2967.3169 3097.7322
 ##        max neval
-##  2552.7776     5
-##   233.2760     5
-##  9135.0507     5
-##  2334.5103     5
-##   187.3652     5
-##  9860.9652     5
-##  3464.5692     5</code></pre>
+##  2621.4595     5
+##   230.2906     5
+##  9749.7491     5
+##  2263.5511     5
+##   226.2177     5
+##  9469.8389     5
+##  3204.5509     5</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,</a>
@@ -303,16 +303,16 @@
 <a class="sourceLine" id="cb13-39" data-line-number="39">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb13-40" data-line-number="40">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr       min        lq      mean    median       uq
-##   gglasso[grp.lasso] 3911.9941 3977.1427 4043.1084 4001.5584 4017.654
-##       oem[grp.lasso]  121.2333  126.2382  136.1924  130.8906  142.306
-##  grplasso[grp.lasso] 8799.1928 8844.2947 9108.6635 8975.1529 9362.578
-##    grpreg[grp.lasso] 2288.8475 2382.1101 2478.5798 2411.4861 2461.169
-##        max neval
-##  4307.1925     5
-##   160.2942     5
-##  9562.0997     5
-##  2849.2869     5</code></pre>
+##                 expr       min        lq       mean    median         uq
+##   gglasso[grp.lasso] 4213.0698 4235.5627  4464.0790 4427.5890  4546.2656
+##       oem[grp.lasso]  122.5265  151.8338   155.6852  164.9955   165.7759
+##  grplasso[grp.lasso] 9010.8600 9224.9403 10376.0763 9640.6276 10956.3353
+##    grpreg[grp.lasso] 2436.6968 2542.1362  2693.5194 2700.2787  2851.1327
+##         max neval
+##   4897.9079     5
+##    173.2944     5
+##  13047.6184     5
+##   2937.3528     5</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)</a>
@@ -343,7 +343,7 @@
 <a class="sourceLine" id="cb17-17" data-line-number="17">                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span></a>
 <a class="sourceLine" id="cb17-18" data-line-number="18">                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.86    0.24    4.33</code></pre>
+##    4.03    0.23    4.57</code></pre>
 </div>
 </div>
 <div id="fitting-multiple-penalties" class="section level3">
@@ -380,11 +380,11 @@
 <a class="sourceLine" id="cb19-28" data-line-number="28">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 309.1480 315.4579 316.7939 316.5734 318.3127
-##  oem[lasso/mcp/scad/ols] 377.0658 384.7027 394.3853 393.7399 407.7775
+##               oem[lasso] 263.5128 266.2448 270.2931 266.6826 268.7175
+##  oem[lasso/mcp/scad/ols] 319.3591 323.0294 326.5360 326.9471 330.2104
 ##       max neval
-##  324.4777     5
-##  408.6408     5</code></pre>
+##  286.3077     5
+##  333.1339     5</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co">#</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"></a>

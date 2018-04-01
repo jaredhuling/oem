@@ -286,11 +286,11 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
 <span class='fu'>system.time</span>(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='oem.html'>oem</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                        <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.05    0.00    0.05 </div><div class='input'>
+#&gt;    0.03    0.00    0.03 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                              <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                              <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.37    0.00    0.39 </div><div class='input'>
+#&gt;    0.47    0.00    0.49 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit2</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                               <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>,
                                           <span class='st'>"mcp"</span>,       <span class='st'>"scad"</span>,
@@ -299,7 +299,7 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
                                           <span class='st'>"grp.mcp"</span>,   <span class='st'>"grp.scad"</span>,
                                           <span class='st'>"sparse.grp.lasso"</span>),
                               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    1.84    0.00    1.87 </div><div class='input'>
+#&gt;    2.01    0.00    2.06 </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
