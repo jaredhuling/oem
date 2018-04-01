@@ -62,17 +62,32 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../articles/oem_vignette.html">Intro</a>
+  <a href="../index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/oem_vignette.html">Usage of the oem Package</a>
+    </li>
+  </ul>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jaredhuling/oem">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -271,11 +286,11 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
 <span class='fu'>system.time</span>(<span class='no'>fit</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='oem.html'>oem</a></span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                        <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.02    0.03    0.05 </div><div class='input'>
+#&gt;    0.05    0.00    0.05 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                              <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                              <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.32    0.00    0.32 </div><div class='input'>
+#&gt;    0.37    0.00    0.39 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>xfit2</span> <span class='kw'>&lt;-</span> <span class='fu'>xval.oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>x</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>y</span>,
                               <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>,
                                           <span class='st'>"mcp"</span>,       <span class='st'>"scad"</span>,
@@ -284,7 +299,7 @@ to <code>TRUE</code> will dramatically increase computational time</p></td>
                                           <span class='st'>"grp.mcp"</span>,   <span class='st'>"grp.scad"</span>,
                                           <span class='st'>"sparse.grp.lasso"</span>),
                               <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>)))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    1.44    0.03    1.47 </div><div class='input'>
+#&gt;    1.84    0.00    1.87 </div><div class='input'>
 </div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

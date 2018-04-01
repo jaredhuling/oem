@@ -41,16 +41,31 @@
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
 <li>
-  <a href="articles/oem_vignette.html">Intro</a>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/oem_vignette.html">Usage of the oem Package</a>
+    </li>
+  </ul>
 </li>
 <li>
-  <a href="reference/index.html">Reference</a>
+  <a href="reference/index.html">Functions</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/jaredhuling/oem">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -120,9 +135,12 @@
 <a class="sourceLine" id="cb2-26" data-line-number="26">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb2-27" data-line-number="27">)</a></code></pre></div>
 <pre><code>## Unit: seconds
-##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 7.759672 8.161684 8.532638 8.409030 9.076335 9.256468     5
-##     oem[lasso] 2.303121 2.313267 2.395584 2.410177 2.448850 2.502506     5</code></pre>
+##           expr      min       lq      mean    median       uq       max
+##  glmnet[lasso] 9.195956 9.408628 10.046357 10.169540 10.34893 11.108734
+##     oem[lasso] 2.429123 2.447966  2.596305  2.543138  2.68941  2.871887
+##  neval
+##      5
+##      5</code></pre>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># difference of results</span></a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw">max</span>(<span class="kw">abs</span>(<span class="kw">coef</span>(res1) <span class="op">-</span><span class="st"> </span>res2<span class="op">$</span>beta[[<span class="dv">1</span>]]))</a></code></pre></div>
 <pre><code>## [1] 1.048072e-07</code></pre>
@@ -211,21 +229,21 @@
 ## Warning message: some lam not reached by the plus path and dropped</code></pre>
 <pre><code>## Unit: milliseconds
 ##            expr       min        lq      mean    median        uq
-##  sparsenet[mcp] 1873.0075 1935.2129 2040.9020 2018.9411 2133.2424
-##        oem[mcp]  173.7662  201.0871  204.0613  210.9544  216.0536
-##     ncvreg[mcp] 8114.2007 8622.6090 8802.2905 8935.7932 9098.8091
-##       plus[mcp] 1703.2846 1705.1565 2028.2589 1913.5869 2300.5436
-##       oem[scad]  137.7981  140.5439  165.5125  182.1263  182.4966
-##    ncvreg[scad] 8562.4897 8614.5552 9081.4637 9089.8884 9401.0993
-##      plus[scad] 1807.2932 1822.6552 2522.4374 2502.0830 3108.3029
+##  sparsenet[mcp] 2140.9757 2187.3806 2328.0461 2367.2423 2391.8542
+##        oem[mcp]  194.4682  203.6908  211.7043  209.5416  217.5449
+##     ncvreg[mcp] 8668.2675 8743.1243 8917.3225 8937.6722 9102.4979
+##       plus[mcp] 2087.8867 2093.8887 2210.6794 2241.2011 2295.9101
+##       oem[scad]  169.9534  175.9625  178.5809  176.0848  183.5387
+##    ncvreg[scad] 9071.9152 9169.9700 9316.9526 9182.1433 9299.7695
+##      plus[scad] 2317.6977 2386.1783 2723.2890 2541.7474 2906.2526
 ##        max neval
-##  2244.1060     5
-##   218.4453     5
-##  9240.0406     5
-##  2518.7228     5
-##   184.5977     5
-##  9739.2858     5
-##  3371.8529     5</code></pre>
+##  2552.7776     5
+##   233.2760     5
+##  9135.0507     5
+##  2334.5103     5
+##   187.3652     5
+##  9860.9652     5
+##  3464.5692     5</code></pre>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb11-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb11-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"MCP:  oem and ncvreg"</span>, <span class="st">"SCAD: oem and ncvreg"</span>,</a>
@@ -285,16 +303,16 @@
 <a class="sourceLine" id="cb13-39" data-line-number="39">    <span class="dt">times =</span> <span class="dv">5</span></a>
 <a class="sourceLine" id="cb13-40" data-line-number="40">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
-##                 expr        min        lq      mean   median        uq
-##   gglasso[grp.lasso] 3336.06794 3372.6636 3459.1743 3483.110 3548.9352
-##       oem[grp.lasso]   98.64013  104.7013  105.6078  105.177  105.8579
-##  grplasso[grp.lasso] 6800.37421 6966.6782 7204.8363 7278.925 7478.6854
-##    grpreg[grp.lasso] 1885.03669 1972.2172 2045.1390 1992.293 2088.5747
+##                 expr       min        lq      mean    median       uq
+##   gglasso[grp.lasso] 3911.9941 3977.1427 4043.1084 4001.5584 4017.654
+##       oem[grp.lasso]  121.2333  126.2382  136.1924  130.8906  142.306
+##  grplasso[grp.lasso] 8799.1928 8844.2947 9108.6635 8975.1529 9362.578
+##    grpreg[grp.lasso] 2288.8475 2382.1101 2478.5798 2411.4861 2461.169
 ##        max neval
-##  3555.0943     5
-##   113.6626     5
-##  7499.5188     5
-##  2287.5733     5</code></pre>
+##  4307.1925     5
+##   160.2942     5
+##  9562.0997     5
+##  2849.2869     5</code></pre>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1">diffs &lt;-<span class="st"> </span><span class="kw">array</span>(<span class="ot">NA</span>, <span class="dt">dim =</span> <span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb15-2" data-line-number="2"><span class="kw">colnames</span>(diffs) &lt;-<span class="st"> "abs diff"</span></a>
 <a class="sourceLine" id="cb15-3" data-line-number="3"><span class="kw">rownames</span>(diffs) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">"oem and gglasso"</span>, <span class="st">"oem and grplasso"</span>)</a>
@@ -325,7 +343,7 @@
 <a class="sourceLine" id="cb17-17" data-line-number="17">                       <span class="dt">alpha   =</span> <span class="fl">0.25</span>, <span class="co"># mixing param for l2 penalties</span></a>
 <a class="sourceLine" id="cb17-18" data-line-number="18">                       <span class="dt">tau     =</span> <span class="fl">0.5</span>)) <span class="co"># mixing param for sparse grp lasso </span></a></code></pre></div>
 <pre><code>##    user  system elapsed 
-##    3.29    0.17    3.54</code></pre>
+##    3.86    0.24    4.33</code></pre>
 </div>
 </div>
 <div id="fitting-multiple-penalties" class="section level3">
@@ -362,11 +380,11 @@
 <a class="sourceLine" id="cb19-28" data-line-number="28">)</a></code></pre></div>
 <pre><code>## Unit: milliseconds
 ##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 222.8869 224.8886 229.8559 227.4627 234.1854
-##  oem[lasso/mcp/scad/ols] 263.6928 270.2818 277.8220 272.5559 276.1437
+##               oem[lasso] 309.1480 315.4579 316.7939 316.5734 318.3127
+##  oem[lasso/mcp/scad/ols] 377.0658 384.7027 394.3853 393.7399 407.7775
 ##       max neval
-##  239.8558     5
-##  306.4358     5</code></pre>
+##  324.4777     5
+##  408.6408     5</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1"><span class="co">#png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()</span></a>
 <a class="sourceLine" id="cb21-2" data-line-number="2"><span class="co">#</span></a>
 <a class="sourceLine" id="cb21-3" data-line-number="3"></a>

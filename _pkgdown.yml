@@ -1,6 +1,53 @@
+
+
 navbar:
+  type: default
   left:
-  - text: Intro
-    href: articles/oem_vignette.html
-  - text: Reference
-    href: reference/index.html
+    - icon: fa-home
+      href: index.html
+    - text: "Vignettes"
+      href: articles/oem_vignette.html
+      menu:
+      - text: Usage of the oem Package
+        href: articles/oem_vignette.html
+    - text: "Functions"
+      href: reference/index.html
+  right:
+   - icon: fa-github
+     href: https://github.com/jaredhuling/oem
+     
+
+reference:
+  - title: Fitting Functions
+    contents:
+    - oem
+    - big.oem
+    - oem.xtx
+    
+  - title: Cross Validation Functions
+    contents:
+    - cv.oem
+    - xval.oem
+
+  - title: Plotting
+    contents:
+    - check.overlap
+    - starts_with("plot")
+
+  - title: Summarizing
+    contents:
+    - starts_with("summar")
+    - starts_with("print")
+
+  - title: Predicting
+    contents:
+    - starts_with("predict")
+
+  - title: Deprecated
+    contents:
+    - oemfit
+    - cv.oemfit
+
+  - title: Utilities
+    contents:
+    - logLik
