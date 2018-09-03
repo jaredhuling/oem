@@ -1,46 +1,45 @@
----
-output:
-  html_document:
-    keep_md: yes
-    self_contained: true
----
 
 [![version](http://www.r-pkg.org/badges/version/oem)](https://cran.r-project.org/package=oem)
-
-### Build Status
-|  OS             | Build           |
-|-----------------|-----------------|
-| Linux x86_64 / OSX   | [![Build Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)      | 
-| Windows x86_64     | [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)     |
-
-
-
-
-
-
-
-
-
+[![Build
+Status](https://travis-ci.org/jaredhuling/oem.svg?branch=master)](https://travis-ci.org/jaredhuling/oem)
+[![Appveyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branch=master&svg=true)](https://ci.appveyor.com/project/jaredhuling/oem)
 
 ## Introduction
 
-The oem package provides estimaton for various penalized linear models using the [Orthogonalizing EM algorithm](http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436). Documentation for the package can be found here: [oem site](http://casualinference.org/oem) (still under construction).
+The oem package provides estimaton for various penalized linear models
+using the [Orthogonalizing EM
+algorithm](http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436).
+Documentation for the package can be found here: [oem
+site](http://jaredhuling.org/oem).
 
-Install using the **devtools** package (RcppEigen must be installed first as well):
+Install using the **devtools** package (RcppEigen must be installed
+first as well):
 
-
-```r
+``` r
 devtools::install_github("jaredhuling/oem")
 ```
 
 or by cloning and building using `R CMD INSTALL`
 
-## Models
+## Citation
+
+To cite oem please use:
+
+Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) Orthogonalizing
+EM: A design-based least squares algorithm, Technometrics, Volume 58,
+Pages 285-293,  
+<http://dx.doi.org/10.1080/00401706.2015.1054436>.
+
+Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross
+Validation for Tall Data with the OEM Package, Journal of Statistical
+Software, to appear, URL: <https://arxiv.org/abs/1801.09661>.
+
+## Penalties
 
 ### Lasso
 
-
-```r
+``` r
 library(microbenchmark)
 library(glmnet)
 library(oem)
@@ -70,23 +69,19 @@ microbenchmark(
 )
 ```
 
-```
-## Unit: seconds
-##           expr      min       lq     mean   median       uq      max neval
-##  glmnet[lasso] 8.454950 8.925667 9.183843 9.255825 9.351194 9.931580     5
-##     oem[lasso] 2.456566 2.640007 2.754852 2.881469 2.884303 2.911914     5
-```
+    ## Unit: seconds
+    ##           expr      min       lq     mean   median       uq      max neval
+    ##  glmnet[lasso] 7.610364 7.622585 7.879448 7.667767 7.945518 8.551005     5
+    ##     oem[lasso] 1.969916 2.027118 2.133341 2.089135 2.126875 2.453660     5
 
-```r
+``` r
 # difference of results
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
-```
-## [1] 1.048072e-07
-```
+    ## [1] 1.048072e-07
 
-```r
+``` r
 res1 <- glmnet(x, y, thresh = 1e-12, 
                standardize = FALSE,
                intercept = TRUE,
@@ -96,14 +91,11 @@ res1 <- glmnet(x, y, thresh = 1e-12,
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
-```
-## [1] 3.763397e-09
-```
+    ## [1] 3.763397e-09
 
 ### Nonconvex Penalties
 
-
-```r
+``` r
 library(sparsenet)
 library(ncvreg)
 library(plus)
@@ -167,40 +159,17 @@ microbenchmark(
 )
 ```
 
-```
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-## Warning message: some lam not reached by the plus path and dropped
-```
+    ## Unit: milliseconds
+    ##            expr       min        lq      mean    median        uq      max
+    ##  sparsenet[mcp] 1762.3026 1779.0533 1907.9942 1871.4751 1954.0494 2173.091
+    ##        oem[mcp]  159.3148  159.6247  194.6605  160.0044  238.3018  256.057
+    ##     ncvreg[mcp] 7566.5792 7636.3529 7900.8602 7681.1292 7907.0934 8713.146
+    ##       plus[mcp] 1625.3785 1692.9125 1703.2951 1694.1239 1711.7150 1792.346
+    ##       oem[scad]  136.1331  136.3932  138.6294  137.1140  138.2907  145.216
+    ##    ncvreg[scad] 7485.8139 8060.6739 8534.4502 8388.1125 8779.2423 9958.408
+    ##      plus[scad] 1765.2935 1873.8984 2009.8369 1878.5176 2097.5155 2433.959
 
-```
-## Unit: milliseconds
-##            expr       min        lq      mean    median         uq
-##  sparsenet[mcp] 2320.8100 2352.9517 2458.7722 2392.4679  2517.0486
-##        oem[mcp]  189.3625  212.6236  233.1697  226.6125   267.3957
-##     ncvreg[mcp] 8129.6092 8555.1828 9115.0166 8886.1990  9958.1984
-##       plus[mcp] 2099.2994 2500.4747 2554.6303 2589.2470  2756.9943
-##       oem[scad]  137.4814  139.5355  184.2794  187.5250   220.8466
-##    ncvreg[scad] 8808.6070 9585.5057 9916.8835 9804.8729 10375.9077
-##      plus[scad] 2304.6635 2496.2100 2617.9396 2539.4899  2831.3368
-##         max neval
-##   2710.5826     5
-##    269.8545     5
-##  10045.8938     5
-##   2827.1361     5
-##    236.0083     5
-##  11009.5241     5
-##   2917.9977     5
-```
-
-```r
+``` r
 diffs <- array(NA, dim = c(4, 1))
 colnames(diffs) <- "abs diff"
 rownames(diffs) <- c("MCP:  oem and ncvreg", "SCAD: oem and ncvreg",
@@ -211,20 +180,19 @@ diffs[,1] <- c(max(abs(res2$beta[[1]] - res3$beta)), max(abs(res5$beta[[1]] - re
 diffs
 ```
 
-```
-##                          abs diff
-## MCP:  oem and ncvreg 1.725859e-07
-## SCAD: oem and ncvreg 5.094648e-08
-## MCP:  oem and plus   2.684136e-11
-## SCAD: oem and plus   1.732409e-11
-```
+    ##                          abs diff
+    ## MCP:  oem and ncvreg 1.725859e-07
+    ## SCAD: oem and ncvreg 5.094648e-08
+    ## MCP:  oem and plus   2.684136e-11
+    ## SCAD: oem and plus   1.732409e-11
 
+### Group Penalties
 
+In addition to the group lasso, the oem package offers computation for
+the group MCP, group SCAD, and group sparse lasso penalties. All
+aforementioned penalties can also be augmented with a ridge penalty.
 
-### Group Lasso
-
-
-```r
+``` r
 library(gglasso)
 library(grpreg)
 library(grplasso)
@@ -267,21 +235,19 @@ microbenchmark(
 )
 ```
 
-```
-## Unit: milliseconds
-##                 expr       min        lq     mean    median        uq
-##   gglasso[grp.lasso] 4004.4774 4086.1746 4108.586 4103.6553 4126.2035
-##       oem[grp.lasso]  112.8335  114.3252  125.083  118.6199  120.8217
-##  grplasso[grp.lasso] 7816.4330 8224.7857 9044.954 8851.7595 9250.1811
-##    grpreg[grp.lasso] 2253.6705 2319.5918 2431.038 2379.3103 2565.8449
-##         max neval
-##   4222.4212     5
-##    158.8146     5
-##  11081.6107     5
-##   2636.7702     5
-```
+    ## Unit: milliseconds
+    ##                 expr        min       lq      mean    median        uq
+    ##   gglasso[grp.lasso] 3483.62353 3529.320 3601.1492 3600.3122 3675.7521
+    ##       oem[grp.lasso]   99.62382  100.823  107.9303  106.6158  114.8208
+    ##  grplasso[grp.lasso] 7105.62106 7409.959 7835.5972 7836.2535 7977.5347
+    ##    grpreg[grp.lasso] 1972.84562 2013.477 2132.7026 2015.0525 2149.0820
+    ##        max neval
+    ##  3716.7380     5
+    ##   117.7679     5
+    ##  8848.6178     5
+    ##  2513.0563     5
 
-```r
+``` r
 diffs <- array(NA, dim = c(2, 1))
 colnames(diffs) <- "abs diff"
 rownames(diffs) <- c("oem and gglasso", "oem and grplasso")
@@ -289,16 +255,13 @@ diffs[,1] <- c(  max(abs(res2$beta[[1]][-1,] - res1$beta)), max(abs(res2$beta[[1
 diffs
 ```
 
-```
-##                      abs diff
-## oem and gglasso  1.303906e-06
-## oem and grplasso 1.645871e-08
-```
+    ##                      abs diff
+    ## oem and gglasso  1.303906e-06
+    ## oem and grplasso 1.645871e-08
 
 #### Bigger Group Lasso Example
 
-
-```r
+``` r
 set.seed(123)
 n <- 500000
 p <- 200
@@ -308,6 +271,7 @@ x <- matrix(rnorm(n * p, sd = 3), n, p)
 y <- drop(x %*% b) + rnorm(n)
 groups <- rep(1:floor(p/10), each = 10)
 
+# fit all group penalties at once
 grp.penalties <- c("grp.lasso", "grp.mcp", "grp.scad", 
                    "grp.mcp.net", "grp.scad.net",
                    "sparse.group.lasso")
@@ -318,17 +282,15 @@ system.time(res <- oem(x, y,
                        tau     = 0.5)) # mixing param for sparse grp lasso 
 ```
 
-```
-##    user  system elapsed 
-##    3.62    0.17    4.03
-```
+    ##    user  system elapsed 
+    ##    3.23    0.17    3.46
 
 ### Fitting Multiple Penalties
 
-The oem algorithm is quite efficient at fitting multiple penalties simultaneously when p is not too big.
+The oem algorithm is quite efficient at fitting multiple penalties
+simultaneously when p is not too big.
 
-
-```r
+``` r
 set.seed(123)
 n <- 100000
 p <- 100
@@ -359,17 +321,15 @@ microbenchmark(
 )
 ```
 
-```
-## Unit: milliseconds
-##                     expr      min       lq     mean   median       uq
-##               oem[lasso] 213.7904 219.6538 226.4532 219.8930 237.8327
-##  oem[lasso/mcp/scad/ols] 259.2121 260.7772 267.5143 268.8317 271.7456
-##       max neval
-##  241.0959     5
-##  277.0047     5
-```
+    ## Unit: milliseconds
+    ##                     expr      min       lq     mean   median       uq
+    ##               oem[lasso] 214.3171 218.2459 225.8759 219.6271 226.8682
+    ##  oem[lasso/mcp/scad/ols] 253.8738 255.8601 279.3674 272.4458 276.6489
+    ##       max neval
+    ##  250.3211     5
+    ##  338.0085     5
 
-```r
+``` r
 #png("../mcp_path.png", width = 3000, height = 3000, res = 400);par(mar=c(5.1,5.1,4.1,2.1));plot(res2, which.model = 2, main = "mcp",lwd = 3,cex.axis=2.0, cex.lab=2.0, cex.main=2.0, cex.sub=2.0);dev.off()
 #
 

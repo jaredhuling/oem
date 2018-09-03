@@ -2,12 +2,12 @@
 ## Update for 'oem'
 
 * Vignette update
-* Fixes gcc / clang errors arising from BigMatrix/FileBackedBigMatrix pointer confusion issues
+* The clang-UBSAN gcc-UBSAN warnings appear to be not due to any issue with bigmemory, but with the tests not allowing inheritance of classes. See here https://github.com/kaneplusplus/bigmemory/issues/73#issuecomment-362330232
 
 ## Test environments
 
-* local Windows 7 x64 install, (R 3.4.2, r74185 R-devel)
-* Ubuntu 14.04 LTS (on travis-ci), (R 3.4.2, R-patch)
+* local Windows 7 x64 install, (R 3.4.2, r74446 R-devel)
+* Ubuntu 14.04.5 LTS (on travis-ci), (R 3.4.4, R-patch)
 
 ## R CMD check results
 

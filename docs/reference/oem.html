@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Orthogonalizing EM � oem • oem</title>
+<title>Orthogonalizing EM — oem • oem</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -18,13 +18,19 @@
 <!-- Font Awesome icons -->
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
 
+<!-- clipboard.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/1.7.1/clipboard.min.js" integrity="sha384-cV+rhyOuRHc9Ub/91rihWcGmMmCXDeksTtCihMupQHSsi8GIIRDG0ThDc3HGQFJ3" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
 <script src="../jquery.sticky-kit.min.js"></script>
 <script src="../pkgdown.js"></script>
-  
-  
+<meta property="og:title" content="Orthogonalizing EM — oem" />
+
+<meta property="og:description" content="Orthogonalizing EM" />
+<meta name="twitter:card" content="summary" />
+
+
 <!-- mathjax -->
 <script src='https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
@@ -47,22 +53,41 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="../index.html">oem</a>
+      <span class="navbar-brand">
+        <a class="navbar-link" href="../index.html">oem</a>
+        <span class="label label-default" data-toggle="tooltip" data-placement="bottom" title="Released package">2.0.8</span>
+      </span>
     </div>
+
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="../articles/oem_vignette.html">Intro</a>
+  <a href="../index.html">
+    <span class="fa fa-home"></span>
+     
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Vignettes
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/oem_vignette.html">Usage of the oem Package</a>
+    </li>
+  </ul>
 </li>
 <li>
-  <a href="../reference/index.html">Reference</a>
+  <a href="../reference/index.html">Functions</a>
 </li>
       </ul>
       
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/jaredhuling/oem">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fa fa-github"></span>
      
   </a>
 </li>
@@ -78,6 +103,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Orthogonalizing EM</h1>
+    <small>Source: <a href='https://github.com/jaredhuling/oem/blob/master/R/oem.R'><code>R/oem.R</code></a></small>
     </div>
 
     
@@ -95,7 +121,7 @@
   <span class='kw'>accelerate</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>ncores</span> <span class='kw'>=</span> -<span class='fl'>1</span>, <span class='kw'>compute.loss</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
   <span class='kw'>hessian.type</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"upper.bound"</span>, <span class='st'>"full"</span>))</pre>
     
-    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a> Arguments</h2>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
@@ -267,7 +293,7 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
 <span class='fu'>layout</span>(<span class='fu'>matrix</span>(<span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>3</span>))
 <span class='fu'>plot</span>(<span class='no'>fit</span>)
 <span class='fu'>plot</span>(<span class='no'>fit</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='fu'>plot</span>(<span class='no'>fit</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='st'>"sparse.grp.lasso"</span>)</div><div class='img'><img src='oem-1.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>fit</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='st'>"sparse.grp.lasso"</span>)</div><div class='img'><img src='oem-1.png' alt='' width='700' height='433' /></div><div class='input'>
 <span class='co'># the oem package has support for</span>
 <span class='co'># sparse design matrices</span>
 
@@ -281,7 +307,7 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
                        <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>), <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
                        <span class='kw'>standardize</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.44    0.03    0.48 </div><div class='input'>
+#&gt;    0.50    0.08    0.60 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>fits</span> <span class='kw'>&lt;-</span> <span class='fu'>oem</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='no'>xs</span>, <span class='kw'>y</span> <span class='kw'>=</span> <span class='no'>ys</span>,
                         <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"lasso"</span>, <span class='st'>"grp.lasso"</span>),
                         <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>20</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>), <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
@@ -297,11 +323,11 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
                        <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>10</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>5</span>),
                        <span class='kw'>nlambda</span> <span class='kw'>=</span> <span class='fl'>10</span>,
                        <span class='kw'>irls.tol</span> <span class='kw'>=</span> <span class='fl'>1e-3</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-8</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.14    0.00    0.14 </div><div class='input'>
+#&gt;    0.16    0.00    0.17 </div><div class='input'>
 <span class='fu'>layout</span>(<span class='fu'>matrix</span>(<span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>ncol</span> <span class='kw'>=</span> <span class='fl'>3</span>))
 <span class='fu'>plot</span>(<span class='no'>res</span>)
 <span class='fu'>plot</span>(<span class='no'>res</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='fl'>2</span>)
-<span class='fu'>plot</span>(<span class='no'>res</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='st'>"mcp"</span>)</div><div class='img'><img src='oem-2.png' alt='' width='700' height='432.632880098887' /></div><div class='input'>
+<span class='fu'>plot</span>(<span class='no'>res</span>, <span class='kw'>which.model</span> <span class='kw'>=</span> <span class='st'>"mcp"</span>)</div><div class='img'><img src='oem-2.png' alt='' width='700' height='433' /></div><div class='input'>
 
 <span class='co'># sparse design matrix</span>
 <span class='no'>xs</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://www.rdocumentation.org/packages/Matrix/topics/rsparsematrix'>rsparsematrix</a></span>(<span class='no'>n.obs</span> * <span class='fl'>2</span>, <span class='no'>n.vars</span>, <span class='kw'>density</span> <span class='kw'>=</span> <span class='fl'>0.01</span>)
@@ -314,14 +340,14 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
                           <span class='kw'>nlambda</span> <span class='kw'>=</span> <span class='fl'>10</span>,
                           <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>10</span>),
                           <span class='kw'>irls.tol</span> <span class='kw'>=</span> <span class='fl'>1e-3</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-8</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.06    0.00    0.08 </div><div class='input'>
+#&gt;    0.19    0.02    0.21 </div><div class='input'>
 <span class='fu'>system.time</span>(<span class='no'>res.gr.s</span> <span class='kw'>&lt;-</span> <span class='fu'>oem</span>(<span class='no'>xs</span>, <span class='no'>ys</span>, <span class='kw'>intercept</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
                             <span class='kw'>penalty</span> <span class='kw'>=</span> <span class='st'>"grp.lasso"</span>,
                             <span class='kw'>family</span> <span class='kw'>=</span> <span class='st'>"binomial"</span>,
                             <span class='kw'>nlambda</span> <span class='kw'>=</span> <span class='fl'>10</span>,
                             <span class='kw'>groups</span> <span class='kw'>=</span> <span class='fu'>rep</span>(<span class='fl'>1</span>:<span class='fl'>5</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>10</span>),
                             <span class='kw'>irls.tol</span> <span class='kw'>=</span> <span class='fl'>1e-3</span>, <span class='kw'>tol</span> <span class='kw'>=</span> <span class='fl'>1e-8</span>))</div><div class='output co'>#&gt;    user  system elapsed 
-#&gt;    0.05    0.00    0.05 </div><div class='input'>
+#&gt;    0.04    0.00    0.07 </div><div class='input'>
 <span class='fu'>max</span>(<span class='fu'>abs</span>(<span class='no'>res.gr</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]] - <span class='no'>res.gr.s</span>$<span class='no'>beta</span><span class='kw'>[[</span><span class='fl'>1</span>]]))</div><div class='output co'>#&gt; [1] 1.134368e-05</div><div class='input'>
 </div></pre>
   </div>
@@ -354,3 +380,4 @@ EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. 
 
   </body>
 </html>
+

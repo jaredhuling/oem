@@ -93,47 +93,35 @@ plot(fit1)
 
 ## Available functions
 
-+--------------------+-----------------------------------+
+
 | Function Name      | Functionality                     |
-+====================+===================================+
+| ------------------ | --------------------------------- |
 | `oem()`            | Main fitting function             |
-+--------------------+-----------------------------------+
-| `predict.oemfit()` | Prediction for oem objects        |
-+--------------------+-----------------------------------+
-| `plot.oemfit()`    | Plotting for oem objects          |
-+--------------------+-----------------------------------+
-| `logLik.oemfit()`  | log Likelihood for oem objects    |
-+--------------------+-----------------------------------+
+| `oem.xtx()`            | Fitting function for precomputed $X'X,X'y$            |
+| `big.oem()`            | Fitting function for `big.matrix()` objects            |
+| `summary.oemfit()` | Summary for `oem` objects        |
+| `predict.oemfit()` | Prediction for `oem` objects        |
+| `plot.oemfit()`    | Plotting for `oem` objects          |
+| `logLik.oemfit()`  | log Likelihood for `oem` objects    |
 | `cv.oem()`         | Cross-validation function         |
-+--------------------+-----------------------------------+
-| `predict.cv.oem()` | Prediction for cv.oem objects     |
-+--------------------+-----------------------------------+
-| `plot.cv.oem()`    | Plotting for cv.oem objects       |
-+--------------------+-----------------------------------+
+| `xval.oem()`       | Fast cross-validation for linear models         |
+| `summary.cv.oem()` | Summary for `cv.oem` objects        |
+| `predict.cv.oem()` | Prediction for `cv.oem` objects     |
+| `plot.cv.oem()`    | Plotting for `cv.oem` objects       |
 | `logLik.cv.oem()`  | log Likelihood for cv.oem objects |
-+--------------------+-----------------------------------+
 
 ## Available Penalties
 
-+--------------------+--------------------+--------------------------+
 | Penalty            | Option Name        |  Penalty Form            |
-+====================+===============================================+
+| ------------------ | ------------------ | ------------------------ |
 | Lasso              | `lasso`            | $\lambda \sum_{j = 1}^pd_j|\beta_j|$ |
-+--------------------+--------------------+--------------------------+
 | Elastic Net        | `elastic.net`      | $\lambda \sum_{j = 1}^p\alpha d_j|\beta_j| + \frac{1}{2}(1 - \alpha)\lambda \sum_{j = 1}^pd_j\beta_j^2$ |
-+--------------------+--------------------+--------------------------+
 | MCP                | `mcp`              | $\lambda \sum_{j = 1}^pd_j \int_0^{\beta_j}(1 - x/(\gamma\lambda d_j))_+\mathrm{d}x$ |
-+--------------------+--------------------+--------------------------+
 | SCAD               | `scad`             | $\sum_{j = 1}^p p^{SCAD}_{\lambda d_j,\gamma}(\beta_j)$               |
-+--------------------+--------------------+--------------------------+
 | Group Lasso        | `grp.lasso`        | $\lambda \sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}$ |
-+--------------------+--------------------+--------------------------+
 | Group MCP          | `grp.mcp`          | $\lambda \sum_{k = 1}^Gp^{MCP}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)$ |
-+--------------------+--------------------+--------------------------+
 | Group SCAD         | `grp.scad`         | $\lambda \sum_{k = 1}^Gp^{SCAD}_{\lambda d_k,\gamma}(||\boldsymbol\beta_{g_k}||_2)$ |
-+--------------------+--------------------+--------------------------+
 | Sparse Group Lasso | `sparse.grp.lasso` | $\lambda \alpha\sum_{j = 1}^pd_j|\beta_j| + \lambda (1-\alpha)\sum_{k = 1}^Gd_k\sqrt{\sum_{j \in g_k}\beta_j^2}$ |
-+--------------------+--------------------+--------------------------+
 
 where $||\boldsymbol\beta_{g_k}||_2 = \sqrt{\sum_{j \in g_k}\beta_j^2}$,
 \[ p_{\lambda, \gamma}^{SCAD}(\beta) =   \left\{
@@ -163,13 +151,10 @@ $$
 
 The following models are available currently. 
 
-+---------------------+--------------------+--------------------------+
 | Model               | Option Name        |  Loss Form               |
-+=====================+===============================================+
+| ------------------- | ------------------ | ------------------------ |
 | Linear Regression   | `gaussian`         | $\frac{1}{2n}\sum_{i=1}^n(y_i - x_i^T\beta) ^ 2$ |
-+---------------------+--------------------+--------------------------+
 | Logistic Regression | `binomial`         |  $-\frac{1}{n}\sum_{i=1}^n\left[y_i x_i^T\beta - \log (1 + \exp\{ x_i^T\beta \} ) \right]$|
-+---------------------+--------------------+--------------------------+
 
 There are plans to include support for multiple responses, binomial models (not just logistic regression), Cox's proportional hazards model, and more if requested.
 
@@ -299,23 +284,16 @@ system.time(ofit1 <- oem(x = xc, y = yc, penalty = "lasso",
 
 A variety of evaluation metrics can be used for cross validation. The available metrics can be found in the table below
 
-+-----------------------+------------------------------------+--------------------------+
 | Model                 | Metric                             |  `type.measure=`         |
-+=======================+====================================+==========================+
+| --------------------- | ---------------------------------- | ------------------------ |
 | **Linear Regression** | Mean squared error                 |     `mse` or `deviance`  |
-+-----------------------+------------------------------------+--------------------------+
 |                       | Mean absolute error                |     `mae`                |
-+-----------------------+------------------------------------+--------------------------+
+| --------------------- | ---------------------------------- | ------------------------ |
 |**Logistic Regression**| Deviance                           |     `deviance`           |
-+-----------------------+------------------------------------+--------------------------+
 |                       | Area under the ROC curve           |     `auc`                |
-+-----------------------+------------------------------------+--------------------------+
 |                       | Misclassification Rate             |     `class`              |
-+-----------------------+------------------------------------+--------------------------+
 |                       | Mean squared error of fitted mean  |     `mse`                |
-+-----------------------+------------------------------------+--------------------------+
 |                       | Mean absolute error of fitted mean |     `mae`                |
-+-----------------------+------------------------------------+--------------------------+
 
 Consider a binary outcome setting with logistic regression. 
 
@@ -517,7 +495,7 @@ plot(fit.adaptive.grp)
 For further information about `oem`,
 please visit:
 
-  * The oem site:        [casualinference.org/oem](http://casualinference.org/oem)
+  * The oem site:        [jaredhuling.org/oem](http://jaredhuling.github.io/oem)
   * The oem source code: [github.com/jaredhuling/oem](https://github.com/jaredhuling/oem)
   * The oem paper:       [oem paper](http://www.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436)
 
