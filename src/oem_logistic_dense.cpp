@@ -186,6 +186,8 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
     double ilambda = 0.0;
     
     std::string elasticnettxt(".net");
+    std::string scadtxt("scad");
+    std::string mcptxt("mcp");
 
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
@@ -196,6 +198,10 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
         
         bool is_net_pen = penalty[pp].find(elasticnettxt) != std::string::npos;
         
+        bool is_mcp_pen = penalty[pp].find(mcptxt) != std::string::npos;
+        
+        bool is_scad_pen = penalty[pp].find(scadtxt) != std::string::npos;
+        
         if (provided_lambda)
         {
             lambda_tmp = lambda[pp];
@@ -204,6 +210,14 @@ RcppExport SEXP oem_fit_logistic_dense(SEXP x_,
             if (is_net_pen)
             {
                 lambda_tmp = (lambda_base.array() / alpha).matrix(); // * n; // 
+                
+                // manual adjustment factor for mcp/scad (and .net versions)
+                if (is_mcp_pen || is_scad_pen)
+                {
+                    double pen_ncv_fact = 3.5 - std::min(3.5, gamma) * 5.71425 / 8.0;
+                    lambda_tmp = (pen_ncv_fact * lambda_base.array() / std::pow(alpha, 0.8)  ).matrix();
+                }
+                
             } else
             {
                 lambda_tmp = lambda_base; // * n; // 
