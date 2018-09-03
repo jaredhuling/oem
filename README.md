@@ -7,7 +7,7 @@ Status](https://ci.appveyor.com/api/projects/status/github/jaredhuling/oem?branc
 
 ## Introduction
 
-The oem package provides estimaton for various penalized linear models
+The oem package provides estimation for various penalized linear models
 using the [Orthogonalizing EM
 algorithm](http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436).
 Documentation for the package can be found here: [oem
