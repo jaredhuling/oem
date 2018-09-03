@@ -161,6 +161,12 @@ xval.oem <- function(x,
     }
     
     dims <- dim(x)
+    
+    if (is.null(dims))
+    {
+        stop("x must have at least two columns")
+    }
+    
     n <- dims[1]
     p <- dims[2]
     
@@ -169,6 +175,11 @@ xval.oem <- function(x,
         stop("number of observations must be greater than the number of variables
              for xval, use cv.oem instead, or, preferably, use another package such as
              glmnet for the lasso, ncvreg for MCP/SCAD, or grpreg or gglasso for group lasso.")
+    }
+    
+    if (p < 2)
+    {
+        stop("x must have at least two columns")
     }
     
     if (is.null(foldid)) 

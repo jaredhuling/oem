@@ -148,6 +148,11 @@ oem.xtx <- function(xtx,
     
     dims <- dim(xtx)
     
+    if (is.null(dims))
+    {
+        stop("xtx must be a matrix")
+    }
+    
     if (dims[1] != dims[2]) stop("xtx must be a square matrix equal to X'X. do NOT provide design matrix")
     
     p <- dims[2]
@@ -158,6 +163,11 @@ oem.xtx <- function(xtx,
     if(inherits(xtx, "sparseMatrix"))
     {
         stop("Sparse matrices not allowed")
+    }
+    
+    if (p < 2)
+    {
+        stop("xtx must have at least two columns")
     }
     
     if (family == "binomial") stop("binomial not implemented yet")

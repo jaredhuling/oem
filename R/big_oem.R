@@ -155,10 +155,21 @@ big.oem <- function(x,
     if (family == "binomial") stop("binomial case not implemented yet")
     
     dims   <- dim(x)
+    
+    if (is.null(dims))
+    {
+        stop("x must have at least two columns")
+    }
+    
     n      <- dims[1]
     p      <- dims[2]
     y      <- drop(y)
     y.vals <- unique(y)
+    
+    if (p < 2)
+    {
+        stop("x must have at least two columns")
+    }
     
     if (length(weights) > 0) stop("weights not implemented yet.")
     

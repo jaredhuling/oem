@@ -503,7 +503,7 @@ protected:
         int ncv = 4;
         if (XX.cols() < 4)
         {
-            ncv = XX.cols() - 1;
+            ncv = XX.cols();
         }
         
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, ncv);
