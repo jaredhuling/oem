@@ -5,11 +5,11 @@
 \title{Cross validation for Orthogonalizing EM}
 \usage{
 cv.oem(x, y, penalty = c("elastic.net", "lasso", "ols", "mcp", "scad",
-  "mcp.net", "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
-  "grp.mcp.net", "grp.scad.net", "sparse.grp.lasso"), weights = numeric(0),
-  lambda = NULL, type.measure = c("mse", "deviance", "class", "auc", "mae"),
-  nfolds = 10, foldid = NULL, grouped = TRUE, keep = FALSE,
-  parallel = FALSE, ncores = -1, ...)
+  "mcp.net", "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp",
+  "grp.scad", "grp.mcp.net", "grp.scad.net", "sparse.grp.lasso"),
+  weights = numeric(0), lambda = NULL, type.measure = c("mse",
+  "deviance", "class", "auc", "mae"), nfolds = 10, foldid = NULL,
+  grouped = TRUE, keep = FALSE, parallel = FALSE, ncores = -1, ...)
 }
 \arguments{
 \item{x}{input matrix of dimension n x p or \code{CsparseMatrix} objects of the \pkg{Matrix} (sparse not yet implemented. 

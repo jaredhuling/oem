@@ -4,15 +4,16 @@
 \alias{big.oem}
 \title{Orthogonalizing EM for big.matrix objects}
 \usage{
-big.oem(x, y, family = c("gaussian", "binomial"), penalty = c("elastic.net",
-  "lasso", "ols", "mcp", "scad", "mcp.net", "scad.net", "grp.lasso",
-  "grp.lasso.net", "grp.mcp", "grp.scad", "grp.mcp.net", "grp.scad.net",
-  "sparse.grp.lasso"), weights = numeric(0), lambda = numeric(0),
-  nlambda = 100L, lambda.min.ratio = NULL, alpha = 1, gamma = 3,
-  tau = 0.5, groups = numeric(0), penalty.factor = NULL,
-  group.weights = NULL, standardize = TRUE, intercept = TRUE,
-  maxit = 500L, tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001,
-  compute.loss = FALSE, gigs = 4, hessian.type = c("full", "upper.bound"))
+big.oem(x, y, family = c("gaussian", "binomial"),
+  penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "mcp.net",
+  "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
+  "grp.mcp.net", "grp.scad.net", "sparse.grp.lasso"),
+  weights = numeric(0), lambda = numeric(0), nlambda = 100L,
+  lambda.min.ratio = NULL, alpha = 1, gamma = 3, tau = 0.5,
+  groups = numeric(0), penalty.factor = NULL, group.weights = NULL,
+  standardize = TRUE, intercept = TRUE, maxit = 500L, tol = 1e-07,
+  irls.maxit = 100L, irls.tol = 0.001, compute.loss = FALSE,
+  gigs = 4, hessian.type = c("full", "upper.bound"))
 }
 \arguments{
 \item{x}{input big.matrix object pointing to design matrix 

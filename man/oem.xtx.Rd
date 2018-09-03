@@ -7,11 +7,12 @@
 oem.xtx(xtx, xty, family = c("gaussian", "binomial"),
   penalty = c("elastic.net", "lasso", "ols", "mcp", "scad", "mcp.net",
   "scad.net", "grp.lasso", "grp.lasso.net", "grp.mcp", "grp.scad",
-  "grp.mcp.net", "grp.scad.net", "sparse.grp.lasso"), lambda = numeric(0),
-  nlambda = 100L, lambda.min.ratio = NULL, alpha = 1, gamma = 3,
-  tau = 0.5, groups = numeric(0), scale.factor = numeric(0),
-  penalty.factor = NULL, group.weights = NULL, maxit = 500L,
-  tol = 1e-07, irls.maxit = 100L, irls.tol = 0.001)
+  "grp.mcp.net", "grp.scad.net", "sparse.grp.lasso"),
+  lambda = numeric(0), nlambda = 100L, lambda.min.ratio = NULL,
+  alpha = 1, gamma = 3, tau = 0.5, groups = numeric(0),
+  scale.factor = numeric(0), penalty.factor = NULL,
+  group.weights = NULL, maxit = 500L, tol = 1e-07,
+  irls.maxit = 100L, irls.tol = 0.001)
 }
 \arguments{
 \item{xtx}{input matrix equal to \code{crossprod(x) / nrow(x)}. 
