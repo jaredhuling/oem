@@ -186,7 +186,7 @@ RcppExport SEXP oem_fit_logistic_sparse(SEXP x_,
     
     std::string elasticnettxt(".net");
     std::string scadtxt("scad");
-    std::string mcptxt("mcp");
+    std::string mcptxt("mcp"); 
 
     for (unsigned int pp = 0; pp < penalty.size(); pp++)
     {
