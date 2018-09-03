@@ -614,7 +614,13 @@ protected:
         XX /= nobs;
         
         Spectra::DenseSymMatProd<double> op(XX);
-        Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
+        int ncv = 4;
+        if (XX.cols() < 4)
+        {
+            ncv = XX.cols() - 1;
+        }
+        
+        Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, ncv);
         
         eigs.init();
         eigs.compute(10000, 1e-10);

@@ -217,6 +217,11 @@ oem <- function(x,
         warning("oem() is optimized for n >> p settings and may be very slow when p > n")
     }
     
+    if (p < 2)
+    {
+        stop("x must have at least two columns")
+    }
+    
     y <- drop(y)
     y.vals <- unique(y)
     is.sparse <- FALSE

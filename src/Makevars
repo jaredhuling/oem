@@ -6,7 +6,19 @@
 
 
 PKG_CXXFLAGS = -DNDEBUG
-PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
-PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+#PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
+#PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
+PKG_LIBS =  $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
 
 CXX_STD = CXX11
+
+## For macosx:
+#CC=/usr/local/opt/llvm/bin/clang
+#CXX=/usr/local/opt/llvm/bin/clang++
+#CXX11=/usr/local/opt/llvm/bin/clang++
+#CXX1X=/usr/local/opt/llvm/bin/clang++
+
+#And add runtime and headers
+#LDFLAGS    = -L/usr/local/opt/llvm/lib
+#CPPFLAGS   = -I/usr/local/opt/llvm/include
