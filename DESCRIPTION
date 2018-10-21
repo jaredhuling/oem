@@ -4,7 +4,8 @@ Title: Orthogonalizing EM: Penalized Regression for Big Tall Data
 Version: 2.0.9
 Authors@R: c(
     person("Bin", "Dai", , "bdai@uwalumni.com", role = c("aut")),
-    person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre")),
+    person("Jared", "Huling", , "jaredhuling@gmail.com", c("aut", "cre"),
+            comment = c(ORCID = "0000-0003-0670-4845")),
     person("Yixuan", "Qiu", , , c("ctb")),
     person("Gael", "Guennebaud", , , c("cph")),
     person("Jitse", "Niesen", , , c("cph"))
