@@ -2,6 +2,7 @@
 ## Update for 'oem'
 
 * Fixes error for datasets with p < 4
+* Fixes makevars problem pointed out by Prof Ripley
 * The clang-UBSAN gcc-UBSAN warnings appear to be not due to any issue with bigmemory, but with the tests not allowing inheritance of classes. See here https://github.com/kaneplusplus/bigmemory/issues/73#issuecomment-362330232
 
 ## Test environments
