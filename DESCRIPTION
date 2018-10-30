@@ -23,6 +23,7 @@ URL:
     https://jaredhuling.github.io/oem
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
+Encoding: UTF-8
 LazyData: TRUE
 Depends:
     R (>= 3.2.0),
