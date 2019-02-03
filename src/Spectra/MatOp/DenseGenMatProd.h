@@ -1,8 +1,8 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
-// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #ifndef DENSE_GEN_MAT_PROD_H
 #define DENSE_GEN_MAT_PROD_H
@@ -32,34 +32,33 @@ class DenseGenMatProd
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
-    typedef Eigen::Map<const Matrix> MapMat;
-    typedef Eigen::Map< Eigen::Matrix<Scalar, Eigen::Dynamic, 1> > MapVec;
-
+    typedef Eigen::Map<const Vector> MapConstVec;
+    typedef Eigen::Map<Vector> MapVec;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
 
-    const MapMat m_mat;
+    ConstGenericMatrix m_mat;
 
 public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param mat_ An **Eigen** matrix object, whose type can be
+    /// \param mat An **Eigen** matrix object, whose type can be
     /// `Eigen::Matrix<Scalar, ...>` (e.g. `Eigen::MatrixXd` and
     /// `Eigen::MatrixXf`), or its mapped version
     /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
     ///
-    DenseGenMatProd(ConstGenericMatrix &mat_) :
-        m_mat(mat_.data(), mat_.rows(), mat_.cols())
+    DenseGenMatProd(ConstGenericMatrix& mat) :
+        m_mat(mat)
     {}
 
     ///
     /// Return the number of rows of the underlying matrix.
     ///
-    int rows() { return m_mat.rows(); }
+    int rows() const { return m_mat.rows(); }
     ///
     /// Return the number of columns of the underlying matrix.
     ///
-    int cols() { return m_mat.cols(); }
+    int cols() const { return m_mat.cols(); }
 
     ///
     /// Perform the matrix-vector multiplication operation \f$y=Ax\f$.
@@ -68,10 +67,10 @@ public:
     /// \param y_out Pointer to the \f$y\f$ vector.
     ///
     // y_out = A * x_in
-    void perform_op(Scalar *x_in, Scalar *y_out)
+    void perform_op(const Scalar* x_in, Scalar* y_out) const
     {
-        MapVec x(x_in, m_mat.cols());
-        MapVec y(y_out, m_mat.rows());
+        MapConstVec x(x_in,  m_mat.cols());
+        MapVec      y(y_out, m_mat.rows());
         y.noalias() = m_mat * x;
     }
 };

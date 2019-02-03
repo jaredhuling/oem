@@ -4,11 +4,12 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-#ifndef DENSE_SYM_SHIFT_SOLVE_H
-#define DENSE_SYM_SHIFT_SOLVE_H
+#ifndef SPARSE_SYM_SHIFT_SOLVE_H
+#define SPARSE_SYM_SHIFT_SOLVE_H
 
 #include <Eigen/Core>
-#include <Eigen/Cholesky>
+#include <Eigen/SparseCore>
+#include <Eigen/SparseCholesky>
 #include <stdexcept>
 
 namespace Spectra {
@@ -17,38 +18,37 @@ namespace Spectra {
 ///
 /// \ingroup MatOp
 ///
-/// This class defines the shift-solve operation on a real symmetric matrix \f$A\f$,
+/// This class defines the shift-solve operation on a sparse real symmetric matrix \f$A\f$,
 /// i.e., calculating \f$y=(A-\sigma I)^{-1}x\f$ for any real \f$\sigma\f$ and
 /// vector \f$x\f$. It is mainly used in the SymEigsShiftSolver eigen solver.
 ///
-template <typename Scalar, int Uplo = Eigen::Lower>
-class DenseSymShiftSolve
+template <typename Scalar, int Uplo = Eigen::Lower, int Flags = 0, typename StorageIndex = int>
+class SparseSymShiftSolve
 {
 private:
-    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
     typedef Eigen::Map<const Vector> MapConstVec;
     typedef Eigen::Map<Vector> MapVec;
-    typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
+    typedef Eigen::SparseMatrix<Scalar, Flags, StorageIndex> SparseMatrix;
+    typedef const Eigen::Ref<const SparseMatrix> ConstGenericSparseMatrix;
 
-    ConstGenericMatrix m_mat;
+    ConstGenericSparseMatrix m_mat;
     const int m_n;
-    Eigen::LDLT<Matrix, Uplo> m_solver;
+    Eigen::SimplicialLDLT<SparseMatrix, Uplo> m_solver;
 
 public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param mat An **Eigen** matrix object, whose type can be
-    /// `Eigen::Matrix<Scalar, ...>` (e.g. `Eigen::MatrixXd` and
-    /// `Eigen::MatrixXf`), or its mapped version
-    /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
+    /// \param mat An **Eigen** sparse matrix object, whose type can be
+    /// `Eigen::SparseMatrix<Scalar, ...>` or its mapped version
+    /// `Eigen::Map<Eigen::SparseMatrix<Scalar, ...> >`.
     ///
-    DenseSymShiftSolve(ConstGenericMatrix& mat) :
+    SparseSymShiftSolve(ConstGenericSparseMatrix& mat) :
         m_mat(mat), m_n(mat.rows())
     {
         if(mat.rows() != mat.cols())
-            throw std::invalid_argument("DenseSymShiftSolve: matrix must be square");
+            throw std::invalid_argument("SparseSymShiftSolve: matrix must be square");
     }
 
     ///
@@ -65,7 +65,8 @@ public:
     ///
     void set_shift(Scalar sigma)
     {
-        m_solver.compute(m_mat - sigma * Matrix::Identity(m_n, m_n));
+        m_solver.setShift(-sigma);
+        m_solver.compute(m_mat);
     }
 
     ///
@@ -86,4 +87,4 @@ public:
 
 } // namespace Spectra
 
-#endif // DENSE_SYM_SHIFT_SOLVE_H
+#endif // SPARSE_SYM_SHIFT_SOLVE_H

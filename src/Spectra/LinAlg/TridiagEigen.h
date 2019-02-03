@@ -2,18 +2,20 @@
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
-// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #ifndef TRIDIAG_EIGEN_H
 #define TRIDIAG_EIGEN_H
 
 #include <Eigen/Core>
-#include <Eigen/Eigenvalues>
+#include <Eigen/Jacobi>
 #include <stdexcept>
+
+#include "../Util/TypeTraits.h"
 
 namespace Spectra {
 
@@ -39,19 +41,16 @@ private:
     Matrix m_evecs;         // To store eigenvectors
 
     bool m_computed;
-
-    static bool is_much_smaller_than(const Scalar &x, const Scalar &y,
-        const Scalar &prec = Eigen::NumTraits<Scalar>::dummy_precision())
-    {
-        return Eigen::numext::abs2(x) <= Eigen::numext::abs2(y) * prec * prec;
-    }
+    const Scalar m_near_0;  // a very small value, ~= 1e-307 for the "double" type
 
     // Adapted from Eigen/src/Eigenvaleus/SelfAdjointEigenSolver.h
-    static void tridiagonal_qr_step(RealScalar *diag,
-                                    RealScalar *subdiag, Index start,
-                                    Index end, Scalar *matrixQ,
+    static void tridiagonal_qr_step(RealScalar* diag,
+                                    RealScalar* subdiag, Index start,
+                                    Index end, Scalar* matrixQ,
                                     Index n)
     {
+        using std::abs;
+
         RealScalar td = (diag[end-1] - diag[end]) * RealScalar(0.5);
         RealScalar e = subdiag[end-1];
         // Note that thanks to scaling, e^2 or td^2 cannot overflow, however they can still
@@ -60,89 +59,114 @@ private:
         //   RealScalar mu = diag[end] - e2 / (td + (td>0 ? 1 : -1) * sqrt(td*td + e2));
         // This explain the following, somewhat more complicated, version:
         RealScalar mu = diag[end];
-        if(td == 0)
-            mu -= std::abs(e);
+        if(td == Scalar(0))
+            mu -= abs(e);
         else
         {
             RealScalar e2 = Eigen::numext::abs2(subdiag[end-1]);
             RealScalar h = Eigen::numext::hypot(td, e);
-            if(e2==0)  mu -= (e / (td + (td>0 ? 1 : -1))) * (e / h);
-            else       mu -= e2 / (td + (td>0 ? h : -h));
+            if(e2==RealScalar(0)) mu -= (e / (td + (td>RealScalar(0) ? RealScalar(1) : RealScalar(-1)))) * (e / h);
+            else                  mu -= e2 / (td + (td>RealScalar(0) ? h : -h));
         }
 
         RealScalar x = diag[start] - mu;
         RealScalar z = subdiag[start];
+        Eigen::Map<Matrix> q(matrixQ, n, n);
         for(Index k = start; k < end; ++k)
         {
             Eigen::JacobiRotation<RealScalar> rot;
             rot.makeGivens(x, z);
 
-            // do T = G' T G
-            RealScalar sdk = rot.s() * diag[k] + rot.c() * subdiag[k];
-            RealScalar dkp1 = rot.s() * subdiag[k] + rot.c() * diag[k + 1];
+            const RealScalar s = rot.s();
+            const RealScalar c = rot.c();
 
-            diag[k] = rot.c() * (rot.c() * diag[k] - rot.s() * subdiag[k]) - rot.s() * (rot.c() * subdiag[k] - rot.s() * diag[k + 1]);
-            diag[k + 1] = rot.s() * sdk + rot.c() * dkp1;
-            subdiag[k] = rot.c() * sdk - rot.s() * dkp1;
+            // do T = G' T G
+            RealScalar sdk = s * diag[k] + c * subdiag[k];
+            RealScalar dkp1 = s * subdiag[k] + c * diag[k + 1];
+
+            diag[k] = c * (c * diag[k] - s * subdiag[k]) - s * (c * subdiag[k] - s * diag[k + 1]);
+            diag[k + 1] = s * sdk + c * dkp1;
+            subdiag[k] = c * sdk - s * dkp1;
 
             if(k > start)
-                subdiag[k - 1] = rot.c() * subdiag[k - 1] - rot.s() * z;
+                subdiag[k - 1] = c * subdiag[k - 1] - s * z;
 
             x = subdiag[k];
 
             if(k < end - 1)
             {
-                z = -rot.s() * subdiag[k+1];
-                subdiag[k + 1] = rot.c() * subdiag[k + 1];
+                z = -s * subdiag[k+1];
+                subdiag[k + 1] = c * subdiag[k + 1];
             }
 
             // apply the givens rotation to the unit matrix Q = Q * G
             if(matrixQ)
-            {
-                Eigen::Map<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> > q(matrixQ, n, n);
                 q.applyOnTheRight(k, k + 1, rot);
-            }
         }
     }
 
 public:
     TridiagEigen() :
-        m_n(0), m_computed(false)
+        m_n(0), m_computed(false),
+        m_near_0(TypeTraits<Scalar>::min() * Scalar(10))
     {}
 
-    TridiagEigen(ConstGenericMatrix &mat) :
-        m_n(mat.rows()), m_computed(false)
+    TridiagEigen(ConstGenericMatrix& mat) :
+        m_n(mat.rows()), m_computed(false),
+        m_near_0(TypeTraits<Scalar>::min() * Scalar(10))
     {
         compute(mat);
     }
 
-    void compute(ConstGenericMatrix &mat)
+    void compute(ConstGenericMatrix& mat)
     {
-        if(mat.rows() != mat.cols())
-            throw std::invalid_argument("TridiagEigen: matrix must be square");
+        using std::abs;
 
         m_n = mat.rows();
-        m_main_diag = mat.diagonal();
-        m_sub_diag = mat.diagonal(-1);
+        if(m_n != mat.cols())
+            throw std::invalid_argument("TridiagEigen: matrix must be square");
+
+        m_main_diag.resize(m_n);
+        m_sub_diag.resize(m_n - 1);
         m_evecs.resize(m_n, m_n);
         m_evecs.setIdentity();
+
+        // Scale matrix to improve stability
+        const Scalar scale = std::max(mat.diagonal().cwiseAbs().maxCoeff(),
+                                      mat.diagonal(-1).cwiseAbs().maxCoeff());
+        // If scale=0, mat is a zero matrix, so we can early stop
+        if(scale < m_near_0)
+        {
+            // m_main_diag contains eigenvalues
+            m_main_diag.setZero();
+            // m_evecs has been set identity
+            // m_evecs.setIdentity();
+            m_computed = true;
+            return;
+        }
+        m_main_diag.noalias() = mat.diagonal() / scale;
+        m_sub_diag.noalias() = mat.diagonal(-1) / scale;
+
+        Scalar* diag = m_main_diag.data();
+        Scalar* subdiag = m_sub_diag.data();
 
         Index end = m_n - 1;
         Index start = 0;
         int iter = 0; // total number of iterations
-        int info = 0;
+        int info = 0; // 0 for success, 1 for failure
 
-        Scalar *maind = m_main_diag.data();
-        Scalar *subd = m_sub_diag.data();
+        const Scalar considerAsZero = TypeTraits<Scalar>::min();
+        const Scalar precision = Scalar(2) * Eigen::NumTraits<Scalar>::epsilon();
 
         while(end > 0)
         {
             for(Index i = start; i < end; i++)
-                if(is_much_smaller_than(std::abs(subd[i]), (std::abs(maind[i]) + std::abs(maind[i + 1]))))
-                    subd[i] = 0;
+                if(abs(subdiag[i]) <= considerAsZero ||
+                   abs(subdiag[i]) <= (abs(diag[i]) + abs(diag[i + 1])) * precision)
+                    subdiag[i] = 0;
 
             // find the largest unreduced block
-            while(end > 0 && subd[end - 1] == 0)
+            while(end > 0 && subdiag[end - 1] == Scalar(0))
                 end--;
 
             if(end <= 0)
@@ -157,19 +181,22 @@ public:
             }
 
             start = end - 1;
-            while(start > 0 && subd[start - 1] != 0)
+            while(start > 0 && subdiag[start - 1] != Scalar(0))
                 start--;
 
-            tridiagonal_qr_step(maind, subd, start, end, m_evecs.data(), m_n);
+            tridiagonal_qr_step(diag, subdiag, start, end, m_evecs.data(), m_n);
         }
 
         if(info > 0)
-            throw std::logic_error("TridiagEigen: failed to compute all the eigenvalues");
+            throw std::runtime_error("TridiagEigen: eigen decomposition failed");
+
+        // Scale eigenvalues back
+        m_main_diag *= scale;
 
         m_computed = true;
     }
 
-    Vector eigenvalues()
+    const Vector& eigenvalues() const
     {
         if(!m_computed)
             throw std::logic_error("TridiagEigen: need to call compute() first");
@@ -178,7 +205,7 @@ public:
         return m_main_diag;
     }
 
-    Matrix eigenvectors()
+    const Matrix& eigenvectors() const
     {
         if(!m_computed)
             throw std::logic_error("TridiagEigen: need to call compute() first");

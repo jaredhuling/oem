@@ -26,7 +26,7 @@ RcppExport SEXP oemfit(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP,
 double powerM(arma::mat A); 
 inline arma::colvec signVec(arma::colvec);
 inline double sign(double);
-inline double threshold(double);
+inline double threshold_o(double);
 inline bool stopRule(const arma::colvec&, const arma::colvec&);
 //void print(arma::colvec input) { std::cout << input << std::endl;}
 //void print(arma::mat input) {std::cout << input << std::endl;}

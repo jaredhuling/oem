@@ -1,8 +1,8 @@
-// Copyright (C) 2016 Yixuan Qiu <yixuan.qiu@cos.name>
+// Copyright (C) 2016-2018 Yixuan Qiu <yixuan.qiu@cos.name>
 //
 // This Source Code Form is subject to the terms of the Mozilla
 // Public License v. 2.0. If a copy of the MPL was not distributed
-// with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 #ifndef DENSE_GEN_COMPLEX_SHIFT_SOLVE_H
 #define DENSE_GEN_COMPLEX_SHIFT_SOLVE_H
@@ -27,17 +27,18 @@ class DenseGenComplexShiftSolve
 {
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-    typedef Eigen::Map<const Matrix> MapMat;
-    typedef Eigen::Map< Eigen::Matrix<Scalar, Eigen::Dynamic, 1> > MapVec;
+    typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
+    typedef Eigen::Map<const Vector> MapConstVec;
+    typedef Eigen::Map<Vector> MapVec;
+    typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
 
     typedef std::complex<Scalar> Complex;
     typedef Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic> ComplexMatrix;
     typedef Eigen::Matrix<Complex, Eigen::Dynamic, 1> ComplexVector;
+
     typedef Eigen::PartialPivLU<ComplexMatrix> ComplexSolver;
 
-    typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
-
-    const MapMat m_mat;
+    ConstGenericMatrix m_mat;
     const int m_n;
     ComplexSolver m_solver;
     ComplexVector m_x_cache;
@@ -46,27 +47,26 @@ public:
     ///
     /// Constructor to create the matrix operation object.
     ///
-    /// \param mat_ An **Eigen** matrix object, whose type can be
+    /// \param mat An **Eigen** matrix object, whose type can be
     /// `Eigen::Matrix<Scalar, ...>` (e.g. `Eigen::MatrixXd` and
     /// `Eigen::MatrixXf`), or its mapped version
     /// (e.g. `Eigen::Map<Eigen::MatrixXd>`).
     ///
-    DenseGenComplexShiftSolve(ConstGenericMatrix &mat_) :
-        m_mat(mat_.data(), mat_.rows(), mat_.cols()),
-        m_n(mat_.rows())
+    DenseGenComplexShiftSolve(ConstGenericMatrix& mat) :
+        m_mat(mat), m_n(mat.rows())
     {
-        if(mat_.rows() != mat_.cols())
+        if(mat.rows() != mat.cols())
             throw std::invalid_argument("DenseGenComplexShiftSolve: matrix must be square");
     }
 
     ///
     /// Return the number of rows of the underlying matrix.
     ///
-    int rows() { return m_n; }
+    int rows() const { return m_n; }
     ///
     /// Return the number of columns of the underlying matrix.
     ///
-    int cols() { return m_n; }
+    int cols() const { return m_n; }
 
     ///
     /// Set the complex shift \f$\sigma\f$.
@@ -76,9 +76,7 @@ public:
     ///
     void set_shift(Scalar sigmar, Scalar sigmai)
     {
-        ComplexMatrix cmat = m_mat.template cast<Complex>();
-        cmat.diagonal().array() -= Complex(sigmar, sigmai);
-        m_solver.compute(cmat);
+        m_solver.compute(m_mat.template cast<Complex>() - Complex(sigmar, sigmai) * ComplexMatrix::Identity(m_n, m_n));
         m_x_cache.resize(m_n);
         m_x_cache.setZero();
     }
@@ -91,9 +89,9 @@ public:
     /// \param y_out Pointer to the \f$y\f$ vector.
     ///
     // y_out = Re( inv(A - sigma * I) * x_in )
-    void perform_op(Scalar *x_in, Scalar *y_out)
+    void perform_op(const Scalar* x_in, Scalar* y_out)
     {
-        m_x_cache.real() = MapVec(x_in, m_n);
+        m_x_cache.real() = MapConstVec(x_in, m_n);
         MapVec y(y_out, m_n);
         y.noalias() = m_solver.solve(m_x_cache).real();
     }

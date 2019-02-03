@@ -4,8 +4,8 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
-#ifndef SPARSE_GEN_MAT_PROD_H
-#define SPARSE_GEN_MAT_PROD_H
+#ifndef SPARSE_SYM_MAT_PROD_H
+#define SPARSE_SYM_MAT_PROD_H
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -17,12 +17,11 @@ namespace Spectra {
 /// \ingroup MatOp
 ///
 /// This class defines the matrix-vector multiplication operation on a
-/// sparse real matrix \f$A\f$, i.e., calculating \f$y=Ax\f$ for any vector
-/// \f$x\f$. It is mainly used in the GenEigsSolver and SymEigsSolver
-/// eigen solvers.
+/// sparse real symmetric matrix \f$A\f$, i.e., calculating \f$y=Ax\f$ for any vector
+/// \f$x\f$. It is mainly used in the SymEigsSolver eigen solver.
 ///
-template <typename Scalar, int Flags = 0, typename StorageIndex = int>
-class SparseGenMatProd
+template <typename Scalar, int Uplo = Eigen::Lower, int Flags = 0, typename StorageIndex = int>
+class SparseSymMatProd
 {
 private:
     typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Vector;
@@ -41,7 +40,7 @@ public:
     /// `Eigen::SparseMatrix<Scalar, ...>` or its mapped version
     /// `Eigen::Map<Eigen::SparseMatrix<Scalar, ...> >`.
     ///
-    SparseGenMatProd(ConstGenericSparseMatrix& mat) :
+    SparseSymMatProd(ConstGenericSparseMatrix& mat) :
         m_mat(mat)
     {}
 
@@ -65,11 +64,11 @@ public:
     {
         MapConstVec x(x_in,  m_mat.cols());
         MapVec      y(y_out, m_mat.rows());
-        y.noalias() = m_mat * x;
+        y.noalias() = m_mat.template selfadjointView<Uplo>() * x;
     }
 };
 
 
 } // namespace Spectra
 
-#endif // SPARSE_GEN_MAT_PROD_H
+#endif // SPARSE_SYM_MAT_PROD_H

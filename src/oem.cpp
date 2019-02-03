@@ -75,7 +75,7 @@ arma::colvec oem::solution(arma::colvec& u, double lambda, double eigenVal) cons
       colvec ret = zeros<mat> (u.n_rows, 1);
       for (unsigned i = 0; i < u.n_rows; i++)
 	if (std::abs(u(i)) <= (eigenVal + 1) * lambda)
-	  ret(i) = sign(u(i)) * threshold(std::abs(u(i)) - lambda) / eigenVal;
+	  ret(i) = sign(u(i)) * threshold_o(std::abs(u(i)) - lambda) / eigenVal;
 	else if (std::abs(u(i)) <= alpha * lambda * eigenVal)
 	  ret(i) = sign(u(i)) * (std::abs(u(i)) - alpha * lambda / (alpha - 1)) 
 	    / (eigenVal - 1 / (alpha - 1));
@@ -92,7 +92,7 @@ arma::colvec oem::solution(arma::colvec& u, double lambda, double eigenVal) cons
     colvec ret = zeros<mat> (u.n_rows, 1);
     for (unsigned i = 0; i < u.n_rows; i++)
       if (std::abs(u(i)) <= alpha * lambda * eigenVal)
-	ret(i) = sign(u(i)) * threshold(std::abs(u(i)) - lambda) 
+	ret(i) = sign(u(i)) * threshold_o(std::abs(u(i)) - lambda) 
 	  / (eigenVal - 1 / alpha);
       else
 	ret(i) = u(i) / eigenVal;
@@ -151,7 +151,7 @@ double sign(double num)
   return 1;
 }
 
-double threshold(double num) 
+double threshold_o(double num) 
 {
   return num > 0 ? num : 0;
 }
