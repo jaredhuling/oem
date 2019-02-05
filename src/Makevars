@@ -5,7 +5,7 @@
 #               -I${R_HOME}/library/RcppEigen/include  -I. -DNDEBUG
 
 
-PKG_CXXFLAGS = -DNDEBUG -Wa,-mbig-obj
+PKG_CXXFLAGS = -DNDEBUG
 #PKG_CXXFLAGS = $(SHLIB_OPENMP_CXXFLAGS)
 #PKG_LIBS = `$(R_HOME)/bin/Rscript -e "Rcpp:::LdFlags()"` $(SHLIB_OPENMP_CXXFLAGS) $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS)
 PKG_LIBS =  $(LAPACK_LIBS) $(BLAS_LIBS) $(FLIBS) $(SHLIB_OPENMP_CFLAGS)
