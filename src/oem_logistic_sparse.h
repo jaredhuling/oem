@@ -745,6 +745,7 @@ public:
                 }
             }
             colsq /= (double(nobs) - 1.0);
+            colsq = (colsq.array() == 0.0).select(1.0, colsq);
             colsq_inv = 1.0 / colsq.array().sqrt();
         }
         
