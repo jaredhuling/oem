@@ -77,6 +77,7 @@
 #' @importFrom bigmemory is.big.matrix
 #' @export
 #' @examples
+#' \dontrun{
 #' set.seed(123)
 #' nrows <- 50000
 #' ncols <- 100
@@ -113,6 +114,7 @@
 #' layout(matrix(1:2, ncol = 2))
 #' plot(fit)
 #' plot(fit, which.model = 2)
+#' }
 #' 
 big.oem <- function(x, 
                     y, 

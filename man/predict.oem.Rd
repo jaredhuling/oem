@@ -4,8 +4,14 @@
 \alias{predict.oem}
 \title{Prediction method for Orthogonalizing EM fitted objects}
 \usage{
-\method{predict}{oem}(object, newx, s = NULL, which.model = 1,
-  type = c("link", "response", "coefficients", "nonzero", "class"), ...)
+\method{predict}{oem}(
+  object,
+  newx,
+  s = NULL,
+  which.model = 1,
+  type = c("link", "response", "coefficients", "nonzero", "class"),
+  ...
+)
 }
 \arguments{
 \item{object}{fitted "oem" model object}

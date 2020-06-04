@@ -9,21 +9,48 @@
 \alias{print.oemfit}
 \title{Deprecated functions}
 \usage{
-oemfit(formula, data = list(), lambda = NULL, nlambda = 100,
-  lambda.min.ratio = NULL, tolerance = 0.001, maxIter = 1000,
-  standardized = TRUE, numGroup = 1, penalty = c("lasso", "scad",
-  "ols", "elastic.net", "ngarrote", "mcp"), alpha = 3, evaluate = 0,
-  condition = -1)
+oemfit(
+  formula,
+  data = list(),
+  lambda = NULL,
+  nlambda = 100,
+  lambda.min.ratio = NULL,
+  tolerance = 0.001,
+  maxIter = 1000,
+  standardized = TRUE,
+  numGroup = 1,
+  penalty = c("lasso", "scad", "ols", "elastic.net", "ngarrote", "mcp"),
+  alpha = 3,
+  evaluate = 0,
+  condition = -1
+)
 
-cv.oemfit(formula, data = list(), lambda = NULL,
-  type.measure = c("mse", "mae"), ..., nfolds = 10, foldid,
-  penalty = c("lasso", "scad", "elastic.net", "ngarrote", "mcp"))
+cv.oemfit(
+  formula,
+  data = list(),
+  lambda = NULL,
+  type.measure = c("mse", "mae"),
+  ...,
+  nfolds = 10,
+  foldid,
+  penalty = c("lasso", "scad", "elastic.net", "ngarrote", "mcp")
+)
 
-\method{plot}{oemfit}(x, xvar = c("norm", "lambda", "loglambda", "dev"),
-  xlab = iname, ylab = "Coefficients", ...)
+\method{plot}{oemfit}(
+  x,
+  xvar = c("norm", "lambda", "loglambda", "dev"),
+  xlab = iname,
+  ylab = "Coefficients",
+  ...
+)
 
-\method{predict}{oemfit}(object, newx, s = NULL, type = c("response",
-  "coefficients", "nonzero"), ...)
+\method{predict}{oemfit}(
+  object,
+  newx,
+  s = NULL,
+  type = c("response", "coefficients", "nonzero"),
+  ...
+)
 
 \method{print}{oemfit}(x, digits = max(3, getOption("digits") - 3), ...)
 }

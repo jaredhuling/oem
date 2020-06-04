@@ -235,7 +235,6 @@ coef.oemfit <- function(object, s = NULL, ...) {
 }
 
 #' @rdname deprecated
-#' @rdname plot
 #' @param x fitted \code{oemfit} object
 #' @param xvar what is on the X-axis. "norm" plots against the L1-norm of the coefficients,
 #' "lambda" against the log-lambda sequence, and "dev" against the percent deviance
@@ -314,7 +313,6 @@ predict.oemfit <- function(object, newx, s = NULL,
 }
 
 #' @rdname deprecated
-#' @rdname print
 #' @param digits significant digits in print out.
 #' @method print oemfit
 #' @export

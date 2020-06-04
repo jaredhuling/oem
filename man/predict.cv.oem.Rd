@@ -4,8 +4,13 @@
 \alias{predict.cv.oem}
 \title{Prediction function for fitted cross validation oem objects}
 \usage{
-\method{predict}{cv.oem}(object, newx, which.model = "best.model",
-  s = c("lambda.min", "lambda.1se"), ...)
+\method{predict}{cv.oem}(
+  object,
+  newx,
+  which.model = "best.model",
+  s = c("lambda.min", "lambda.1se"),
+  ...
+)
 }
 \arguments{
 \item{object}{fitted \code{"cv.oem"} model object}
