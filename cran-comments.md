@@ -1,7 +1,7 @@
 
 ## Update for 'oem'
 
-* Updates to latest version of Spectra
+* fixes deprecated std:: function use that cause the package to be kicked from CRAN
 
 ## Test environments
 
