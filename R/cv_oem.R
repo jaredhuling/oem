@@ -315,7 +315,7 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
         good[i, seq(nlams[i])] = 1
         which <- foldid == i
         for (j in seq(nlams[i])) {
-          cvraw[[m]][i, j] = precrec::auc(evalmod(scores = predlist[[m]][which,j] , labels = y[which,2]))[4][2,]
+          cvraw[[m]][i, j] = precrec::auc(precrec::evalmod(scores = predlist[[m]][which,j] , labels = y[which,2]))[4][2,]
         }
       }
         N[[m]] = apply(good, 2, sum)
