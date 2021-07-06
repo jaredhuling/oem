@@ -221,7 +221,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
 }
 
 
- cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.measure, grouped, keep = FALSE) 
+cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.measure, grouped, keep = FALSE) 
 {
     ## code modified from "glmnet" package
     typenames = c(mse = "Mean-Squared Error", mae = "Mean Absolute Error", 
