@@ -84,6 +84,8 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
     else type.measure = match.arg(type.measure)
     if (!is.null(lambda) && length(lambda) < 2) 
         stop("Need more than one value of lambda for cv.oem")
+    if (length(weights)!=0 & type.measure=="auprc") 
+      stop("Cross-validation based on AUPRC is not available with sampling weights")
     N = nrow(x)
     if (length(weights)) 
         weights = as.double(weights)
