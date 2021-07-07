@@ -305,9 +305,7 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
         }
         weights = tapply(weights, foldid, sum)
         weights = rep(list(weights), nmodels)
-    } 
-     
-    if (type.measure == "auprc") {
+    } else if (type.measure == "auprc") {
     cvraw <- rep(list(matrix(NA, nfolds, length(lambda[[1]]))), 
                  nmodels)
     N <- vector(mode = "list", length = nmodels)
@@ -324,9 +322,7 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
       }
       weights = tapply(weights, foldid, sum)
       weights = rep(list(weights), nmodels)
-   }
-                                     
-   else 
+   } else 
     {
         ywt <- apply(y, 1, sum)
         y <- y / ywt
