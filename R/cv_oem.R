@@ -17,7 +17,7 @@
 #' a value of lambda overrides this.
 #' @param type.measure measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
 #' which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
-#' regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} is for two-class logistic 
+#' regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} or \code{type.measure = "auprc"} are for two-class logistic 
 #' regression only. \code{type.measure = "mse"} or \code{type.measure = "mae"} (mean absolute error) can be used by all models;
 #' they measure the deviation from the fitted mean to the response.
 #' @param nfolds number of folds for cross-validation. default is 10. 3 is smallest value allowed. 
