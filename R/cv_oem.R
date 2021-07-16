@@ -89,7 +89,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
     N = nrow(x)
     if (length(weights)) 
         weights = as.double(weights)
-    y = drop(y)
+    y = drop(y) 
     
     if (parallel & ncores != 1)
     {
