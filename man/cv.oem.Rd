@@ -12,7 +12,7 @@ cv.oem(
     "sparse.grp.lasso"),
   weights = numeric(0),
   lambda = NULL,
-  type.measure = c("mse", "deviance", "class", "auc", "mae"),
+  type.measure = c("mse", "deviance", "class", "auc", "auprc", "mae"),
   nfolds = 10,
   foldid = NULL,
   grouped = TRUE,
@@ -42,7 +42,7 @@ a value of lambda overrides this.}
 
 \item{type.measure}{measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
 which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
-regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} is for two-class logistic 
+regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} and \code{type.measure = "auprc"} are for two-class logistic 
 regression only. \code{type.measure = "mse"} or \code{type.measure = "mae"} (mean absolute error) can be used by all models;
 they measure the deviation from the fitted mean to the response.}
 

@@ -32,7 +32,8 @@ Imports:
     Rcpp (>= 0.11.0),
     Matrix,
     foreach,
-    methods
+    methods,
+    precrec
 LinkingTo: Rcpp,
     RcppEigen,
     BH,
