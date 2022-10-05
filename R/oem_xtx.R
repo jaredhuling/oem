@@ -63,6 +63,8 @@
 #' @import Matrix
 #' @import foreach
 #' @export
+#' @references Huling. J.D. and Chien, P. (2022), Fast Penalized Regression and Cross Validation for Tall Data with the oem Package.
+#' Journal of Statistical Software 104(6), 1-24. doi:10.18637/jss.v104.i06
 #' @examples
 #' set.seed(123)
 #' n.obs <- 1e4
