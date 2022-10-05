@@ -163,3 +163,7 @@ system.time(xfit2 <- xval.oem(x = x, y = y,
                               groups = rep(1:20, each = 5)))
 
 }
+\references{
+Huling. J.D. and Chien, P. (2022), Fast Penalized Regression and Cross Validation for Tall Data with the oem Package.
+Journal of Statistical Software 104(6), 1-24. doi:10.18637/jss.v104.i06
+}
