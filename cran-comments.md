@@ -5,7 +5,7 @@
 
 ## Test environments
 
-* Windows x64 install, (4.0.0, devel 2020-06-02 r78630, Patched 2020-05-25 r78571)
+* Ubuntu install, R Under development (unstable) (2022-10-04 r83014)
 * Mac OSX (R 4.2.0)
 
 ## R CMD check results
