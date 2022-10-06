@@ -495,8 +495,8 @@ plot(fit.adaptive.grp)
 For further information about `oem`,
 please visit:
 
-  * The oem site:        [jaredhuling.org/oem](http://jaredhuling.github.io/oem)
+  * The oem site:        [jaredhuling.org/oem](https://jaredhuling.org/oem/)
   * The oem source code: [github.com/jaredhuling/oem](https://github.com/jaredhuling/oem)
-  * The oem paper:       [oem paper](http://www.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436)
+  * The oem paper:       [oem paper](https://www.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436)
 
 # References

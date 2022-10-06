@@ -21,7 +21,7 @@ Description: Solves penalized least squares problems for big tall data
 URL: 
     https://arxiv.org/abs/1801.09661,
     https://github.com/jaredhuling/oem,
-    https://jaredhuling.github.io/oem
+    https://jaredhuling.org/oem/
 BugReports: https://github.com/jaredhuling/oem/issues
 License: GPL (>= 2)
 Encoding: UTF-8
