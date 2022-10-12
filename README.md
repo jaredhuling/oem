@@ -11,7 +11,7 @@ The oem package provides estimation for various penalized linear models
 using the [Orthogonalizing EM
 algorithm](https://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436).
 Documentation for the package can be found here: [oem
-site](https://jaredhuling.org/oem).
+site](https://jaredhuling.org/oem/).
 
 Install using the **devtools** package (RcppEigen must be installed
 first as well):
