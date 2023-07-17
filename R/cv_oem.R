@@ -17,7 +17,7 @@
 #' a value of lambda overrides this.
 #' @param type.measure measure to evaluate for cross-validation. The default is \code{type.measure = "deviance"}, 
 #' which uses squared-error for gaussian models (a.k.a \code{type.measure = "mse"} there), deviance for logistic
-#' regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} is for two-class logistic 
+#' regression. \code{type.measure = "class"} applies to binomial only. \code{type.measure = "auc"} or \code{type.measure = "auprc"} are for two-class logistic 
 #' regression only. \code{type.measure = "mse"} or \code{type.measure = "mae"} (mean absolute error) can be used by all models;
 #' they measure the deviation from the fitted mean to the response.
 #' @param nfolds number of folds for cross-validation. default is 10. 3 is smallest value allowed. 
@@ -63,7 +63,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
                                       "grp.mcp.net",   "grp.scad.net",
                                       "sparse.grp.lasso"),
                     weights = numeric(0), lambda = NULL, 
-                    type.measure = c("mse", "deviance", "class", "auc", "mae"), nfolds = 10, foldid = NULL, 
+                    type.measure = c("mse", "deviance", "class", "auc", "auprc", "mae"), nfolds = 10, foldid = NULL, 
                     grouped = TRUE, keep = FALSE, parallel = FALSE, ncores = -1, ...) 
 {
     ## code modified from "glmnet" package
@@ -86,10 +86,12 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
     else type.measure = match.arg(type.measure)
     if (!is.null(lambda) && length(lambda) < 2) 
         stop("Need more than one value of lambda for cv.oem")
+    if (length(weights)!=0 & type.measure=="auprc") 
+      stop("Cross-validation based on AUPRC is not yet available with sampling weights")
     N = nrow(x)
     if (length(weights)) 
         weights = as.double(weights)
-    y = drop(y)
+    y = drop(y) 
     
     if (parallel & ncores != 1)
     {
@@ -211,7 +213,7 @@ cv.oem <- function (x, y, penalty = c("elastic.net",
                nzero = nz, name = cvname, oem.fit = oem.object)
     if (keep) 
         out = c(out, list(fit.preval = cvstuff$fit.preval, foldid = foldid))
-    lamin <- if(cvname == "AUC") getmin(lambda, lapply(cvm, function(ccvvmm) -ccvvmm), cvsd)
+    lamin <- if(cvname == "AUC" | cvname == "AUPRC") getmin(lambda, lapply(cvm, function(ccvvmm) -ccvvmm), cvsd)
     else getmin(lambda, cvm, cvsd)
     obj <- c(out, as.list(lamin))
     obj$best.model <- penalty[obj$model.min]
@@ -225,13 +227,13 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
 {
     ## code modified from "glmnet" package
     typenames = c(mse = "Mean-Squared Error", mae = "Mean Absolute Error", 
-                  deviance = "Binomial Deviance", auc = "AUC", class = "Misclassification Error")
+                  deviance = "Binomial Deviance", auc = "AUC", auprc = "AUPRC", class = "Misclassification Error")
     if (type.measure == "default") 
         type.measure = "deviance"
-    if (!match(type.measure, c("mse", "mae", "deviance", "auc", 
+    if (!match(type.measure, c("mse", "mae", "deviance", "auc", "auprc",
                                "class"), FALSE)) 
     {
-        warning("Only 'deviance', 'class', 'auc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
+        warning("Only 'deviance', 'class', 'auc', 'auprc', 'mse' or 'mae'  available for binomial models; 'deviance' used")
         type.measure = "deviance"
     }
     prob_min = 1e-05
@@ -305,7 +307,24 @@ cv.oemfit_binomial <- function (outlist, lambda, x, y, weights, foldid, type.mea
         }
         weights = tapply(weights, foldid, sum)
         weights = rep(list(weights), nmodels)
-    } else 
+    } else if (type.measure == "auprc") {
+    cvraw <- rep(list(matrix(NA, nfolds, length(lambda[[1]]))), 
+                 nmodels)
+    N <- vector(mode = "list", length = nmodels)
+    for (m in 1:nmodels) {
+      good <- matrix(0, nfolds, length(lambda[[1]]))
+      for (i in seq(nfolds)) {
+        good[i, seq(nlams[i])] = 1
+        which <- foldid == i
+        for (j in seq(nlams[i])) {
+          cvraw[[m]][i, j] = precrec::auc(evalmod(scores = predlist[[m]][which,j] , labels = y[which,2]))[4][2,]
+        }
+      }
+        N[[m]] = apply(good, 2, sum)
+      }
+      weights = tapply(weights, foldid, sum)
+      weights = rep(list(weights), nmodels)
+   } else 
     {
         ywt <- apply(y, 1, sum)
         y <- y / ywt

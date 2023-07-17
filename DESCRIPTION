@@ -33,13 +33,14 @@ Imports:
     Rcpp (>= 0.11.0),
     Matrix,
     foreach,
-    methods
+    methods,
+    precrec
 LinkingTo: Rcpp,
     RcppEigen,
     BH,
     bigmemory,
     RcppArmadillo
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Suggests:
     knitr,
     rmarkdown
