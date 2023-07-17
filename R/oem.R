@@ -73,11 +73,13 @@
 #' faster in certain situations, ie when n >> p
 #' @return An object with S3 class "oem" 
 #' @references Shifeng Xiong, Bin Dai, Jared Huling, and Peter Z. G. Qian. Orthogonalizing
-#' EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
+#' EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{https://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
 #' @useDynLib oem, .registration=TRUE
 #' @import Rcpp
 #' @import Matrix
 #' @import foreach
+#' @references Huling. J.D. and Chien, P. (2022), Fast Penalized Regression and Cross Validation for Tall Data with the oem Package.
+#' Journal of Statistical Software 104(6), 1-24. doi:10.18637/jss.v104.i06
 #' @export
 #' @examples
 #' set.seed(123)

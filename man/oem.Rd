@@ -215,5 +215,8 @@ max(abs(res.gr$beta[[1]] - res.gr.s$beta[[1]]))
 }
 \references{
 Shifeng Xiong, Bin Dai, Jared Huling, and Peter Z. G. Qian. Orthogonalizing
-EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{http://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
+EM: A design-based least squares algorithm. Technometrics, 58(3):285-293, 2016. \url{https://amstat.tandfonline.com/doi/abs/10.1080/00401706.2015.1054436}
+
+Huling. J.D. and Chien, P. (2022), Fast Penalized Regression and Cross Validation for Tall Data with the oem Package.
+Journal of Statistical Software 104(6), 1-24. doi:10.18637/jss.v104.i06
 }

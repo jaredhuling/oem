@@ -16,16 +16,19 @@ citEntry(,
       "http://dx.doi.org/10.1080/00401706.2015.1054436.")
 )
 
-citEntry(, 
-  entry        = "Article",
-  author       = "Jared D. Huling and Peter Chien",
-  title        = "Fast Penalized Regression and Cross Validation for Tall Data with the oem Package",
+bibentry(bibtype = "Article",
+  title        = "Fast Penalized Regression and Cross Validation for Tall Data with the {oem} Package",
+  author       = c(person(given = c("Jared", "D."),
+                          family = "Huling",
+                          email = "huling@umn.edu"),
+                   person(given = "Peter",
+                          family = "Chien")),
   journal      = "Journal of Statistical Software",
-  year         = "2018",
-  note         = "To appear",
-  url          = "https://arxiv.org/abs/1801.09661",
-  textVersion  = paste("Huling, J.D., Chien, P. (2018) ",
-      "Fast Penalized Regression and Cross Validation for Tall Data with the oem Package, ",
-      "Journal of Statistical Software, to appear,",
-      "URL: https://arxiv.org/abs/1801.09661.")
+  year         = "2022",
+  volume       = "104",
+  number       = "6",
+  pages        = "1--24",
+  doi          = "10.18637/jss.v104.i06",
+  header       = "To cite oem in publications use:"
 )
+

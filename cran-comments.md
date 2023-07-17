@@ -1,12 +1,12 @@
 
 ## Update for 'oem'
 
-* fixes deprecated std:: function use that cause the package to be kicked from CRAN
+* update for jss
 
 ## Test environments
 
-* Windows x64 install, (4.0.0, devel 2020-06-02 r78630, Patched 2020-05-25 r78571)
-* Ubuntu 16.04.6 LTS (on travis-ci), (R 4.0.0)
+* Ubuntu install, R Under development (unstable) (2022-10-04 r83014)
+* Mac OSX (R 4.2.0)
 
 ## R CMD check results
 
