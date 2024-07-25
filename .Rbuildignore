@@ -22,3 +22,5 @@ revdep
 ^\_pkgdown\.yml$
 docs
 ^_pkgdown\.yml$
+^\.github$
+^\.github/workflows/rhub.yaml$
