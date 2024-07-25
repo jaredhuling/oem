@@ -37,6 +37,7 @@ Imports:
 LinkingTo: Rcpp,
     RcppEigen,
     BH,
+    RSpectra (>= 0.16-2),
     bigmemory,
     RcppArmadillo
 RoxygenNote: 7.2.0
