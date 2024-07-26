@@ -1,8 +1,16 @@
-citHeader("To cite oem in publications use:")
 
-citEntry(, 
-  entry        = "Article",
+
+bibentry(bibtype = "Article",
   author       = "Shifeng Xiong and Bin Dai and Jared Huling and Peter Z. G. Qian",
+    author       = c(person(given = "Shifeng",
+                          family = "Xiong"),
+                     person(given = "Bin",
+                          family = "Dai"),
+                     person(given = c("Jared", "D."),
+                          family = "Huling",
+                          email = "huling@umn.edu"),
+                     person(given = c("Peter", "Z. G."),
+                          family = "Qian")),
   title        = "Orthogonalizing EM: A design-based least squares algorithm",
   journal      = "Technometrics",
   year         = "2016",
@@ -10,10 +18,7 @@ citEntry(,
   pages        = "285--293",
   doi          = "10.1080/00401706.2015.1054436",
   url          = "https://doi.org/10.1080/00401706.2015.1054436",
-  textVersion  = paste("Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) ",
-      "Orthogonalizing EM: A design-based least squares algorithm, ",
-      "Technometrics, Volume 58, Pages 285-293,",
-      "http://dx.doi.org/10.1080/00401706.2015.1054436.")
+  header       = "To cite oem in publications use:"
 )
 
 bibentry(bibtype = "Article",
