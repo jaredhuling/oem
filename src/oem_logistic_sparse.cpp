@@ -22,7 +22,7 @@ using Rcpp::CharacterVector;
 typedef Map<VectorXd> MapVecd;
 typedef Map<VectorXi> MapVeci;
 typedef Map<Eigen::MatrixXd> MapMatd;
-typedef Eigen::MappedSparseMatrix<double> MSpMat;
+typedef Eigen::Map<Eigen::SparseMatrix<double>> MSpMat;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
 

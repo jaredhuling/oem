@@ -17,7 +17,6 @@ using Rcpp::List;
 using Rcpp::Named;
 using Rcpp::IntegerVector;
 using Rcpp::CharacterVector;
-using Eigen::MappedSparseMatrix;
 using Eigen::SparseMatrix;
 
 typedef Map<VectorXd> MapVecd;
@@ -25,7 +24,7 @@ typedef Map<VectorXi> MapVeci;
 typedef Map<Eigen::MatrixXd> MapMatd;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
-typedef Eigen::MappedSparseMatrix<double> MSpMat;
+typedef Eigen::Map<Eigen::SparseMatrix<double>> MSpMat;
 typedef Eigen::SparseMatrix<double> SpMat;
 
 

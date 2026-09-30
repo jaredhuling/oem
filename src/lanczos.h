@@ -17,9 +17,8 @@ using Eigen::VectorXd;
 using Eigen::SparseMatrix;
 using Eigen::JacobiSVD;
 using Eigen::Ref;
-using Eigen::MappedSparseMatrix;
 using Eigen::SparseMatrix;
-typedef Eigen::MappedSparseMatrix<double> MSpMat;
+typedef Eigen::Map<Eigen::SparseMatrix<double>> MSpMat;
 typedef Eigen::SparseMatrix<double> SpMat;
 
 void GKLBidiag(const Ref<const MatrixXd>& AA, double& eigenv, Ref<VectorXd> v, 
