@@ -188,7 +188,7 @@ RcppExport SEXP oemfit(SEXP X,        // design matrix
 {
   using namespace Rcpp;
   using namespace arma;
-  try {
+  BEGIN_RCPP
     // store data into Armadillo objects
     NumericMatrix Xr(X);
     NumericVector Yr(Y);
@@ -243,17 +243,12 @@ RcppExport SEXP oemfit(SEXP X,        // design matrix
 			Named("power") = powerIter,
 			Named("time1") = t2[2] - t1[2],
 			Named("time2") = t3[2] - t2[2]);
-  } catch (std::exception &ex) {
-    forward_exception_to_r(ex);
-  } catch (...) {
-    ::Rf_error("C++ exception (unknown reason)");
-  }
-  return R_NilValue; //-Wall
+  END_RCPP
 }
 
 double powerM(arma::mat A) {
   using namespace arma;
-  try {
+  {
     if (A.n_rows == 1) return A(0, 0);
     colvec z0 = randu<vec>(A.n_rows);
     colvec z(A.n_rows);
@@ -269,12 +264,7 @@ double powerM(arma::mat A) {
       z0 = z;
     }
     return norm(z, 2);
-  } catch(std::exception &ex) {
-    forward_exception_to_r (ex);
-  } catch(...) {
-    ::Rf_error("C++ exception (unknown reason)");
   }
-  return 0; // -Wall
 }
 
 arma::colvec signVec(arma::colvec input) {
