@@ -31,7 +31,7 @@ typedef Eigen::Matrix<double, Eigen::Dynamic, 1> VectorX;
 typedef Map<const MatrixX> MapMat;
 typedef Map<const VectorX> MapVec;
 typedef Eigen::Triplet<double> T;
-typedef Eigen::MappedSparseMatrix<double> MSpMat;
+typedef Eigen::Map<Eigen::SparseMatrix<double>> MSpMat;
 typedef Eigen::SparseVector<double> SpVec;
 typedef Eigen::SparseMatrix<double> SpMat;
 typedef Map<MatrixXd> MapMatd;

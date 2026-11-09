@@ -48,7 +48,7 @@ protected:
     typedef Map<VectorXi> MapVeci;
     typedef const Eigen::Ref<const Matrix> ConstGenericMatrix;
     typedef const Eigen::Ref<const Vector> ConstGenericVector;
-    typedef Eigen::MappedSparseMatrix<double> MSpMat;
+    typedef Eigen::Map<Eigen::SparseMatrix<double>> MSpMat;
     typedef Eigen::SparseMatrix<double> SpMat;
     typedef Eigen::SparseVector<double> SparseVector;
     typedef MSpMat::InnerIterator InIterMat;
