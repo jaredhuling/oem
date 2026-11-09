@@ -474,16 +474,9 @@ protected:
                     XX.bottomRightCorner(nvars, nvars) = XtWX();
                 }
                 
-                if (xxdiag <= 0)
-                {
-                    xxdiag = XX.diagonal().tail(nvars).mean();
-                    intval = sqrt( (xxdiag / W.array().sum()) / double(nobs));
-                }
-                colsums.array() *= intval;
-                
                 XX.block(0,1,1,nvars) = colsums;
                 XX.block(1,0,nvars,1) = colsums.transpose();
-                XX(0,0) = xxdiag;
+                XX(0,0) = W.array().sum();
             } else 
             {
                 if (standardize)
@@ -728,8 +721,9 @@ public:
     {
         wt_len = weights.size();
         
+        // The intercept column is a column of ones, as in the dense solver.
         xxdiag = 0;
-        intval = 0;
+        intval = 1.0;
         found_grp_idx = false;
         
         if (standardize)
@@ -747,6 +741,10 @@ public:
             colsq /= (double(nobs) - 1.0);
             colsq = (colsq.array() == 0.0).select(1.0, colsq);
             colsq_inv = 1.0 / colsq.array().sqrt();
+        } else
+        {
+            // unit scaling, so code that applies colsq_inv is unaffected
+            colsq_inv.setOnes();
         }
         
         if (intercept)
@@ -962,9 +960,9 @@ public:
                 // make sure no weights are too small
                 for (int kk = 0; kk < nobs; ++kk)
                 {
-                    if (W(i) < 1e-5) 
+                    if (W(kk) < 1e-5) 
                     {
-                        W(i) = 1e-5;
+                        W(kk) = 1e-5;
                     }
                 }
                 
@@ -1039,10 +1037,6 @@ public:
     
     VectorXd get_beta() 
     { 
-        if (intercept && nobs > nvars)
-        {
-            beta(0) *= intval;
-        }
         if (standardize)
         {
             if (intercept)

@@ -735,6 +735,10 @@ public:
             colsq = (colsq.array() == 0.0).select(1.0, colsq);
             //}
             colsq_inv = 1.0 / colsq.array().sqrt();
+        } else
+        {
+            // unit scaling, so code that applies colsq_inv is unaffected
+            colsq_inv.setOnes();
         }
         
         //if (wt_len)
@@ -952,9 +956,9 @@ public:
                 // make sure no weights are too small
                 for (int kk = 0; kk < nobs; ++kk)
                 {
-                    if (W(i) < 1e-5) 
+                    if (W(kk) < 1e-5) 
                     {
-                        W(i) = 1e-5;
+                        W(kk) = 1e-5;
                     }
                 }
                 

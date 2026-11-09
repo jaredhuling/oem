@@ -181,7 +181,11 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
             lambda_tmp = lambda[pp];
         } else 
         {
-            if (is_net_pen)
+            const double lmax_pp = oem_lambda_max(solver, penalty[pp], alpha, gamma, tau, maxit);
+            if (lmax_pp > 0.0)
+            {
+                lambda_tmp = oem_lambda_sequence(lmax_pp, as<double>(lmin_ratio_), nl);
+            } else if (is_net_pen)
             {
                 lambda_tmp = (lambda_base.array() / alpha).matrix(); // * n; // 
             } else

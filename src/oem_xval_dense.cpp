@@ -210,6 +210,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     double ilambda = 0.0;
     
     std::string elasticnettxt(".net");
+    std::vector<double> lambda_auto_max(penalty.size(), -1.0);
     
     for (int ff = 0; ff < nfolds + 1; ++ff)
     {
@@ -240,7 +241,14 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
                 lambda_tmp = lambda[pp];
             } else 
             {
-                if (is_net_pen)
+                // the default sequence comes from the full data (ff == 0) and is
+                // reused for every fold
+                if (ff == 0) lambda_auto_max[pp] = oem_lambda_max(solver, penalty[pp], alpha, gamma, tau, maxit);
+                const double lmax_pp = lambda_auto_max[pp];
+                if (lmax_pp > 0.0)
+                {
+                    lambda_tmp = oem_lambda_sequence(lmax_pp, as<double>(lmin_ratio_), nl);
+                } else if (is_net_pen)
                 {
                     lambda_tmp = (lambda_base.array() / alpha).matrix(); // * n; // 
                 } else
