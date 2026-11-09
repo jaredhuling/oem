@@ -136,6 +136,7 @@ RcppExport SEXP oem_fit_sparse(SEXP x_,
     
     // compute initial pieces of oem
     solver->init_oem();
+    if (family(0) == "gaussian") solver->set_ridge_scale(1.0 / oem_response_scale(Y, intercept));
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 

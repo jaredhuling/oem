@@ -390,37 +390,23 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold(beta, u, lam, penalty_factor, denom);
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 0, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "scad") 
         {
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            if (alpha == 0)
-            {
-                lam   = 0;
-                denom = d + lambda;
-            }
-            
-            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 2, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 1, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
@@ -428,12 +414,14 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
             
         } else if (penalty == "grp.mcp")
         {
@@ -447,21 +435,25 @@ protected:
                                       unique_groups, groups, gamma);
         } else if (penalty == "grp.mcp.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             
             block_soft_threshold_mcp(beta, u, lam, group_weights,
                                      denom, grp_idx, ngroups, 
                                      unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "grp.scad.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold_scad(beta, u, lam, group_weights,
                                       denom, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "sparse.grp.lasso")
         {
             double lam_grp = (1.0 - tau) * lambda;

@@ -51,6 +51,11 @@ protected:
     VectorXd W;                 // weight vector for IRLS
     VectorXd prob;              // 1 / (1 + exp(-x * beta))
     VectorXd grad;
+    VectorXd W_xx;              // working weights used for XX and d
+    VectorXd beta_prob;         // coefficients at which prob was computed
+    VectorXd colmeans_x;        // column means of X, for implicit centering
+    double int_scale;           // scale c of the intercept column
+    bool int_scale_set;
     VectorXd weights;
     VectorXi groups;            // vector of group membersihp indexes 
     VectorXi unique_groups;     // vector of all unique groups
@@ -453,71 +458,142 @@ protected:
         return dev;
     }
     
-    void compute_XtX_d_update_A()
+    // S^{-1} X' W X S^{-1}
+    MatrixXd scaled_gram(const VectorXd &w) const
     {
-        
-        
-        // compute X'X or XX'
-        // must handle differently if p > n
-        if (nobs > nvars + int(intercept)) 
+        SpMat Xs = X * colsq_inv.asDiagonal();
+        return MatrixXd(SpMat(Xs.adjoint() * w.asDiagonal() * Xs));
+    }
+    // (sw X S^{-1}) (sw X S^{-1})'
+    MatrixXd scaled_outer(const VectorXd &sw) const
+    {
+        SpMat B = sw.asDiagonal() * X * colsq_inv.asDiagonal();
+        return MatrixXd(SpMat(B * B.adjoint()));
+    }
+    // weighted column sums of X and of its squares
+    void column_moments(const VectorXd &w, VectorXd &s1, VectorXd &s2) const
+    {
+        s1.setZero(nvars);
+        s2.setZero(nvars);
+        for (int j = 0; j < nvars; ++j)
         {
-            if (intercept)
+            for (InIterMat i_(X, j); i_; ++i_)
             {
-                colsums = X.adjoint() * W; 
-                
-                if (standardize)
-                {
-                    colsums.array() *= colsq_inv.array();
-                    XX.bottomRightCorner(nvars, nvars) = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
-                } else 
-                {
-                    XX.bottomRightCorner(nvars, nvars) = XtWX();
-                }
-                
-                XX.block(0,1,1,nvars) = colsums;
-                XX.block(1,0,nvars,1) = colsums.transpose();
-                XX(0,0) = W.array().sum();
-            } else 
-            {
-                if (standardize)
-                {
-                    XX = colsq_inv.asDiagonal() * XtWX() * colsq_inv.asDiagonal();
-                } else 
-                {
-                    XX = XtWX();
-                }
+                s1(j) += w(i_.row()) * i_.value();
+                s2(j) += w(i_.row()) * i_.value() * i_.value();
             }
-        } else 
-        {
-            XX = XWXt();
-            if (intercept)
-                XX.array() += 1.0; // adding 1 to all of XX' for the intercept
         }
-        
-        
-        // scale by sample size. needed for SCAD/MCP
-        XX /= nobs;
-        
-        Spectra::DenseSymMatProd<double> op(XX);
+    }
+
+    static double largest_eigenvalue(const MatrixXd &M)
+    {
+        Spectra::DenseSymMatProd<double> op(M);
         int ncv = 4;
-        if (XX.cols() < 4)
+        if (M.cols() < 4)
         {
-            ncv = XX.cols();
+            ncv = M.cols();
         }
-        
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, ncv);
-        
         eigs.init();
         eigs.compute(1000, 1e-6);
-        Vector eigenvals = eigs.eigenvalues();
-        d = eigenvals[0] * 1.0005; // multiply by an increasing factor to be safe
-        
-        if (nobs > nvars + int(intercept))
+        return eigs.eigenvalues()[0];
+    }
+    
+    // Linear predictor for coefficients theta in the solver's coordinates.
+    // The solver works with Z = [c 1, (X - 1 m') S^{-1}] when there is an
+    // intercept and Z = X S^{-1} otherwise (see compute_XtX_d_update_A).
+    VectorXd linear_predictor(const VectorXd &theta) const
+    {
+        if (intercept)
         {
+            VectorXd b = theta.tail(nvars).cwiseProduct(colsq_inv);
+            VectorXd eta = X * b;
+            eta.array() += int_scale * theta(0) - colmeans_x.dot(b);
+            return eta;
+        }
+        return X * theta.cwiseProduct(colsq_inv);
+    }
+    
+    // Z' r for an n-vector r
+    VectorXd crossprod_Z(const VectorXd &r) const
+    {
+        VectorXd out(nvars + int(intercept));
+        if (intercept)
+        {
+            const double rsum = r.sum();
+            out.tail(nvars) = (X.adjoint() * r - colmeans_x * rsum).cwiseProduct(colsq_inv);
+            out(0) = int_scale * rsum;
+        } else
+        {
+            out = (X.adjoint() * r).cwiseProduct(colsq_inv);
+        }
+        return out;
+    }
+    
+    void compute_XtX_d_update_A()
+    {
+        // Centering the columns by their means m (implicitly, so X is not
+        // modified) makes the intercept column nearly orthogonal to the
+        // others, which improves the conditioning of Z'WZ. The intercept
+        // column is scaled by c, fixed for the whole fit, so that its
+        // curvature matches the largest eigenvalue of the rest.
+        W_xx = W;
+        const double Wsum = W.sum();
+        const VectorXd v = colmeans_x.cwiseProduct(colsq_inv);   // S^{-1} m
+        
+        if (nobs > nvars + int(intercept)) 
+        {
+            MatrixXd G = scaled_gram(W);
+            VectorXd cw = (X.adjoint() * W).cwiseProduct(colsq_inv);
+            if (intercept)
+            {
+                G -= v * cw.transpose() + cw * v.transpose();
+                G += Wsum * v * v.transpose();
+            }
+            G /= double(nobs);
+            if (intercept)
+            {
+                if (!int_scale_set)
+                {
+                    double drest = largest_eigenvalue(G);
+                    int_scale = (drest > 0.0) ? std::sqrt(drest / (Wsum / double(nobs))) : 1.0;
+                    int_scale_set = true;
+                }
+                VectorXd cross = int_scale * (cw - Wsum * v) / double(nobs);
+                XX.setZero();
+                XX(0, 0) = int_scale * int_scale * Wsum / double(nobs);
+                XX.block(1, 0, nvars, 1) = cross;
+                XX.block(0, 1, 1, nvars) = cross.transpose();
+                XX.bottomRightCorner(nvars, nvars) = G;
+            } else
+            {
+                XX = G;
+            }
+            d = largest_eigenvalue(XX) * 1.0005; // multiply by an increasing factor to be safe
             A = -XX;
             A.diagonal().array() += d;
+        } else 
+        {
+            // Z W Z' / n has the same nonzero eigenvalues as Z'WZ / n and is
+            // n x n; it is used only to find d.
+            VectorXd sw = W.array().sqrt().matrix();
+            MatrixXd M = scaled_outer(sw);
+            if (intercept)
+            {
+                VectorXd Bv = sw.cwiseProduct(X * v);
+                M -= Bv * sw.transpose() + sw * Bv.transpose();
+                M += v.squaredNorm() * sw * sw.transpose();
+                if (!int_scale_set)
+                {
+                    double drest = largest_eigenvalue(M / double(nobs));
+                    int_scale = (drest > 0.0) ? std::sqrt(drest / (Wsum / double(nobs))) : 1.0;
+                    int_scale_set = true;
+                }
+                M += int_scale * int_scale * sw * sw.transpose();
+            }
+            M /= double(nobs);
+            d = largest_eigenvalue(M) * 1.0005;
         }
-        
     }
     
     void next_u(Vector &res)
@@ -527,41 +603,15 @@ protected:
             res.noalias() = A * beta_prev + XY;
         } else 
         {
-            if (intercept)
-            {
-                if (standardize)
-                {
-                    // need to handle differently with intercept
-                    VectorXd resid  = Y - X * (beta_prev.tail(nvars).array() * colsq_inv.array()).matrix();
-                    resid.array() -= beta_prev(0);
-                    //resid.array() *= W.array();
-                    
-                    resid /=  double(nobs);
-                    res.tail(nvars) = (colsq_inv.asDiagonal() * X.adjoint()) * (resid) + d * beta_prev.tail(nvars);
-                    res(0) = resid.sum() + d * beta_prev(0);
-                } else 
-                {
-                    // need to handle differently with intercept
-                    VectorXd resid  = Y - X * beta_prev.tail(nvars).matrix();
-                    resid.array() -= beta_prev(0);
-                    //resid.array() *= W.array();
-                    
-                    resid /=  double(nobs);
-                    res.tail(nvars) = X.adjoint() * (resid) + d * beta_prev.tail(nvars);
-                    res(0) = resid.sum() + d * beta_prev(0);
-                }
-            } else 
-            {
-                if (standardize)
-                {
-                    res.noalias() = (colsq_inv.array() * (X.adjoint() * ((W.array() * (Y - X * ( beta_prev.array() * colsq_inv.array() ).matrix() ).array() ) / double(nobs)).matrix()).array()).matrix();
-                } else 
-                {
-                    res.noalias() = X.adjoint() * ((W.array() * (Y - X * beta_prev).array() ) / double(nobs)).matrix();
-                }
-                res += d * beta_prev;
-            }
-            
+            // The quadratic majorizer of the negative log likelihood at
+            // beta_prob, where prob was computed, has gradient
+            //   -Z' [ (y - prob) + W_xx * Z (beta_prob - theta) ] / n,
+            // so u = d * theta minus that gradient, computed without Z'Z.
+            VectorXd resid = Y - prob;
+            if (wt_len) resid.array() *= weights.array();
+            resid.array() += W_xx.array() * linear_predictor(beta_prob - beta_prev).array();
+            resid /= double(nobs);
+            res = crossprod_Z(resid) + d * beta_prev;
         }
     }
     
@@ -575,37 +625,23 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold(beta, u, lam, penalty_factor, denom);
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 0, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "scad") 
         {
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            if (alpha == 0)
-            {
-                lam   = 0;
-                denom = d + lambda;
-            }
-            
-            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 2, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 1, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
@@ -613,12 +649,14 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
             
         } else if (penalty == "grp.mcp")
         {
@@ -632,21 +670,25 @@ protected:
                                       unique_groups, groups, gamma);
         } else if (penalty == "grp.mcp.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             
             block_soft_threshold_mcp(beta, u, lam, group_weights,
                                      denom, grp_idx, ngroups, 
                                      unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "grp.scad.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold_scad(beta, u, lam, group_weights,
                                       denom, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "sparse.grp.lasso")
         {
             double lam_grp = (1.0 - tau) * lambda;
@@ -720,79 +762,35 @@ public:
     void init_oem()
     {
         wt_len = weights.size();
-        
-        // The intercept column is a column of ones, as in the dense solver.
-        xxdiag = 0;
-        intval = 1.0;
         found_grp_idx = false;
         
-        if (standardize)
+        // column scales (standard deviations with denominator n, as in
+        // glmnet, when standardizing) and column means (with an intercept)
+        VectorXd w = wt_len ? VectorXd(weights) : VectorXd(VectorXd::Ones(nobs));
+        const double wsum = w.sum();
+        VectorXd s1, s2;
+        column_moments(w, s1, s2);
+        colsq_inv.setOnes();
+        colmeans_x.setZero(nvars);
+        for (int j = 0; j < nvars; ++j)
         {
-            VectorXd colsq(nvars);
-            colsq.setZero();
-            
-            for (int j = 0; j < nvars; ++j)
-            {
-                for (InIterMat i_(X, j); i_; ++i_)
-                {
-                    colsq(j) += std::pow(i_.value(), 2);
-                }
-            }
-            colsq /= (double(nobs) - 1.0);
-            colsq = (colsq.array() == 0.0).select(1.0, colsq);
-            colsq_inv = 1.0 / colsq.array().sqrt();
-        } else
-        {
-            // unit scaling, so code that applies colsq_inv is unaffected
-            colsq_inv.setOnes();
+            double mean = s1(j) / wsum;
+            if (intercept) colmeans_x(j) = mean;
+            double var = s2(j) / wsum - mean * mean;
+            if (standardize && var > 0.0) colsq_inv(j) = 1.0 / std::sqrt(var);
         }
+        int_scale = 1.0;
+        int_scale_set = false;
         
         if (intercept)
         {
-            // these need to be one element
-            // larger for model with intercept
             u.resize(nvars + 1);
             beta.resize(nvars + 1);
             beta_prev.resize(nvars + 1);
-            
-            if (wt_len)
-            {
-                XY.tail(nvars) = X.transpose() * (Y.array() * weights.array()).matrix();
-                XY(0) = (Y.array() * weights.array()).sum() * intval;
-            } else 
-            {
-                XY.tail(nvars) = X.transpose() * Y;
-                XY(0) = Y.sum() * intval;
-            }
-            
-            colsums = X.adjoint() * VectorXd::Ones( nobs );
-            
-            if (standardize)
-            {
-                XY.tail(nvars).array() *= colsq_inv.array();
-                colsums.array() *= colsq_inv.array();
-            } 
-            
-        } else 
-        {
-            if (wt_len)
-            {
-                XY.noalias() = X.transpose() * (Y.array() * weights.array()).matrix();
-            } else
-            {
-                XY.noalias() = X.transpose() * Y;
-            }
-            
-            if (standardize)
-            {
-                XY.array() *= colsq_inv.array();
-                colsums.array() *= colsq_inv.array();
-            } 
-            
         }
         
-        XY /= nobs;
-        
+        // Z' y / n, used only for the fallback lambda sequence
+        XY = crossprod_Z(Y) / double(nobs);
     }
     
     double compute_lambda_zero() 
@@ -863,90 +861,10 @@ public:
             
             if (!(i == 0 && !on_lam_1))
             {
+                beta_prob = beta;
                 // calculate mu hat
-                if (ncores <= 1)
-                {
-                    // calculate mu hat
-                    if (intercept)
-                    {
-                        if (standardize)
-                        {
-                            prob = 1 / (1 + (-1 * ((X * ( beta.tail(nvars).array() * colsq_inv.array() ).matrix()   ).array() + 
-                                beta(0)).array()).exp().array());
-                        } else 
-                        {
-                            prob = 1 / (1 + (-1 * ((X * (beta.tail(nvars).array() * colsq_inv.array()).matrix() ).array() + beta(0) * intval).array()).exp().array());
-                        }
-                            
-                    } else
-                    {
-                        if (standardize){
-                            prob.noalias() = (1 / (1 + (-1 * (X * ( beta.array() * colsq_inv.array() ).matrix()  ).array()).exp().array())).matrix();
-                        } else 
-                        {
-                            prob.noalias() = (1 / (1 + (-1 * (X * beta).array()).exp().array())).matrix();
-                        }
-                    }
-                } else 
-                {
-                    int numrowscur = std::floor(double(nobs) / double(ncores));
-                    int numrowscurfirst = numrowscur;
-                    
-                    #pragma omp parallel for schedule(static)
-                    for (int ff = 0; ff < ncores; ++ff)
-                    {
-                        
-                        if (ff + 1 == ncores)
-                        {
-                            numrowscur = nobs - (ncores - 1) * std::floor(double(nobs) / double(ncores));
-                            if (intercept)
-                            {
-                                if (standardize)
-                                {
-                                    prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * (beta.tail(nvars).array() * colsq_inv.array()).matrix() ).array() + beta(0) * intval).array()).exp().array());
-                                } else 
-                                {
-                                    prob.tail(numrowscur) = 1 / (1 + (-1 * ((X.bottomRows(numrowscur) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
-                                }
-                                    
-                            } else
-                            {
-                                if (standardize)
-                                {
-                                    prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * (beta.array() * colsq_inv.array()).matrix()   ).array()).exp().array())).matrix();
-                                } else 
-                                {
-                                    prob.tail(numrowscur) = (1 / (1 + (-1 * (X.bottomRows(numrowscur) * beta).array()).exp().array())).matrix();
-                                }
-                            }
-                        } else 
-                        {
-                            if (intercept)
-                            {
-                                if (standardize)
-                                {
-                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * (beta.tail(nvars).array() * colsq_inv.array()).matrix()  ).array() + beta(0) * intval).array()).exp().array());
-                                } else 
-                                {
-                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = 1 / (1 + (-1 * ((X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta.tail(nvars)).array() + beta(0) * intval).array()).exp().array());
-                                }
-                                    
-                            } else
-                            {
-                                if (standardize)
-                                {
-                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * (beta.array() * colsq_inv.array()).matrix()).array()).exp().array())).matrix();
-                                } else 
-                                {
-                                    prob.segment(ff * numrowscurfirst, numrowscurfirst) = (1 / (1 + (-1 * (X.middleRows(ff * numrowscurfirst, numrowscurfirst) * beta).array()).exp().array())).matrix();
-                                }
-                            }
-                        }
-                    }
-                }
+                prob = (1.0 / (1.0 + (-linear_predictor(beta)).array().exp())).matrix();
                 
-                
-                // calculate Jacobian (or weight vector)
                 W = prob.array() * (1 - prob.array());
                 
                 
@@ -975,33 +893,10 @@ public:
                 // only for p < n case
                 if (nobs > nvars + int(intercept))
                 {
-                    
-                    if (intercept)
-                    {
-                        VectorXd presid = Y.array() - prob.array();
-                        grad.tail(nvars) = (X.adjoint() * presid).array() / double(nobs);
-                        grad(0) = presid.sum() / double(nobs);
-                        
-                        if (standardize)
-                        {
-                            grad.tail(nvars).array() *= colsq_inv.array();
-                        }
-                        
-                    } else 
-                    {
-                        grad.noalias() = X.adjoint() * (Y.array() - prob.array()).matrix() / double(nobs);
-                        
-                        if (standardize)
-                        {
-                            grad.array() *= colsq_inv.array();
-                        }
-                    }
-                    
-                    
-                    // not sure why the following doesn't 
-                    // work but the above, which seems
-                    // wrong does work
-                    //grad = X.adjoint() * ( W.array() * (Y.array() - prob.array()).array()).matrix();
+                    // gradient of the log likelihood at beta
+                    VectorXd presid = Y - prob;
+                    if (wt_len) presid.array() *= weights.array();
+                    grad = crossprod_Z(presid) / double(nobs);
                     XY.noalias() = XX * beta + grad;
                 }
             }
@@ -1037,22 +932,17 @@ public:
     
     VectorXd get_beta() 
     { 
-        if (standardize)
+        // coefficients on the original scale of x
+        VectorXd beta_ret = beta;
+        if (intercept)
         {
-            if (intercept)
-            {
-                VectorXd beta_ret = beta;
-                beta_ret.tail(nvars).array() *= colsq_inv.array();
-                return(beta_ret);
-            } else 
-            {
-                return (beta.array() * colsq_inv.array()).matrix();
-            }
-        } else 
+            beta_ret.tail(nvars).array() *= colsq_inv.array();
+            beta_ret(0) = int_scale * beta(0) - colmeans_x.dot(beta_ret.tail(nvars));
+        } else
         {
-            return beta;
+            beta_ret.array() *= colsq_inv.array();
         }
-        return beta;
+        return beta_ret;
     }
     
     virtual double get_loss()

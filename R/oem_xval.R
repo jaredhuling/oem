@@ -47,7 +47,12 @@
 #' depends on the sample size nobs relative to the number of variables nvars. If
 #' \code{nobs > nvars}, the default is 0.0001, close to zero. 
 #' @param alpha mixing value for \code{elastic.net}, \code{mcp.net}, \code{scad.net}, \code{grp.mcp.net}, \code{grp.scad.net}. 
-#' penalty applied is (1 - alpha) * (ridge penalty) + alpha * (lasso/mcp/mcp/grp.lasso penalty)
+#' The penalty applied is \code{lambda * (alpha * P + (1 - alpha) / 2 * R)}, where \code{P} is the lasso, MCP, SCAD,
+#' or group penalty and \code{R} is the sum of squared coefficients. For the elementwise penalties both parts are
+#' multiplied by \code{penalty.factor}. Coefficients that are not penalized, including the intercept, are not
+#' shrunk by either part.
+#' For Gaussian models, as in \code{glmnet}, the ridge part is divided by the standard deviation of \code{y}
+#' (its root mean square when \code{intercept = FALSE}).
 #' @param gamma tuning parameter for SCAD and MCP penalties. must be >= 1
 #' @param tau mixing value for \code{sparse.grp.lasso}. penalty applied is (1 - tau) * (group lasso penalty) + tau * (lasso penalty)
 #' @param groups A vector of describing the grouping of the coefficients. See the example below. All unpenalized variables
@@ -61,6 +66,7 @@
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
 #' @param standardize Logical flag for \code{x} variable standardization, prior to fitting the models. 
+#' Each column is scaled by its standard deviation (computed with denominator n), as in \code{glmnet}.
 #' The coefficients are always returned on the original scale. Default is \code{standardize = TRUE}. If 
 #' variables are in the same units already, you might not wish to standardize. 
 #' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})

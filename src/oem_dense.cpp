@@ -149,6 +149,8 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     }
     
     DataStd<double> datstd(n, p + add, standardize, intercept);
+    // response scale for the ridge part, before Y is standardized
+    const double ridge_y_scale = oem_response_scale(Y, intercept_bin);
     datstd.standardize(X, Y, weights);
     
     
@@ -171,6 +173,8 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     
     
     solver->init_oem();
+    // the solver sees y / scaleY, so its ridge level carries that factor
+    solver->set_ridge_scale(datstd.get_scaleY() / ridge_y_scale);
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero() * datstd.get_scaleY(); // 

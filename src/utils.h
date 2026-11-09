@@ -164,4 +164,82 @@ T extract(const T2& full, const T& ind)
 }
 */
 
+
+// Scale of the response used by glmnet for Gaussian models: the standard
+// deviation of y (denominator n) with an intercept, and the root mean square
+// of y without one. Returns 1 when that scale is zero.
+inline double oem_response_scale(const VectorXd &y, bool intercept)
+{
+    double center = intercept ? y.mean() : 0.0;
+    double s = std::sqrt((y.array() - center).square().mean());
+    return (s > 0.0) ? s : 1.0;
+}
+
+// Thresholding rule for one coordinate, given u = d * b + score:
+// type 0 is the lasso, 1 is MCP, and 2 is SCAD, with penalty level pen.
+// These are the rules used by soft_threshold, soft_threshold_mcp, and
+// soft_threshold_scad in the solver classes.
+inline double oem_threshold_scalar(double u, double pen, double d, int type, double gamma)
+{
+    if (type == 1)
+    {
+        if (std::abs(u) > gamma * d * pen) return u / d;
+        double denom = d - 1.0 / gamma;
+        if (u > pen) return (u - pen) / denom;
+        if (u < -pen) return (u + pen) / denom;
+        return 0.0;
+    } else if (type == 2)
+    {
+        if (std::abs(u) > gamma * d * pen) return u / d;
+        if (std::abs(u) > (d + 1.0) * pen)
+        {
+            double gam_u = (gamma - 1.0) * u;
+            double gam_pen = gamma * pen;
+            double denom = (gamma - 1.0) * d - 1.0;
+            if (gam_u > gam_pen) return (gam_u - gam_pen) / denom;
+            if (gam_u < -gam_pen) return (gam_u + gam_pen) / denom;
+            return 0.0;
+        }
+        if (u > pen) return (u - pen) / d;
+        if (u < -pen) return (u + pen) / d;
+        return 0.0;
+    }
+    if (u > pen) return (u - pen) / d;
+    if (u < -pen) return (u + pen) / d;
+    return 0.0;
+}
+
+// Update for the elementwise ".net" penalties
+//   lambda * pf_j * ( alpha * P(|b_j|) + (1 - alpha) / 2 * b_j^2 ),
+// with P the lasso, MCP, or SCAD penalty (type as in oem_threshold_scalar).
+// Coordinate j uses L1 level lam_l1 * pf_j and denominator d + lam_l2 * pf_j,
+// so a coordinate with pf_j = 0, such as the intercept, is neither
+// thresholded nor shrunk by the ridge term.
+inline void oem_net_threshold(VectorXd &res, const VectorXd &u, int type,
+                              double lam_l1, double lam_l2, const VectorXd &pf,
+                              double d, double gamma)
+{
+    for (int j = 0; j < u.size(); ++j)
+    {
+        res(j) = oem_threshold_scalar(u(j), lam_l1 * pf(j), d + lam_l2 * pf(j), type, gamma);
+    }
+}
+
+// For the group ".net" penalties, the coefficients in group 0 (unpenalized
+// variables and, where the solver carries it, the intercept) take the
+// unpenalized update u / d, with no ridge term.
+inline void oem_unpenalized_group_update(VectorXd &res, const VectorXd &u,
+                                         const std::vector<std::vector<int> > &grp_idx,
+                                         const VectorXi &unique_groups, double d)
+{
+    for (int g = 0; g < unique_groups.size(); ++g)
+    {
+        if (unique_groups(g) != 0) continue;
+        for (std::vector<int>::size_type v = 0; v < grp_idx[g].size(); ++v)
+        {
+            res(grp_idx[g][v]) = u(grp_idx[g][v]) / d;
+        }
+    }
+}
+
 #endif

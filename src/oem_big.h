@@ -6,6 +6,7 @@
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
+#include "oem_center.h"
 #include <bigmemory/MatrixAccessor.hpp>
 #include <bigmemory/BigMatrix.h>
 
@@ -63,6 +64,9 @@ protected:
     Eigen::RowVectorXd colsums;
     Eigen::RowVectorXd colsq;
     Eigen::VectorXd colsq_inv;
+    VectorXd cvec;              // scaled column means v for implicit centering
+    double int_scale;           // scale c of the intercept column
+    bool centered;              // true if the solver uses the centered design
     
     bool found_grp_idx;
     
@@ -442,7 +446,7 @@ protected:
             {
                 // find all variables in group number g
                 std::vector<int> idx_tmp;
-                for (int v = 0; v < nvars; ++v) 
+                for (int v = 0; v < groups.size(); ++v) 
                 {
                     if (groups(v) == unique_groups(g)) 
                     {
@@ -501,9 +505,31 @@ protected:
                 }
             } else 
             {
-                XX = XWXt();
-                if (intercept)
-                    XX.array() += 1.0; // adding 1 to all of XX' for the intercept
+                // Z W Z' / n has the same nonzero eigenvalues as Z'WZ / n and is
+                // n x n; it is used only to find d.
+                MatrixXd Zs = X * colsq_inv.asDiagonal();
+                if (wt_len)
+                {
+                    VectorXd sw = weights.array().sqrt().matrix();
+                    Zs = sw.asDiagonal() * Zs;
+                    XX = MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().rankUpdate(Zs);
+                    if (intercept) XX += sw * sw.transpose();
+                } else
+                {
+                    XX = MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().rankUpdate(Zs);
+                    if (intercept)
+                    {
+                        // centered design: (X S^{-1} - 1 v')(X S^{-1} - 1 v')' + c^2 1 1'
+                        cvec = colsums.transpose().cwiseProduct(colsq_inv) / double(nobs);
+                        VectorXd Zv = Zs * cvec;
+                        XX -= Zv * VectorXd::Ones(nobs).transpose() + VectorXd::Ones(nobs) * Zv.transpose();
+                        XX.array() += cvec.squaredNorm();
+                        double drest = oem_largest_eigenvalue(XX / double(nobs));
+                        int_scale = (drest > 0.0) ? std::sqrt(drest) : 1.0;
+                        XX.array() += int_scale * int_scale;
+                        centered = true;
+                    }
+                }
             }
         } else 
         {
@@ -535,13 +561,41 @@ protected:
                 }
             } else 
             {
-                XX = XXt();
-                if (intercept)
-                    XX.array() += 1.0; // adding 1 to all of XX' for the intercept
+                // Z W Z' / n has the same nonzero eigenvalues as Z'WZ / n and is
+                // n x n; it is used only to find d.
+                MatrixXd Zs = X * colsq_inv.asDiagonal();
+                if (wt_len)
+                {
+                    VectorXd sw = weights.array().sqrt().matrix();
+                    Zs = sw.asDiagonal() * Zs;
+                    XX = MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().rankUpdate(Zs);
+                    if (intercept) XX += sw * sw.transpose();
+                } else
+                {
+                    XX = MatrixXd(nobs, nobs).setZero().selfadjointView<Lower>().rankUpdate(Zs);
+                    if (intercept)
+                    {
+                        // centered design: (X S^{-1} - 1 v')(X S^{-1} - 1 v')' + c^2 1 1'
+                        cvec = colsums.transpose().cwiseProduct(colsq_inv) / double(nobs);
+                        VectorXd Zv = Zs * cvec;
+                        XX -= Zv * VectorXd::Ones(nobs).transpose() + VectorXd::Ones(nobs) * Zv.transpose();
+                        XX.array() += cvec.squaredNorm();
+                        double drest = oem_largest_eigenvalue(XX / double(nobs));
+                        int_scale = (drest > 0.0) ? std::sqrt(drest) : 1.0;
+                        XX.array() += int_scale * int_scale;
+                        centered = true;
+                    }
+                }
             }
         }
         
         XX /= nobs;
+        
+        if (intercept && !wt_len && nobs > nvars + int(intercept))
+        {
+            oem_center_gram(XX, cvec, int_scale);
+            centered = true;
+        }
         
         Spectra::DenseSymMatProd<double> op(XX);
         
@@ -572,12 +626,35 @@ protected:
             res.noalias() = A * beta_prev + XY;
         } else 
         {
-            if (wt_len)
+            // u = d * theta + Z' W (y - Z theta) / n, without forming Z'Z
+            VectorXd theta = centered ? oem_uncenter_theta(beta_prev, cvec, int_scale) : VectorXd(beta_prev);
+            VectorXd resid;
+            if (intercept)
             {
-                res.noalias() = X.adjoint() * ((Y - X * beta_prev).array() * weights.array().square()).matrix() / double(nobs) + d * beta_prev;
+                resid = Y - X * (theta.tail(nvars).cwiseProduct(colsq_inv));
+                resid.array() -= theta(0);
             } else
             {
-                res.noalias() = X.adjoint() * (Y - X * beta_prev) / double(nobs) + d * beta_prev;
+                resid = Y - X * (theta.cwiseProduct(colsq_inv));
+            }
+            if (wt_len) resid.array() *= weights.array();
+            resid /= double(nobs);
+            if (intercept)
+            {
+                const double g0 = resid.sum();
+                VectorXd gt = (X.adjoint() * resid).cwiseProduct(colsq_inv);
+                if (centered)
+                {
+                    res(0) = d * beta_prev(0) + int_scale * g0;
+                    res.tail(nvars) = d * beta_prev.tail(nvars) + gt - cvec * g0;
+                } else
+                {
+                    res(0) = d * beta_prev(0) + g0;
+                    res.tail(nvars) = d * beta_prev.tail(nvars) + gt;
+                }
+            } else
+            {
+                res = (X.adjoint() * resid).cwiseProduct(colsq_inv) + d * beta_prev;
             }
         }
     }
@@ -592,37 +669,23 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold(beta, u, lam, penalty_factor, denom);
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 0, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "scad") 
         {
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            if (alpha == 0)
-            {
-                lam   = 0;
-                denom = d + lambda;
-            }
-            
-            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 2, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 1, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
@@ -630,12 +693,14 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
             
         } else if (penalty == "grp.mcp")
         {
@@ -649,21 +714,25 @@ protected:
                                       unique_groups, groups, gamma);
         } else if (penalty == "grp.mcp.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             
             block_soft_threshold_mcp(beta, u, lam, group_weights,
                                      denom, grp_idx, ngroups, 
                                      unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "grp.scad.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold_scad(beta, u, lam, group_weights,
                                       denom, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "sparse.grp.lasso")
         {
             double lam_grp = (1.0 - tau) * lambda;
@@ -740,6 +809,9 @@ protected:
             // calculate number of rows per slice
             nslices = std::ceil(xgigs / gigs);
             
+            // unit scaling unless standardizing, so code that applies
+            // colsq_inv is unaffected
+            colsq_inv.setOnes();
             if (standardize)
             {
                 if (wt_len)
@@ -754,12 +826,14 @@ protected:
                 {
                     // colsq = X.array().square().matrix().colwise().sum() / (nobs - 1);
                     // don't want to access all of X at once
+                    // variance with denominator n, as in glmnet
                     for (int i = 0; i < pc; ++i)
                     {
-                        colsq(i) = X.col(i).array().square().sum() / (double(nobs) - 1.0);
+                        double m = X.col(i).mean();
+                        colsq(i) = X.col(i).array().square().sum() / double(nobs) - m * m;
                     }
                 }
-                colsq = (colsq.array() == 0.0).select(1.0, colsq);
+                colsq = (colsq.array() <= 0.0).select(1.0, colsq);
                 colsq_inv = 1.0 / colsq.array().sqrt();
             }
             
@@ -838,7 +912,13 @@ protected:
             
             // compute XtX or XXt (depending on if n > p or not)
             // and compute A = dI - XtX (if n > p)
+            centered = false;
+            int_scale = 1.0;
             compute_XtX_d_update_A();
+            if (centered && nobs > nvars + int(intercept))
+            {
+                oem_center_xy(XY, cvec, int_scale);
+            }
         }
         
         double compute_lambda_zero() 
@@ -879,44 +959,35 @@ protected:
         
         VectorXd get_beta() 
         { 
-            if (standardize)
+            // coefficients on the original scale of x
+            VectorXd beta_ret = centered ? oem_uncenter_theta(beta, cvec, int_scale) : VectorXd(beta);
+            if (intercept)
             {
-                if (intercept)
-                {
-                    VectorXd beta_ret = beta;
-                    beta_ret.tail(nvars).array() *= colsq_inv.array();
-                    return(beta_ret);
-                } else 
-                {
-                    return (beta.array() * colsq_inv.array()).matrix();
-                }
-            } else 
+                beta_ret.tail(nvars).array() *= colsq_inv.array();
+            } else
             {
-                return beta;
+                beta_ret.array() *= colsq_inv.array();
             }
+            return beta_ret;
         }
         
         virtual double get_loss()
         {
-            double loss;
-            VectorXd xbeta(nobs);
-            int pc = X.cols();
-            
-            xbeta.setZero();
-            
-            for (int i = 0; i < pc; ++i)
+            VectorXd b = get_beta();
+            VectorXd eta;
+            if (intercept)
             {
-                xbeta.array() += (X.col(i) * beta).array();
+                eta = X * b.tail(nvars);
+                eta.array() += b(0);
+            } else
+            {
+                eta = X * b;
             }
-            
             if (wt_len)
             {
-                loss = ((Y - xbeta).array().square() * weights.array()).sum();
-            } else 
-            {
-                loss = (Y - xbeta).array().square().sum();
+                return ((Y - eta).array().square() * weights.array()).sum();
             }
-            return loss;
+            return (Y - eta).array().square().sum();
         }
         };
 

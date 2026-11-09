@@ -40,8 +40,11 @@ LinkingTo: Rcpp,
     RSpectra (>= 0.16-2),
     bigmemory,
     RcppArmadillo
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0),
+    glmnet
 VignetteBuilder: knitr
+Config/testthat/edition: 3

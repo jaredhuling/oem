@@ -19,6 +19,7 @@
 #include "oem_base.h"
 #include "Spectra/SymEigsSolver.h"
 #include "utils.h"
+#include "oem_center.h"
 
 
 
@@ -65,8 +66,12 @@ protected:
     std::vector<VectorXd > xty_list;
     std::vector<int > nobs_list;
     std::vector<VectorXd > colsq_list;
+    mutable std::vector<VectorXd > colsum_list;   // column sums of X within each fold
     VectorXd colsq_inv;
     VectorXd colsq;
+    VectorXd cvec;              // scaled column means v for implicit centering
+    double int_scale = 1.0;     // scale c of the intercept column
+    bool centered = false;      // true if the solver uses the centered design
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
@@ -397,6 +402,7 @@ protected:
             VectorXd AtBtmp = sub.adjoint() * sub_y;
             
             VectorXd colsqtmp = sub.array().square().colwise().sum();
+            colsum_list[k-1] = sub.colwise().sum().transpose();
             
             sub.resize(0,0);
             
@@ -470,6 +476,7 @@ protected:
             AtBtmp(0) = sub_y.sum();
             
             VectorXd colsqtmp = sub.array().square().colwise().sum();
+            colsum_list[k-1] = sub.colwise().sum().transpose();
             
             sub.resize(0,0);
             
@@ -533,6 +540,7 @@ protected:
             // this commented code is wrong! we do not standardize with respect to weights
             //VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
             VectorXd colsqtmp = sub.array().square().colwise().sum();
+            colsum_list[k-1] = sub.colwise().sum().transpose();
             
             sub.resize(0,0);
             
@@ -613,6 +621,7 @@ protected:
             
             //VectorXd colsqtmp = ((sub_weights.array().sqrt().matrix()).asDiagonal() * sub).array().square().colwise().sum();
             VectorXd colsqtmp = sub.array().square().colwise().sum();
+            colsum_list[k-1] = sub.colwise().sum().transpose();
             
             sub.resize(0,0);
             
@@ -730,6 +739,7 @@ protected:
         
         nobs = 0;
         colsq.setZero();
+        VectorXd colsum = VectorXd::Zero(nvars);
         for (int k = 0; k < nfolds; ++k)
         {
             // compute
@@ -739,11 +749,14 @@ protected:
             XY += xty_list[k];
             nobs += nobs_list[k];
             colsq.array() += colsq_list[k].array();
+            colsum += colsum_list[k];
         }
         
-        colsq /= (nobs - 1);
-        colsq = (colsq.array() == 0.0).select(1.0, colsq);
+        // variance with denominator n, as in glmnet
+        colsq.array() = colsq.array() / double(nobs) - (colsum.array() / double(nobs)).square();
+        colsq = (colsq.array() <= 0.0).select(1.0, colsq);
         colsq_inv = 1 / colsq.array().sqrt();
+        if (!standardize) colsq_inv.setOnes();
         
         
         if (standardize)
@@ -765,6 +778,15 @@ protected:
         
         XX /= nobs;
         XY /= nobs;
+        
+        // implicit centering with a scaled intercept column (see oem_center.h)
+        centered = false;
+        if (intercept && !wt_len)
+        {
+            oem_center_gram(XX, cvec, int_scale);
+            oem_center_xy(XY, cvec, int_scale);
+            centered = true;
+        }
         
         
         Spectra::DenseSymMatProd<double> op(XX);
@@ -796,6 +818,7 @@ protected:
         nobs = 0;
         
         colsq.setZero();
+        VectorXd colsum = VectorXd::Zero(nvars);
         
         for (int k = 1; k < nfolds + 1; ++k)
         {
@@ -808,12 +831,15 @@ protected:
                 XY += xty_list[k-1];
                 nobs += nobs_list[k-1];
                 colsq.array() += colsq_list[k-1].array();
+                colsum += colsum_list[k-1];
             }
         }
         
-        colsq /= (double(nobs) - 1.0);
-        colsq = (colsq.array() == 0.0).select(1.0, colsq);
+        // variance with denominator n, as in glmnet
+        colsq.array() = colsq.array() / double(nobs) - (colsum.array() / double(nobs)).square();
+        colsq = (colsq.array() <= 0.0).select(1.0, colsq);
         colsq_inv = 1.0 / colsq.array().sqrt();
+        if (!standardize) colsq_inv.setOnes();
         
         
         if (standardize)
@@ -833,6 +859,15 @@ protected:
         
         XX /= nobs;
         XY /= nobs;
+        
+        // implicit centering with a scaled intercept column (see oem_center.h)
+        centered = false;
+        if (intercept && !wt_len)
+        {
+            oem_center_gram(XX, cvec, int_scale);
+            oem_center_xy(XY, cvec, int_scale);
+            centered = true;
+        }
         
         Spectra::DenseSymMatProd<double> op(XX);
         Spectra::SymEigsSolver< double, Spectra::LARGEST_ALGE, Spectra::DenseSymMatProd<double> > eigs(&op, 1, 4);
@@ -878,37 +913,23 @@ protected:
             beta = u / d;
         } else if (penalty == "elastic.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold(beta, u, lam, penalty_factor, denom);
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 0, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "scad") 
         {
             soft_threshold_scad(beta, u, lambda, penalty_factor, d, gamma);
             
         } else if (penalty == "scad.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            if (alpha == 0)
-            {
-                lam   = 0;
-                denom = d + lambda;
-            }
-            
-            soft_threshold_scad(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 2, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "mcp") 
         {
             soft_threshold_mcp(beta, u, lambda, penalty_factor, d, gamma);
         } else if (penalty == "mcp.net") 
         {
-            double denom = d + (1.0 - alpha) * lambda;
-            double lam = lambda * alpha;
-            
-            soft_threshold_mcp(beta, u, lam, penalty_factor, denom, gamma);
-            
+            // L1 level lambda * alpha * pf_j, ridge (1 - alpha) * lambda * pf_j
+            oem_net_threshold(beta, u, 1, lambda * alpha, (1.0 - alpha) * lambda * ridge_scale, penalty_factor, d, gamma);
         } else if (penalty == "grp.lasso")
         {
             block_soft_threshold(beta, u, lambda, group_weights,
@@ -916,12 +937,14 @@ protected:
                                  unique_groups, groups);
         } else if (penalty == "grp.lasso.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold(beta, u, lam, group_weights,
                                  denom, grp_idx, ngroups, 
                                  unique_groups, groups);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
             
         } else if (penalty == "grp.mcp")
         {
@@ -935,21 +958,25 @@ protected:
                                       unique_groups, groups, gamma);
         } else if (penalty == "grp.mcp.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             
             block_soft_threshold_mcp(beta, u, lam, group_weights,
                                      denom, grp_idx, ngroups, 
                                      unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "grp.scad.net")
         {
-            double denom = d + (1.0 - alpha) * lambda;
+            double denom = d + (1.0 - alpha) * lambda * ridge_scale;
             double lam = lambda * alpha;
             
             block_soft_threshold_scad(beta, u, lam, group_weights,
                                       denom, grp_idx, ngroups, 
                                       unique_groups, groups, gamma);
+            // unpenalized coefficients take no ridge term
+            oem_unpenalized_group_update(beta, u, grp_idx, unique_groups, d);
         } else if (penalty == "sparse.grp.lasso")
         {
             double lam_grp = (1.0 - tau) * lambda;
@@ -1011,6 +1038,7 @@ public:
                              xty_list(nfolds_),
                              nobs_list(nfolds_),
                              colsq_list(nfolds_),
+                             colsum_list(nfolds_),
                              colsq_inv(X_.cols()),
                              colsq(X_.cols()),
                              grp_idx(unique_groups_.size())
@@ -1101,47 +1129,31 @@ public:
     
     VectorXd get_beta() 
     { 
-        
-        if (standardize)
+        // coefficients on the original scale of x
+        VectorXd beta_ret = centered ? oem_uncenter_theta(beta, cvec, int_scale) : VectorXd(beta);
+        if (intercept)
         {
-            if (intercept)
-            {
-                VectorXd beta_tmp = beta;
-                beta_tmp.tail(nvars).array() *= colsq_inv.array();
-                return beta_tmp;
-            } else 
-            {
-                return (beta.array() * colsq_inv.array()).matrix();
-            }
-        } else 
+            beta_ret.tail(nvars).array() *= colsq_inv.array();
+        } else
         {
-            return beta;
+            beta_ret.array() *= colsq_inv.array();
         }
+        return beta_ret;
     }
     
     virtual double get_loss()
     {
-        double loss;
+        VectorXd b = get_beta();
+        VectorXd eta;
         if (intercept)
         {
-            if (standardize)
-            {
-                loss = ((Y - X * (beta.tail(nvars).array() * colsq_inv.array()).matrix()  ).array() - beta(0)).array().square().sum();
-            } else 
-            {
-                loss = ((Y - X * beta.tail(nvars)).array() - beta(0)).array().square().sum();
-            }
-        } else 
+            eta = X * b.tail(nvars);
+            eta.array() += b(0);
+        } else
         {
-            if (standardize)
-            {
-                loss = (Y - X * (beta.array() * colsq_inv.array()).matrix() ).array().square().sum();
-            } else 
-            {
-                loss = (Y - X * beta).array().square().sum();
-            }
+            eta = X * b;
         }
-        return loss;
+        return (Y - eta).array().square().sum();
     }
 };
 

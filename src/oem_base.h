@@ -31,6 +31,12 @@ protected:
     
     double tol;                       // tolerance for convergence
     
+    // Multiplier on the ridge part of the ".net" penalties. For Gaussian
+    // models the drivers set it to 1 / s_y, where s_y is the standard
+    // deviation of y (root mean square without an intercept), which is the
+    // convention of glmnet. It is 1 for other families.
+    double ridge_scale = 1.0;
+    
     virtual void next_beta(VecTypeBeta &res) = 0;
     
     virtual void next_u(VectorXd &res) = 0;
@@ -114,6 +120,7 @@ public:
     virtual void init_xtx(bool add_int_) {}
     virtual void update_xtx(int fold_) {}
     virtual double compute_lambda_zero() { return 0; }
+    void set_ridge_scale(double r) { ridge_scale = (r > 0.0 && std::isfinite(r)) ? r : 1.0; }
 
     // Smallest lambda at which the current fit is a fixed point of the
     // thresholding step, so that no coefficient that is zero in the current

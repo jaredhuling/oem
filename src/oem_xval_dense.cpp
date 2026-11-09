@@ -227,6 +227,18 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
             
         }
         
+        // response scale for the ridge part, from the rows used in this fit
+        {
+            std::vector<double> ytrain;
+            ytrain.reserve(n);
+            for (int r = 0; r < n; ++r)
+            {
+                if (ff == 0 || foldid(r) != ff) ytrain.push_back(Y(r));
+            }
+            VectorXd yt = Eigen::Map<VectorXd>(ytrain.data(), ytrain.size());
+            solver->set_ridge_scale(1.0 / oem_response_scale(yt, intercept));
+        }
+        
         for (unsigned int pp = 0; pp < penalty.size(); pp++)
         {
             if (penalty[pp] == "ols")
