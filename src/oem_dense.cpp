@@ -99,7 +99,7 @@ RcppExport SEXP oem_fit_dense(SEXP x_,
     bool intercept         = as<bool>(intercept_);
     bool intercept_bin     = intercept;
     bool compute_loss      = as<bool>(compute_loss_);
-    const bool accelerate  = as<double>(opts["accelerate"]);
+    const int accelerate   = as<int>(opts["accelerate"]);
     
     
     CharacterVector family(as<CharacterVector>(family_));

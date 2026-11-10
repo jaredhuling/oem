@@ -65,6 +65,7 @@
 #' standardization is done differently for sparse matrices, so results (when standardized) may be
 #' slightly different for a sparse matrix object and a dense matrix object
 #' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})
+#' @param accelerate acceleration of the OEM iterations; see \code{\link{oem}}.
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
@@ -148,13 +149,14 @@ big.oem <- function(x,
                     group.weights = NULL,
                     standardize = TRUE,
                     intercept = TRUE,
-                    maxit = 500L, 
+                    maxit = 5000L, 
                     tol = 1e-7,
                     irls.maxit = 100L,
                     irls.tol = 1e-3,
                     compute.loss = FALSE,
                     gigs         = 4.0,
-                    hessian.type = c("full", "upper.bound")) 
+                    hessian.type = c("full", "upper.bound"),
+                    accelerate   = "fista") 
 {
     family       <- match.arg(family)
     penalty      <- match.arg(penalty, several.ok = TRUE)
@@ -360,7 +362,8 @@ big.oem <- function(x,
                     irls_maxit   = irls.maxit,
                     irls_tol     = irls.tol,
                     hessian.type = hessian.type,
-                    gigs         = gigs)
+                    gigs         = gigs,
+                    accelerate   = oem_accelerate_code(accelerate))
     
     res <- switch(family,
                   "gaussian" = oemfit.big.gaussian(x@address, 

@@ -59,7 +59,6 @@ protected:
     
     
     std::vector<std::vector<int> > grp_idx; // vector of vectors of the indexes for all members of each group
-    bool accelerate;
     std::string penalty;        // penalty specified
     
     double lambda;              // L1 penalty
@@ -70,7 +69,6 @@ protected:
     
     double threshval;
     int wt_len;
-    double ak, ak_prev;
     bool found_grp_idx;
     
     static void soft_threshold(VectorXd &res, const VectorXd &vec, const double &penalty, 
@@ -505,6 +503,34 @@ protected:
         }
     }
     
+    // Hooks used by the accelerated iterations in oemBase::inner_solve().
+    // next_u() is affine in beta_prev in both the n > p and p >= n branches.
+    bool penalty_is_convex()
+    {
+        return !(penalty.find("mcp") != std::string::npos ||
+                 penalty.find("scad") != std::string::npos);
+    }
+    
+    double penalty_value(const VectorXd &b)
+    {
+        if (penalty.find("grp") != std::string::npos && !found_grp_idx)
+            return std::numeric_limits<double>::quiet_NaN();
+        return penalty_value_generic(b, penalty, lambda, alpha, gamma, tau,
+                                     penalty_factor, group_weights, grp_idx, unique_groups, ridge_scale);
+    }
+    
+    // In the n > p branch u(b) = A b + XY, so c = XY. In the unweighted
+    // p >= n branch u(b) = d b + X'(Y - X b)/n, so again c = XY.
+    bool linear_term(VectorXd &c)
+    {
+        if (nobs > nvars || !wt_len)
+        {
+            c = XY;
+            return true;
+        }
+        return false;
+    }
+    
     void next_u(Vector &res)
     {
         if (nobs > nvars)
@@ -526,7 +552,6 @@ protected:
     
     void next_beta(Vector &res)
     {
-        VectorXd beta_last = beta;
         if (penalty == "lasso")
         {
             soft_threshold(beta, u, lambda, penalty_factor, d);
@@ -622,26 +647,6 @@ protected:
         
         
         
-        if (accelerate)
-        {
-            ak_prev = ak;
-            ak      = 0.5 * (1 + std::sqrt(1.0 + 4.0 * std::pow(ak, 2)));
-            double ratio_k = (ak_prev - 1.0) / ak;
-            
-            VectorXd beta_update = beta;
-            VectorXd beta_diff = beta - beta_last;
-            beta.array() += ratio_k * beta_diff.array();
-            
-            double adaptive_val = ((beta.array() - beta_update.array()).array() * 
-                                   beta_diff.array()).sum();
-                
-            if (adaptive_val > 0)
-            {
-                ak = 1;
-                //beta = beta_last.array() * 0.90 + beta.array() * 0.1;
-            }
-        }
-        
     }
     
     
@@ -657,7 +662,7 @@ public:
              bool &standardize_,
              int &ncores_,
              const double tol_ = 1e-6,
-             const bool accelerate_ = false) :
+             const int accelerate_ = 0) :
     oemBase<Eigen::VectorXd>(X_.rows(), 
                              X_.cols(),
                              unique_groups_.size(),
@@ -677,10 +682,12 @@ public:
                              XX(XXdim, XXdim),                                // add extra space if intercept but no standardize
                              default_group_weights(bool(group_weights_.size() < 1)), // compute default weights if none given
                              ncores(ncores_),
-                             grp_idx(unique_groups_.size()),
-                             accelerate(accelerate_)
+                             grp_idx(unique_groups_.size())
     
-    {}
+    {
+        // 0 = none, 1 = FISTA, 2 = SQUAREM, 3 = Anderson
+        set_accel(accelerate_, 5);
+    }
     
     void init_oem()
     {
@@ -733,7 +740,6 @@ public:
             get_group_indexes();
         }
         
-        ak = 1;
         
     }
     // when computing for the next lambda, we can use the

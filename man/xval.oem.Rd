@@ -27,11 +27,12 @@ xval.oem(
   group.weights = NULL,
   standardize = TRUE,
   intercept = TRUE,
-  maxit = 500L,
+  maxit = 5000L,
   tol = 1e-07,
   irls.maxit = 100L,
   irls.tol = 0.001,
-  compute.loss = FALSE
+  compute.loss = FALSE,
+  accelerate = "fista"
 )
 }
 \arguments{
@@ -134,6 +135,8 @@ variables are in the same units already, you might not wish to standardize.}
 
 \item{compute.loss}{should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 to \code{TRUE} will dramatically increase computational time}
+
+\item{accelerate}{acceleration of the OEM iterations; see \code{\link{oem}}.}
 }
 \value{
 An object with S3 class \code{"xval.oem"}

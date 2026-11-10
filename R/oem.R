@@ -66,11 +66,15 @@
 #' standardization is done differently for sparse matrices, so results (when standardized) may be
 #' slightly different for a sparse matrix object and a dense matrix object
 #' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})
-#' @param maxit integer. Maximum number of OEM iterations
+#' @param maxit integer. Maximum number of OEM iterations for each value of \code{lambda}
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
 #' @param irls.tol convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}
-#' @param accelerate boolean argument. Whether or not to use Nesterov acceleration with adaptive restarting 
+#' @param accelerate acceleration of the OEM iterations. One of \code{"fista"} or \code{TRUE} (default, FISTA
+#' extrapolation with adaptive restarting), \code{"squarem"} (SQUAREM extrapolation of Varadhan and Roland, 2008,
+#' with step length S1 and a monotone safeguard), or \code{"none"} or \code{FALSE} (plain OEM). Acceleration is used
+#' for every family, penalty, and type of \code{x}. For the nonconvex penalties (MCP and SCAD variants) an accelerated
+#' step is accepted only if it does not increase the objective.
 #' @param ncores Integer scalar that specifies the number of threads to be used
 #' @param compute.loss should the loss be computed for each estimated tuning parameter? Defaults to \code{FALSE}. Setting
 #' to \code{TRUE} will dramatically increase computational time
@@ -189,11 +193,11 @@ oem <- function(x,
                 group.weights = NULL,
                 standardize = TRUE,
                 intercept = TRUE,
-                maxit = 500L, 
+                maxit = 5000L, 
                 tol = 1e-7,
                 irls.maxit = 100L,
                 irls.tol = 1e-3,
-                accelerate = FALSE,
+                accelerate = "fista",
                 ncores = -1,
                 compute.loss = FALSE,
                 hessian.type = c("upper.bound", "full")) 
@@ -428,7 +432,7 @@ oem <- function(x,
     intercept     <- as.logical(intercept)
     compute.loss  <- as.logical(compute.loss)
     ncores        <- as.integer(ncores[1])
-    accelerate    <- as.logical(accelerate)
+    accelerate    <- oem_accelerate_code(accelerate)
     
     if(maxit <= 0 | irls.maxit <= 0)
     {

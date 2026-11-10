@@ -70,6 +70,7 @@
 #' The coefficients are always returned on the original scale. Default is \code{standardize = TRUE}. If 
 #' variables are in the same units already, you might not wish to standardize. 
 #' @param intercept Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})
+#' @param accelerate acceleration of the OEM iterations; see \code{\link{oem}}.
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
@@ -138,11 +139,12 @@ xval.oem <- function(x,
                      group.weights    = NULL,
                      standardize      = TRUE,
                      intercept        = TRUE,
-                     maxit            = 500L, 
+                     maxit            = 5000L, 
                      tol              = 1e-7,
                      irls.maxit       = 100L,
                      irls.tol         = 1e-3,
-                     compute.loss     = FALSE) 
+                     compute.loss     = FALSE,
+                     accelerate       = "fista") 
 {
     this.call    <- match.call()
     
@@ -384,7 +386,8 @@ xval.oem <- function(x,
                     tol        = tol,
                     irls_maxit = irls.maxit,
                     irls_tol   = irls.tol,
-                    ncores     = ncores)
+                    ncores     = ncores,
+                    accelerate = oem_accelerate_code(accelerate))
     
     res <- switch(family,
                   "gaussian" = oemfit_xval.gaussian(is.sparse,

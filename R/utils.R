@@ -1,4 +1,13 @@
 
+# Integer code for the accelerate argument, as used by the C++ solvers.
+oem_accelerate_code <- function(accelerate) {
+    if (is.logical(accelerate)) {
+        accelerate <- if (isTRUE(accelerate[1])) "fista" else "none"
+    }
+    methods <- c("none", "fista", "squarem")
+    accelerate <- match.arg(as.character(accelerate[1]), methods)
+    match(accelerate, methods) - 1L
+}
 
 getmin <- function(lambda, cvm, cvsd){
     #modified from glmnet package

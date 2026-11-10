@@ -165,6 +165,7 @@ RcppExport SEXP oem_xval_dense(SEXP x_,
     
     // only compute X'X parts once
     solver->init_xtx(intercept);
+    solver->set_accel(opts.containsElementNamed("accelerate") ? as<int>(opts["accelerate"]) : 0, 5);
     
     // get eigenvalue
     double d = solver->get_d();

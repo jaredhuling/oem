@@ -154,6 +154,7 @@ RcppExport SEXP oem_fit_logistic_sparse(SEXP x_,
     
     //compute initial pieces of oem
     solver->init_oem();
+    solver->set_accel(opts.containsElementNamed("accelerate") ? as<int>(opts["accelerate"]) : 0, 5);
     
     double lmax = 0.0;
     lmax = solver->compute_lambda_zero(); // 

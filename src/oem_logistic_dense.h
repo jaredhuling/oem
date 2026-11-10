@@ -590,6 +590,23 @@ protected:
         }
     }
     
+    // Hooks used by the accelerated iterations in oemBase::inner_solve().
+    // Within one inner solve next_u() is affine in beta_prev, so the default
+    // linear_term() (one extra evaluation of next_u) is valid.
+    bool penalty_is_convex()
+    {
+        return !(penalty.find("mcp") != std::string::npos ||
+                 penalty.find("scad") != std::string::npos);
+    }
+    
+    double penalty_value(const VectorXd &b)
+    {
+        if (penalty.find("grp") != std::string::npos && !found_grp_idx)
+            return std::numeric_limits<double>::quiet_NaN();
+        return penalty_value_generic(b, penalty, lambda, alpha, gamma, tau,
+                                     penalty_factor, group_weights, grp_idx, unique_groups, ridge_scale);
+    }
+    
     void next_u(Vector &res)
     {
         if (nobs > nvars + int(intercept))
@@ -903,19 +920,8 @@ public:
             //}
             
             // oem iterations
-            for(j = 0; j < maxit; ++j)
-            {
-                
-                beta_prev = beta;
-                
-                update_u();
-                
-                update_beta();
-                
-                if(converged())
-                    break;
-                
-            }
+            // inner OEM iterations, accelerated if requested
+            j = inner_solve(maxit);
             
             // update deviance residual
             dev = sum_dev_resid(Y, prob);

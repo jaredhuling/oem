@@ -131,6 +131,7 @@ RcppExport SEXP oem_fit_fb_big(SEXP x_,
     
     // compute initial pieces of oem
     solver->init_oem();
+    solver->set_accel(opts.containsElementNamed("accelerate") ? as<int>(opts["accelerate"]) : 0, 5);
     if (family(0) == "gaussian") solver->set_ridge_scale(1.0 / oem_response_scale(Y, intercept));
     
     double lmax = 0.0;

@@ -21,10 +21,11 @@ oem.xtx(
   scale.factor = numeric(0),
   penalty.factor = NULL,
   group.weights = NULL,
-  maxit = 500L,
+  maxit = 5000L,
   tol = 1e-07,
   irls.maxit = 100L,
-  irls.tol = 0.001
+  irls.tol = 0.001,
+  accelerate = "fista"
 )
 }
 \arguments{
@@ -107,6 +108,8 @@ groups.}
 \item{irls.maxit}{integer. Maximum number of IRLS iterations}
 
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}}
+
+\item{accelerate}{acceleration of the OEM iterations; see \code{\link{oem}}.}
 }
 \value{
 An object with S3 class \code{"oem"}

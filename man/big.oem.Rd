@@ -23,13 +23,14 @@ big.oem(
   group.weights = NULL,
   standardize = TRUE,
   intercept = TRUE,
-  maxit = 500L,
+  maxit = 5000L,
   tol = 1e-07,
   irls.maxit = 100L,
   irls.tol = 0.001,
   compute.loss = FALSE,
   gigs = 4,
-  hessian.type = c("full", "upper.bound")
+  hessian.type = c("full", "upper.bound"),
+  accelerate = "fista"
 )
 }
 \arguments{
@@ -130,6 +131,8 @@ involving the design matrix x}
 \item{hessian.type}{only for logistic regression. if \code{hessian.type = "full"}, then the full hessian is used. If
 \code{hessian.type = "upper.bound"}, then an upper bound of the hessian is used. The upper bound can be dramatically
 faster in certain situations, ie when n >> p}
+
+\item{accelerate}{acceleration of the OEM iterations; see \code{\link{oem}}.}
 }
 \value{
 An object with S3 class "oem"

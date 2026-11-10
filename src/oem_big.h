@@ -619,6 +619,23 @@ protected:
         }
     }
     
+    // Hooks used by the accelerated iterations in oemBase::inner_solve().
+    // Within one inner solve next_u() is affine in beta_prev, so the default
+    // linear_term() (one extra evaluation of next_u) is valid.
+    bool penalty_is_convex()
+    {
+        return !(penalty.find("mcp") != std::string::npos ||
+                 penalty.find("scad") != std::string::npos);
+    }
+    
+    double penalty_value(const VectorXd &b)
+    {
+        if (penalty.find("grp") != std::string::npos && !found_grp_idx)
+            return std::numeric_limits<double>::quiet_NaN();
+        return penalty_value_generic(b, penalty, lambda, alpha, gamma, tau,
+                                     penalty_factor, group_weights, grp_idx, unique_groups, ridge_scale);
+    }
+    
     void next_u(Vector &res)
     {
         if (nobs > nvars + int(intercept))
@@ -627,6 +644,7 @@ protected:
         } else 
         {
             // u = d * theta + Z' W (y - Z theta) / n, without forming Z'Z
+            res.resize(beta_prev.size());
             VectorXd theta = centered ? oem_uncenter_theta(beta_prev, cvec, int_scale) : VectorXd(beta_prev);
             VectorXd resid;
             if (intercept)

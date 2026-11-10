@@ -23,11 +23,11 @@ oem(
   group.weights = NULL,
   standardize = TRUE,
   intercept = TRUE,
-  maxit = 500L,
+  maxit = 5000L,
   tol = 1e-07,
   irls.maxit = 100L,
   irls.tol = 0.001,
-  accelerate = FALSE,
+  accelerate = "fista",
   ncores = -1,
   compute.loss = FALSE,
   hessian.type = c("upper.bound", "full")
@@ -115,7 +115,7 @@ slightly different for a sparse matrix object and a dense matrix object}
 
 \item{intercept}{Should intercept(s) be fitted (\code{default = TRUE}) or set to zero (\code{FALSE})}
 
-\item{maxit}{integer. Maximum number of OEM iterations}
+\item{maxit}{integer. Maximum number of OEM iterations for each value of \code{lambda}}
 
 \item{tol}{convergence tolerance for OEM iterations}
 
@@ -123,7 +123,11 @@ slightly different for a sparse matrix object and a dense matrix object}
 
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}}
 
-\item{accelerate}{boolean argument. Whether or not to use Nesterov acceleration with adaptive restarting}
+\item{accelerate}{acceleration of the OEM iterations. One of \code{"fista"} or \code{TRUE} (default, FISTA
+extrapolation with adaptive restarting), \code{"squarem"} (SQUAREM extrapolation of Varadhan and Roland, 2008,
+with step length S1 and a monotone safeguard), or \code{"none"} or \code{FALSE} (plain OEM). Acceleration is used
+for every family, penalty, and type of \code{x}. For the nonconvex penalties (MCP and SCAD variants) an accelerated
+step is accepted only if it does not increase the objective.}
 
 \item{ncores}{Integer scalar that specifies the number of threads to be used}
 
