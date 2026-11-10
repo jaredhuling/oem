@@ -29,9 +29,9 @@ EM: A design-based least squares algorithm, Technometrics, Volume 58,
 Pages 285-293,  
 <http://dx.doi.org/10.1080/00401706.2015.1054436>.
 
-Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross
-Validation for Tall Data with the OEM Package, Journal of Statistical
-Software, to appear, URL: <https://arxiv.org/abs/1801.09661>.
+Huling, J.D. and Chien, P. (2022), Fast Penalized Regression and Cross
+Validation for Tall Data with the oem Package, Journal of Statistical
+Software, Volume 104, Issue 6, <https://doi.org/10.18637/jss.v104.i06>.
 
 ## Penalties
 
@@ -67,17 +67,20 @@ microbenchmark(
 )
 ```
 
-    ## Unit: seconds
-    ##           expr      min       lq     mean   median       uq      max neval cld
-    ##  glmnet[lasso] 5.325385 5.374823 5.859432 6.000302 6.292411 6.304239     5  a 
-    ##     oem[lasso] 1.539320 1.573569 1.600241 1.617136 1.631450 1.639730     5   b
+    ## Unit: milliseconds
+    ##           expr       min        lq      mean    median        uq       max
+    ##  glmnet[lasso] 1260.3136 1276.4218 1299.1889 1309.9995 1321.8656 1327.3437
+    ##     oem[lasso]  426.5575  428.8234  445.0209  443.6717  453.7979  472.2539
+    ##  neval cld
+    ##      5  a 
+    ##      5   b
 
 ``` r
 # difference of results
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
-    ## [1] 1.048243e-07
+    ## [1] 1.04823e-07
 
 ``` r
 res1 <- glmnet(x, y, thresh = 1e-12, 
@@ -89,7 +92,61 @@ res1 <- glmnet(x, y, thresh = 1e-12,
 max(abs(coef(res1) - res2$beta[[1]]))
 ```
 
-    ## [1] 3.763507e-09
+    ## [1] 3.763212e-09
+
+### Accelerated OEM Iterations
+
+By default, the OEM iterations are accelerated with FISTA and adaptive
+restarting (`accelerate = "fista"`). SQUAREM (`accelerate = "squarem"`)
+is also available, and `accelerate = "none"` gives the plain OEM
+iterations. Acceleration matters most when the variables are strongly
+correlated, where plain OEM needs many iterations for each value of
+lambda. Below, the variables follow an AR(1) correlation structure with
+correlation 0.9 between neighbors, and each fit is compared with a
+tightly converged `glmnet` fit on the same lambda sequence. The first
+row uses plain OEM with the previous default of 500 iterations per
+lambda.
+
+``` r
+set.seed(123)
+n <- 2000
+p <- 500
+x <- matrix(rnorm(n * p), n, p)
+for (j in 2:p) x[, j] <- 0.9 * x[, j - 1] + sqrt(1 - 0.9 ^ 2) * x[, j]
+b <- c(runif(10, -1, 1), rep(0, p - 10))[sample(p)]
+y <- drop(x %*% b) + rnorm(n)
+
+lambdas <- oem(x, y, penalty = "lasso")$lambda[[1]]
+ref <- as.matrix(coef(glmnet(x, y, lambda = lambdas, thresh = 1e-14)))
+
+settings <- list("plain, maxit = 500" = list(accelerate = "none", maxit = 500),
+                 "plain"              = list(accelerate = "none"),
+                 "fista (default)"    = list(accelerate = "fista"),
+                 "squarem"            = list(accelerate = "squarem"))
+
+comparison <- t(sapply(settings, function(s) {
+    time <- system.time(fit <- do.call(oem, c(list(x, y, penalty = "lasso", lambda = lambdas), s)))
+    maxit <- if (is.null(s$maxit)) 5000 else s$maxit
+    c(seconds          = unname(time["elapsed"]),
+      iterations       = sum(fit$niter[[1]]),
+      lambdas_at_maxit = sum(fit$niter[[1]] >= maxit),
+      max_diff_glmnet  = max(abs(fit$beta[[1]] - ref)))
+}))
+comparison
+```
+
+    ##                    seconds iterations lambdas_at_maxit max_diff_glmnet
+    ## plain, maxit = 500   1.075      48343               93    6.300760e-03
+    ## plain                8.153     368041               46    7.046760e-06
+    ## fista (default)      0.839      35633                0    3.737041e-06
+    ## squarem              0.549      22979                0    3.723342e-06
+
+``` r
+system.time(glmnet(x, y, lambda = lambdas, thresh = 1e-10))
+```
+
+    ##    user  system elapsed 
+    ##   1.358   0.012   1.371
 
 ### Nonconvex Penalties
 
@@ -150,17 +207,17 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##            expr        min         lq       mean     median         uq
-    ##  sparsenet[mcp] 1466.54465 1492.72548 1527.32113 1517.19926 1579.70827
-    ##        oem[mcp]   95.71381   98.09740  105.90083  105.76415  110.31668
-    ##     ncvreg[mcp] 5196.48035 5541.69429 5669.10010 5611.31491 5865.06723
-    ##       oem[scad]   70.74110   71.46554   80.21926   78.76494   84.25458
-    ##    ncvreg[scad] 5289.59790 5810.69254 5801.60997 5950.84377 5964.01276
-    ##         max neval cld
-    ##  1580.42800     5 a  
-    ##   119.61209     5  b 
-    ##  6130.94372     5   c
-    ##    95.87013     5  b 
-    ##  5992.90288     5   c
+    ##  sparsenet[mcp] 1020.71144 1021.67974 1025.02210 1024.83957 1026.75988
+    ##        oem[mcp]   38.10610   38.16046   38.40460   38.18998   38.62651
+    ##     ncvreg[mcp] 3633.25990 3633.53455 3642.49581 3642.71728 3647.88742
+    ##       oem[scad]   34.57764   34.91056   34.99031   34.92585   35.01605
+    ##    ncvreg[scad] 3849.89229 3851.93864 3854.76868 3855.09003 3857.45983
+    ##         max neval  cld
+    ##  1031.11986     5 a   
+    ##    38.93995     5  b  
+    ##  3655.07989     5   c 
+    ##    35.52146     5  b  
+    ##  3859.46263     5    d
 
 ``` r
 diffs <- array(NA, dim = c(2, 1))
@@ -171,8 +228,8 @@ diffs
 ```
 
     ##                          abs diff
-    ## MCP:  oem and ncvreg 1.725859e-07
-    ## SCAD: oem and ncvreg 5.094648e-08
+    ## MCP:  oem and ncvreg 1.725784e-07
+    ## SCAD: oem and ncvreg 5.093743e-08
 
 ### Group Penalties
 
@@ -225,15 +282,15 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##                 expr        min         lq       mean     median         uq
-    ##   gglasso[grp.lasso]  679.59049  724.16350  858.99280  801.79179  865.83580
-    ##       oem[grp.lasso]   59.84769   62.23879   64.11779   63.36026   64.30146
-    ##  grplasso[grp.lasso] 3714.92601 3753.18663 4322.32431 4537.50185 4786.80867
-    ##    grpreg[grp.lasso] 1216.21794 1248.84647 1270.46132 1269.71047 1287.75969
-    ##         max neval cld
-    ##  1223.58241     5 a  
-    ##    70.84075     5  b 
-    ##  4819.19839     5   c
-    ##  1329.77201     5 a
+    ##   gglasso[grp.lasso]  297.39116  298.22293  299.11078  298.79767  299.92500
+    ##       oem[grp.lasso]   22.88964   23.23601   23.47237   23.25143   23.40645
+    ##  grplasso[grp.lasso] 2414.20509 2423.09032 2454.95741 2432.07027 2481.75903
+    ##    grpreg[grp.lasso]  696.54953  704.36438  705.85675  704.50562  704.98840
+    ##         max neval  cld
+    ##   301.21712     5 a   
+    ##    24.57831     5  b  
+    ##  2523.66234     5   c 
+    ##   718.87584     5    d
 
 ``` r
 diffs <- array(NA, dim = c(2, 1))
@@ -244,8 +301,8 @@ diffs
 ```
 
     ##                      abs diff
-    ## oem and gglasso  1.303906e-06
-    ## oem and grplasso 1.645871e-08
+    ## oem and gglasso  1.323814e-06
+    ## oem and grplasso 1.896211e-08
 
 #### Bigger Group Lasso Example
 
@@ -271,7 +328,7 @@ system.time(res <- oem(x, y,
 ```
 
     ##    user  system elapsed 
-    ##   2.043   0.222   2.267
+    ##   0.655   0.068   0.724
 
 ### Fitting Multiple Penalties
 
@@ -311,8 +368,8 @@ microbenchmark(
 
     ## Unit: milliseconds
     ##                     expr      min       lq     mean   median       uq      max
-    ##               oem[lasso] 125.6408 126.7870 130.3534 127.3374 133.4962 138.5055
-    ##  oem[lasso/mcp/scad/ols] 148.3162 152.1743 153.0176 152.4529 154.4300 157.7144
+    ##               oem[lasso] 44.49324 45.65079 45.61038 45.72796 46.05628 46.12361
+    ##  oem[lasso/mcp/scad/ols] 59.09109 59.74372 60.52188 60.20559 61.02395 62.54505
     ##  neval cld
     ##      5  a 
     ##      5   b
@@ -332,4 +389,4 @@ plot(res2, which.model = 7, lwd = 2,
      xvar = "lambda")
 ```
 
-<img src="vignettes/mult-1.png" style="display: block; margin: auto;" />
+<img src="vignettes/mult-1.png" alt="" style="display: block; margin: auto;" />

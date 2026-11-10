@@ -1,4 +1,4 @@
-# oem 2.0.13
+# oem 2.1.0
 
 ## Bug fixes
 
@@ -38,6 +38,27 @@
   in `glmnet`. This was already the case for a dense `x` with an intercept; it
   now holds for every solver except `oem.xtx()`, which does not see `y`.
 
+## New features
+
+* The OEM iterations are now accelerated by default. The new `accelerate`
+  argument of `oem()`, `cv.oem()`, `xval.oem()`, `big.oem()`, and `oem.xtx()`
+  selects FISTA with adaptive restarting (`"fista"`, the default), SQUAREM
+  (`"squarem"`), or plain OEM (`"none"` or `FALSE`). For the nonconvex
+  penalties, an accelerated step is accepted only if it does not increase the
+  objective. On correlated designs, FISTA reduced computation time along the
+  path by a factor of 4 to 10 and fitted the path to the requested tolerance
+  in cases where plain OEM stopped at `maxit` before converging.
+
+## Changes in defaults
+
+* `accelerate = "fista"` is the default, so results change slightly for every
+  model. Use `accelerate = "none"` to reproduce the plain OEM iterations of
+  previous versions.
+* The default `maxit` is now 5000 instead of 500. With 500 iterations, plain
+  OEM often stopped before convergence for correlated variables, without a
+  warning. Fits that converge sooner stop sooner, so the higher limit costs
+  nothing for them.
+
 ## Performance
 
 * Fits with a sparse `x`, logistic regression, `big.oem()`, and `xval.oem()`
@@ -50,3 +71,5 @@
 * Sparse matrices are mapped with `Eigen::Map<Eigen::SparseMatrix>`, so the
   package builds with Eigen 5 (#26, from Dirk Eddelbuettel).
 * Added a testthat suite, including comparisons with `glmnet`.
+* `src/Makevars` assigned `PKG_CXXFLAGS` twice, so `-DNDEBUG` was dropped and
+  Eigen's debugging assertions were compiled in. It is now set once.

@@ -36,9 +36,9 @@ Xiong, S., Dai, B., Huling, J., Qian, P. Z. G. (2016) Orthogonalizing EM: A desi
     squares algorithm, Technometrics, Volume 58, Pages 285-293,              
     http://dx.doi.org/10.1080/00401706.2015.1054436.  
 
-Huling, J.D. and Chien, P. (2018), Fast Penalized Regression and Cross Validation for Tall Data
-    with the OEM Package, Journal of Statistical Software, to appear, URL: 
-    https://arxiv.org/abs/1801.09661. 
+Huling, J.D. and Chien, P. (2022), Fast Penalized Regression and Cross Validation for Tall Data
+    with the oem Package, Journal of Statistical Software, Volume 104, Issue 6,
+    https://doi.org/10.18637/jss.v104.i06. 
 
 ## Penalties
 
@@ -83,6 +83,40 @@ res1 <- glmnet(x, y, thresh = 1e-12,
 
 # answers are now more close once we require more precise glmnet solutions
 max(abs(coef(res1) - res2$beta[[1]]))
+```
+
+### Accelerated OEM Iterations
+
+By default, the OEM iterations are accelerated with FISTA and adaptive restarting (`accelerate = "fista"`). SQUAREM (`accelerate = "squarem"`) is also available, and `accelerate = "none"` gives the plain OEM iterations. Acceleration matters most when the variables are strongly correlated, where plain OEM needs many iterations for each value of lambda. Below, the variables follow an AR(1) correlation structure with correlation 0.9 between neighbors, and each fit is compared with a tightly converged `glmnet` fit on the same lambda sequence. The first row uses plain OEM with the previous default of 500 iterations per lambda.
+
+```{r accel, message = FALSE, warning = FALSE}
+set.seed(123)
+n <- 2000
+p <- 500
+x <- matrix(rnorm(n * p), n, p)
+for (j in 2:p) x[, j] <- 0.9 * x[, j - 1] + sqrt(1 - 0.9 ^ 2) * x[, j]
+b <- c(runif(10, -1, 1), rep(0, p - 10))[sample(p)]
+y <- drop(x %*% b) + rnorm(n)
+
+lambdas <- oem(x, y, penalty = "lasso")$lambda[[1]]
+ref <- as.matrix(coef(glmnet(x, y, lambda = lambdas, thresh = 1e-14)))
+
+settings <- list("plain, maxit = 500" = list(accelerate = "none", maxit = 500),
+                 "plain"              = list(accelerate = "none"),
+                 "fista (default)"    = list(accelerate = "fista"),
+                 "squarem"            = list(accelerate = "squarem"))
+
+comparison <- t(sapply(settings, function(s) {
+    time <- system.time(fit <- do.call(oem, c(list(x, y, penalty = "lasso", lambda = lambdas), s)))
+    maxit <- if (is.null(s$maxit)) 5000 else s$maxit
+    c(seconds          = unname(time["elapsed"]),
+      iterations       = sum(fit$niter[[1]]),
+      lambdas_at_maxit = sum(fit$niter[[1]] >= maxit),
+      max_diff_glmnet  = max(abs(fit$beta[[1]] - ref)))
+}))
+comparison
+
+system.time(glmnet(x, y, lambda = lambdas, thresh = 1e-10))
 ```
 
 ### Nonconvex Penalties
