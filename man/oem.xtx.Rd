@@ -25,7 +25,7 @@ oem.xtx(
   tol = 1e-07,
   irls.maxit = 100L,
   irls.tol = 0.001,
-  accelerate = "fista"
+  accelerate = "none"
 )
 }
 \arguments{
@@ -109,7 +109,9 @@ groups.}
 
 \item{irls.tol}{convergence tolerance for IRLS iterations. Only used if \code{family != "gaussian"}}
 
-\item{accelerate}{acceleration of the OEM iterations; see \code{\link{oem}}.}
+\item{accelerate}{acceleration of the OEM iterations; see \code{\link{oem}} for the options. Unlike the other
+fitting functions, \code{oem.xtx} uses plain OEM iterations by default (\code{accelerate = "none"}), so that
+code built on it reproduces the iterations of previous versions.}
 }
 \value{
 An object with S3 class \code{"oem"}

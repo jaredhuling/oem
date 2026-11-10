@@ -42,18 +42,21 @@
 
 * The OEM iterations are now accelerated by default. The new `accelerate`
   argument of `oem()`, `cv.oem()`, `xval.oem()`, `big.oem()`, and `oem.xtx()`
-  selects FISTA with adaptive restarting (`"fista"`, the default), SQUAREM
-  (`"squarem"`), or plain OEM (`"none"` or `FALSE`). For the nonconvex
-  penalties, an accelerated step is accepted only if it does not increase the
-  objective. On correlated designs, FISTA reduced computation time along the
-  path by a factor of 4 to 10 and fitted the path to the requested tolerance
-  in cases where plain OEM stopped at `maxit` before converging.
+  selects FISTA with adaptive restarting (`"fista"`, the default except in
+  `oem.xtx()`), SQUAREM (`"squarem"`), or plain OEM (`"none"` or `FALSE`).
+  For the nonconvex penalties, an accelerated step is accepted only if it
+  does not increase the objective. On correlated designs, FISTA reduced
+  computation time along the path by a factor of 4 to 10 and fitted the path
+  to the requested tolerance in cases where plain OEM stopped at `maxit`
+  before converging.
 
 ## Changes in defaults
 
-* `accelerate = "fista"` is the default, so results change slightly for every
-  model. Use `accelerate = "none"` to reproduce the plain OEM iterations of
-  previous versions.
+* `accelerate = "fista"` is the default in `oem()`, `cv.oem()`, `xval.oem()`,
+  and `big.oem()`, so their results change slightly. Use `accelerate = "none"`
+  to reproduce the plain OEM iterations of previous versions. `oem.xtx()`, the
+  low-level interface for precomputed `crossprod(x)` and `crossprod(x, y)`,
+  keeps plain iterations by default (`accelerate = "none"`).
 * The default `maxit` is now 5000 instead of 500. With 500 iterations, plain
   OEM often stopped before convergence for correlated variables, without a
   warning. Fits that converge sooner stop sooner, so the higher limit costs

@@ -59,7 +59,9 @@
 #' this is a number that multiplies lambda to allow differential shrinkage. Can be 0 for some groups, 
 #' which implies no shrinkage, and that group is always included in the model. Default is sqrt(group size) for all
 #' groups. 
-#' @param accelerate acceleration of the OEM iterations; see \code{\link{oem}}.
+#' @param accelerate acceleration of the OEM iterations; see \code{\link{oem}} for the options. Unlike the other
+#' fitting functions, \code{oem.xtx} uses plain OEM iterations by default (\code{accelerate = "none"}), so that
+#' code built on it reproduces the iterations of previous versions.
 #' @param maxit integer. Maximum number of OEM iterations
 #' @param tol convergence tolerance for OEM iterations
 #' @param irls.maxit integer. Maximum number of IRLS iterations
@@ -138,7 +140,7 @@ oem.xtx <- function(xtx,
                     tol = 1e-7,
                     irls.maxit = 100L,
                     irls.tol = 1e-3,
-                    accelerate = "fista") 
+                    accelerate = "none") 
 {
     this.call    <- match.call()
     
