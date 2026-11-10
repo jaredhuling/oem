@@ -15,12 +15,21 @@ See NEWS.md for details.
 ## Test environments
 
 * local macOS (aarch64-apple-darwin20), R 4.5.1: R CMD check --as-cran
-* (to fill in: R-hub and win-builder results)
+* win-builder: R-devel (2026-11-07 r90850 ucrt) and R-release (4.6.2 ucrt)
+* R-hub (R-devel): linux, macos-arm64, windows, m1-san, clang-asan,
+  clang-ubsan, valgrind, gcc16, clang23, atlas, mkl, nosuggests
 
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
 
+The sanitizer builds (m1-san, clang-asan, clang-ubsan) reported no runtime
+errors, and valgrind reported 0 errors and no leaks. On the R-hub nosuggests
+platform, the only problem was that the vignette could not be rebuilt because
+rmarkdown, the vignette builder, is in Suggests and was not installed; the
+tests and examples passed there.
+
 ## Reverse dependencies
 
-* (to fill in: WpProj)
+We checked the one reverse dependency on CRAN, WpProj 0.3.1, with this version:
+0 errors, 0 warnings, 0 notes, and all of its tests pass.
